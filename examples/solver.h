@@ -1,7 +1,7 @@
 #ifndef SOLVER_H
 #define SOLVER_H
 
-#include "stella_interface.h"
+#include "stella_solver.h"
 
 #include "boundary.h"
 #include "state.h"
@@ -15,7 +15,7 @@ extern "C" {
 typedef struct {
 	blist *bnd;
 	state *state;
-	void  *ptr;
+	stella  *ptr;
 	int axisymmetric;
 } solver;
 

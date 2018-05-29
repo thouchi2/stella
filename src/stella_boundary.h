@@ -22,14 +22,13 @@ typedef struct stella_boundary {
  * Creates the boundary object for a grid.
  *
  * @param stella_bnd location to put newly created object
- * @param levels array of data needed on each level
- * @param nlevels number of levels in multilevel solve
+ * @param level data needed on each MG level
  * @param dmap efield solver's data mapping object
  * @param state state data for efield solver
  * @param fd finite difference coefficients
  */
 PetscErrorCode stella_boundary_create(stella_boundary **stella_bnd, stella_level *level,
-                                  stella_dmap *dmap, stella_state *state, stella_fd *fd);
+                                      stella_dmap *dmap, stella_state *state, stella_fd *fd);
 
 
 /**

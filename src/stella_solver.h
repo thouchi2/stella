@@ -14,35 +14,32 @@
 #include "stella_fd.h"
 
 /**
- * Efield solver log level.
+ * Stella solver log level.
  *
- * Sets what the efield solver will log.
+ * Sets what the stella solver will log.
  */
 typedef enum {
-	EFS_LOG_STATUS   = 1,      /**< log status messages */
-	EFS_LOG_PROBLEM  = (1<<1), /**< Write the problem (matrix and rhs) to disk */
-	EFS_LOG_RESIDUAL = (1<<2), /**< Write residual to stdout */
-	EFS_LOG_VTK      = (1<<3), /**< Write vtk files of computed solution */
-	EFS_LOG_EIGS     = (1<<4), /**< Output approximate eigenvalues from Krylov solver */
-	EFS_LOG_ALL      = (1<<5)-1
-} efs_log_level;
+	STELLA_LOG_STATUS   = 1,      /**< log status messages */
+	STELLA_LOG_PROBLEM  = (1<<1), /**< Write the problem (matrix and rhs) to disk */
+	STELLA_LOG_RESIDUAL = (1<<2), /**< Write residual to stdout */
+	STELLA_LOG_VTK      = (1<<3), /**< Write vtk files of computed solution */
+	STELLA_LOG_EIGS     = (1<<4), /**< Output approximate eigenvalues from Krylov solver */
+	STELLA_LOG_ALL      = (1<<5)-1
+} stella_log_level;
 
 
 /**
- * Options for efield solver.
+ * Options for stella solver.
  */
 typedef struct {
-	int matfree;             /**< Sets whether the geometric solver uses matrix free operations */
-	int algebraic;           /**< Use AMG vs structured */
-	int axisymmetric;        /**< Use axisymmetric operator */
-	PetscBool galerkin;      /**< Use Galerking coarsening */
-	efs_log_level log_level; /**< Specify loglevel */
-	PetscInt levels;         /**< Depth of multilevel solve */
-} efs_option;
+	int algebraic;              /**< Use AMG vs structured */
+	int axisymmetric;           /**< Use axisymmetric operator */
+	stella_log_level log_level; /**< Specify loglevel */
+} stella_option;
 
 
 /**
- * Main datastructure for efield solver
+ * Main datastructure for stella
  */
 typedef struct {
 	Mat A;   /**< Matrix for linear solve */
@@ -57,7 +54,7 @@ typedef struct {
 	MPI_Comm comm;
 	stella_state   state;
 	stella_grid    grid;
-	efs_option options;
+	stella_option options;
 	stella_level level;
 	stella_dmap  *dmap;
 	stella_operator *op;
@@ -65,37 +62,55 @@ typedef struct {
 	stella_fd *fd;
 	int num_patches;
 	int ts; /**< Timestep (only used for logging). */
-} efs;
-
-
-PetscErrorCode efs_create(efs**, MPI_Comm);
-
-
-PetscErrorCode efs_setup(efs*, int offset[], int stride[]);
-
-
-PetscErrorCode efs_solve(efs*);
+} stella;
 
 
 /**
- * Sets efield solver state.
+ * Initializes structured elliptic solver
+ *
+ * @param[out] solver_ctx pointer to the solver object allocated in this call
+ * @param[in] comm MPI Communicator to be used for the efield solver
+ * @param[in] nGlobal number of global grid points in each dimension
+ * @param[in] nProcs number of processors in each dimension
+ * @param[in] nLocal number of local grid points in each dimension
+ * @param[in] offset offsets of data inside Fortran arrays (e.g. if ghosts are included)
+ * @param[in] stride strides of data inside Fortran arrays
+ * @param[in] cartCoord Cartesian coordinate of my rank
+ * @param[in] periodic flag for setting periodicity of a dimension
+ * @param[in] periodic_storage flag for duplicating grid points if periodic
+ * @param[in] nd number of dimensions
+ * @param[in] ng grid number
+ * @param[in] axisymmetric flag for setting the solver to be axisymmetric
+ */
+PetscErrorCode stella_init(stella **solver_ctx, MPI_Comm comm,
+                           int nGlobal[], int nProcs[], int nLocal[],
+                           int offset[], int stride[],
+                           int cartCoord[], int periodic[], int periodic_storage,
+                           int nd, int axisymmetric);
+
+
+PetscErrorCode stella_solve(stella*);
+
+
+/**
+ * Sets solver state.
  *
  * @param slv solver object
  * @param phi array where solver will put the solution
  * @param dcoef permittivity of electric field
  * @param jump  jump condition
  */
-PetscErrorCode efs_set_state(efs *slv, double phi[], double dcoef[],
-                             double bcoef[], double jump[]);
+PetscErrorCode stella_set_state(stella *slv, double phi[], double dcoef[],
+                                double bcoef[], double jump[]);
 
 
 /**
- * Sets efield solver rhs.
+ * Sets solver rhs.
  *
  * @param slv solver object
  * @param rhs right hand side for linear solve
  */
-PetscErrorCode efs_set_rhs(efs *slv, double rhs[]);
+PetscErrorCode stella_set_rhs(stella *slv, double rhs[]);
 
 
 /**
@@ -104,7 +119,7 @@ PetscErrorCode efs_set_rhs(efs *slv, double rhs[]);
  * This is used in testing to set the analytical solution
  * in order to compute the error of the solve.
  */
-PetscErrorCode efs_set_sol(efs *slv, double sol[]);
+PetscErrorCode stella_set_sol(stella *slv, double sol[]);
 
 
 /**
@@ -116,36 +131,30 @@ PetscErrorCode efs_set_sol(efs *slv, double sol[]);
  * @param num_cells number of grid points on local processor
  * @param xyz array of Cartesian coordinates for each grid point on this processor
  */
-PetscErrorCode efs_set_grid(efs *slv, int is[], int ie[], int num_cells, double xyz[]);
+PetscErrorCode stella_set_grid(stella *slv, int is[], int ie[], int num_cells, double xyz[]);
 
 
 /**
  * Checks if log level is active
  */
-int efs_log(efs*, efs_log_level);
+int stella_log(stella*, stella_log_level);
 
 
 /**
- * Set log level for efield solver
+ * Set log level for stella
  */
-void efs_set_log(efs*, efs_log_level);
+void stella_set_log(stella*, stella_log_level);
 
 
 /**
  * Calls all callbacks needed for setting up the matrix
  */
-PetscErrorCode efs_setup_op(efs*);
+PetscErrorCode stella_setup_op(stella*);
 
 
 /**
- * Calls callbacks required when the rhs is changed
+ * Destroys data structures owned by the elliptic discretization
  */
-PetscErrorCode efs_setup_rhs(efs*);
-
-
-/**
- * Destroys data structures owned by the efield solver
- */
-PetscErrorCode efs_destroy(efs*);
+PetscErrorCode stella_cleanup(stella*);
 
 #endif

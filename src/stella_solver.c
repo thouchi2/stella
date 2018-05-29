@@ -45,593 +45,11 @@ static inline PetscErrorCode petsc_options_set_value(const char name[], const ch
 
 }
 
-PetscErrorCode efs_create(efs **slvctx, MPI_Comm comm)
-{
-	efs *slv = (efs*) malloc(sizeof(efs));
 
-	slv->comm = comm;
-
-	slv->options.matfree = 0;
-	slv->options.galerkin = 0;
-	slv->options.levels = 1;
-	slv->options.axisymmetric = 0;
-	slv->options.algebraic = 1;
-
-	*slvctx = slv;
-
-	return 0;
-}
-
-
-PetscErrorCode efs_setup(efs *slv, int offset[], int stride[])
-{
-	PetscErrorCode ierr;
-	PetscInt xs, ys, zs, xm, ym, zm, ngx, ngy, ngz;
-	stella_pc *shell;
-	PCType pc_type;
-
-	if (efs_log(slv, EFS_LOG_STATUS)) {
-		ierr = stella_io_print(slv->comm, "Setting up electric field solver");CHKERRQ(ierr);
-	}
-
-	{
-		PetscBool flg;
-		ierr = petsc_options_has_name("-boxmg", &flg);CHKERRQ(ierr);
-		if (flg) {
-		#ifdef WITH_BOXMG
-			slv->options.algebraic = 0;
-		#endif
-		} else {
-			slv->options.algebraic = 1;
-		}
-	}
-
-	slv->ts = 0;
-
-	if (efs_log(slv, EFS_LOG_RESIDUAL)) {
-		ierr = petsc_options_set_value("-ksp_monitor_short", NULL);CHKERRQ(ierr);
-	}
-
-	ierr = DMDASetFieldName(slv->dm, 0,"potential");CHKERRQ(ierr);
-
-	if (slv->grid.nd == 2) {
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-		slv->dmap = stella_dmap_create_2d(xs - offset[0], ys - offset[1], xm, ym, stride);
-	} else if (slv->grid.nd == 3) {
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		slv->dmap = stella_dmap_create_3d(xs - offset[0], ys - offset[1], zs - offset[2], xm, ym, zm, stride);
-	} else {
-		SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_SUP, "Unsupported dimmension: %d", slv->grid.nd);
-	}
-	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
-
-	ierr = KSPCreate(slv->comm, &slv->ksp);CHKERRQ(ierr);
-	if (efs_log(slv, EFS_LOG_EIGS)) {
-		ierr = KSPSetComputeEigenvalues(slv->ksp, PETSC_TRUE);CHKERRQ(ierr);
-	}
-
-	ierr = KSPSetFromOptions(slv->ksp);CHKERRQ(ierr);
-
-	if (!slv->options.algebraic) {
-		ierr = KSPGetPC(slv->ksp, &slv->pc);
-		ierr = PCSetType(slv->pc, PCSHELL);CHKERRQ(ierr);
-		ierr = stella_pc_create(&shell);CHKERRQ(ierr);
-		ierr = PCShellSetApply(slv->pc, stella_pc_apply);CHKERRQ(ierr);
-		ierr = PCShellSetDestroy(slv->pc, stella_pc_destroy);CHKERRQ(ierr);
-		ierr = PCShellSetContext(slv->pc, shell);CHKERRQ(ierr);
-		ierr = PCShellSetName(slv->pc, "boxmg");CHKERRQ(ierr);
-		ierr = PCShellSetSetUp(slv->pc, stella_pc_setup);CHKERRQ(ierr);
-	}
-
-	ierr = stella_fd_create(&slv->fd, STELLA_FD_STANDARD_O2);CHKERRQ(ierr);
-	ierr = stella_operator_create(&slv->op, &slv->level, slv->fd, slv->grid.nd);CHKERRQ(ierr);
-	ierr = stella_boundary_create(&slv->boundary, &slv->level,
-	                          slv->dmap, &slv->state, slv->fd);CHKERRQ(ierr);
-	slv->op->axisymmetric = slv->options.axisymmetric;
-	slv->boundary->axisymmetric = slv->options.axisymmetric;
-
-	ierr = DMCreateGlobalVector(slv->dm, &slv->level.dcoef);CHKERRQ(ierr);
-	ierr = DMCreateLocalVector(slv->dm, &slv->level.ldcoef);CHKERRQ(ierr);
-	ierr = DMCreateGlobalVector(slv->dm, &slv->level.bcoef);CHKERRQ(ierr);
-	ierr = DMCreateLocalVector(slv->dm, &slv->level.lbcoef);CHKERRQ(ierr);
-	ierr = DMCreateGlobalVector(slv->dm, &slv->level.add_cont);CHKERRQ(ierr);
-	ierr = DMCreateLocalVector(slv->dm, &slv->level.ladd_cont);CHKERRQ(ierr);
-	ierr = DMCreateGlobalVector(slv->dm, &slv->level.nscale);CHKERRQ(ierr);
-	ierr = DMCreateGlobalVector(slv->dm, &slv->level.pm);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.pm, 1.0);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.add_cont, 0.0);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.nscale, 1.0);CHKERRQ(ierr);
-	ierr = DMCreateGlobalVector(slv->dm, &slv->rhs);CHKERRQ(ierr);
-	ierr = DMCreateGlobalVector(slv->dm, &slv->x);CHKERRQ(ierr);
-
-	if (!slv->options.algebraic) {
-		#ifdef WITH_BOXMG
-		stella_bmg2_mat *mat_ctx = (stella_bmg2_mat*) malloc(sizeof(stella_bmg2_mat));
-		mat_ctx->op = bmg2_operator_create(slv->grid.topo);
-		ierr = MatCreateShell(slv->comm, xm*ym, xm*ym, ngx*ngy, ngx*ngy, mat_ctx, &slv->A);CHKERRQ(ierr);
-		ierr = MatShellSetOperation(slv->A, MATOP_MULT, (void(*)(void)) stella_bmg2_mult);CHKERRQ(ierr);
-		#endif
-	} else {
-		ierr = DMCreateMatrix(slv->dm, &slv->A);CHKERRQ(ierr);
-	}
-
-	if (efs_log(slv, EFS_LOG_STATUS)) {
-		ierr = stella_io_print(slv->comm, "set-up is finished");CHKERRQ(ierr);
-	}
-	return 0;
-}
-
-
-static PetscErrorCode efs_updatebc(efs *slv)
-{
-	PetscErrorCode ierr;
-	ierr = VecSet(slv->level.pm, 1.0);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.add_cont, 0.0);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.nscale, 1.0);CHKERRQ(ierr);
-
-	ierr = stella_boundary_apply(slv->boundary, slv->A, slv->dm);CHKERRQ(ierr);
-
-// 	if (efs_log(slv, EFS_LOG_STATUS)) {
-// 		ierr = stella_io_print(slv->comm, "Matrix assembled");CHKERRQ(ierr);
-// 	}
-
-	if (slv->options.algebraic) {
-		ierr = MatAssemblyBegin(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
-		ierr = MatAssemblyEnd(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
-		if (efs_log(slv, EFS_LOG_PROBLEM)) {
-			PetscViewer vout;
-			ierr = PetscViewerBinaryOpen(slv->comm, "a.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
-			ierr = MatView(slv->A, vout);CHKERRQ(ierr);
-			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
-		}
-	} else {
-		#ifdef WITH_BOXMG
-		if (efs_log(slv, EFS_LOG_PROBLEM)) {
-			stella_bmg2_mat *ctx;
-			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			bmg2_operator_dump(ctx->op);
-		}
-		#endif
-	}
-
-	ierr = KSPSetOperators(slv->ksp, slv->A, slv->A);CHKERRQ(ierr);
-#if VisAndStop
-       PetscViewer bout;
-        PetscViewerASCIIOpen(slv->comm, "Mat.m", &bout);
-        PetscViewerSetFormat(bout,PETSC_VIEWER_ASCII_MATLAB);
-        ierr = MatView(slv->A, bout);CHKERRQ(ierr);
-        PetscViewerDestroy(&bout);
-#endif
-
-	ierr = efs_setup_rhs(slv);CHKERRQ(ierr);
-
-	return 0;
-}
-
-
-PetscErrorCode efs_solve(efs *slv)
-{
-	PetscErrorCode ierr;
-	PetscInt i, j, k, xs, ys, zs, xm, ym, zm;
-	PetscInt ngx,ngy,ngz;
-	DMBoundaryType bx, by, bz;
-	PetscBool boxmg_direct = 0;
-	slv->ts++;
-
-	ierr = petsc_options_has_name("-boxmg_direct", &boxmg_direct);CHKERRQ(ierr);
-
-	ierr = efs_updatebc(slv);CHKERRQ(ierr);
-	ierr = VecSet(slv->x, 0);CHKERRQ(ierr);
-	if (!slv->options.algebraic && boxmg_direct) {
-		PC bmg_pc;
-		ierr = KSPGetPC(slv->ksp, &bmg_pc);CHKERRQ(ierr);
-		ierr = PCApply(bmg_pc, slv->rhs, slv->x);CHKERRQ(ierr);
-	} else {
-		ierr = KSPSolve(slv->ksp, slv->rhs, slv->x);CHKERRQ(ierr);
-	}
-
-#if  VisAndStop
-        ierr = KSPGetRhs(slv->ksp, &slv->rhs);CHKERRQ(ierr);
-        PetscViewer bout;
-       // PetscViewerFileSetMode(bout,FILE_MODE_APPEND);//only for binary
-        PetscViewerASCIIOpen(slv->comm, "b.m", &bout);
-        PetscViewerSetFormat(bout,PETSC_VIEWER_ASCII_MATLAB);
-       ierr = VecView(slv->rhs, bout);CHKERRQ(ierr);
-        PetscViewerDestroy(&bout);
-        PetscViewerASCIIOpen(slv->comm, "x.m", &bout);
-        PetscViewerSetFormat(bout,PETSC_VIEWER_ASCII_MATLAB);
-        ierr = VecView(slv->x, bout);CHKERRQ(ierr);
-         PetscViewerDestroy(&bout);
-        printf("dumped rhs (b)");
-        //PetscFinalize();
-        //exit(0);
-#endif
-
-	//if (efs_log(slv, EFS_LOG_STATUS)) {
-		//ierr = stella_io_print(slv->comm, "Solve completed");CHKERRQ(ierr);
-	//}
-
-	if (slv->state.sol) {
-	  ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
-	  ierr = stella_io_vtkwrite(slv->dm, slv->sol, "sol", slv->grid.id, 0);CHKERRQ(ierr);
-	  Vec err;
-	  ierr = VecDuplicate(slv->sol, &err);CHKERRQ(ierr);
-	  ierr = VecWAXPY(err, -1, slv->x, slv->sol);CHKERRQ(ierr);
-	  ierr = VecAbs(err);CHKERRQ(ierr);
-	  ierr = stella_io_vtkwrite(slv->dm, err, "err", slv->grid.id, 0);CHKERRQ(ierr);
-	  ierr = VecDestroy(&err);CHKERRQ(ierr);
-	}
-
-
-	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0, &bx, &by, &bz,0);CHKERRQ(ierr);
-
-	ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-
-	if (slv->grid.nd == 2) {
-		Vec loc_x;
-		PetscScalar **xvec;
-		double **phi;
-
-		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
-		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				phi[j][i] = xvec[j][i];
-			}
-		}
-
-		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
-			for (i = xs; i < xs + xm; i++) {
-				phi[ngy][i] = xvec[ngy][i];
-			}
-		}
-
-		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
-			for (j = ys; j < ys + ym; j++) {
-				phi[j][ngx] = xvec[j][ngx];
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-		if (efs_log(slv, EFS_LOG_VTK)) {
-			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
-		}
-		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		PetscScalar ***xvec;
-		double ***phi;
-		Vec loc_x;
-
-		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
-		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					phi[k][j][i] = xvec[k][j][i];
-				}
-			}
-		}
-
-		if ((bz == DM_BOUNDARY_PERIODIC) && (zs + zm == ngz) && slv->grid.overlap_periodic) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					phi[ngz][j][i] = xvec[ngz][j][i];
-				}
-			}
-		}
-		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
-			for (k = zs; k < zs + zm; k++) {
-				for (i = xs; i < xs + xm; i++) {
-					phi[k][ngy][i] = xvec[k][ngy][i];
-				}
-			}
-		}
-		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
-			for (k = zs; k < zs + zm; k++) {
-				for (j = ys; j < ys + ym; j++) {
-					phi[k][j][ngx] = xvec[k][j][ngx];
-				}
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-		if (efs_log(slv, EFS_LOG_VTK)) {
-			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
-		}
-		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-	}
-
-	if (efs_log(slv, EFS_LOG_PROBLEM)) {
-		PetscViewer vout;
-		ierr = PetscViewerBinaryOpen(slv->comm, "sol.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
-		ierr = VecView(slv->x, vout);CHKERRQ(ierr);
-		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
-	}
-
-	return 0;
-}
-
-
-PetscErrorCode efs_set_state(efs *slv, double phi[], double dcoef[],
-                             double bcoef[], double jump[])
-{
-	PetscErrorCode ierr;
-
-	slv->state.phi = phi;
-	slv->state.dcoef = dcoef;
-	slv->state.bcoef = bcoef;
-	slv->state.jump = jump;
-	slv->state.sol = NULL;
-
-	if (slv->grid.nd == 2) {
-		PetscScalar **dcoefvec;
-		double **dcostella_state;
-		PetscInt i, j;
-		PetscInt xs, ys, xm, ym;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.dcoef, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				dcoefvec[j][i] = dcostella_state[j][i];
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		PetscScalar ***dcoefvec;
-		double ***dcostella_state;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.dcoef, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					dcoefvec[k][j][i] = dcostella_state[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-
-	}
-
-	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
-	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
-
-  if (slv->grid.nd == 2) {
-    PetscScalar **bcoefvec;
-    double **bcostella_state;
-    PetscInt i, j;
-    PetscInt xs, ys, xm, ym;
-    ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-    ierr = stella_dmap_get(slv->dmap, slv->state.bcoef, &bcostella_state);CHKERRQ(ierr);
-    ierr = DMDAVecGetArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-    for (j = ys; j < ys + ym; j++) {
-        for (i = xs; i < xs + xm; i++) {
-            bcoefvec[j][i] = bcostella_state[j][i];
-        }
-    }
-    ierr = stella_dmap_restore(slv->dmap, &bcostella_state);CHKERRQ(ierr);
-    ierr = DMDAVecRestoreArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-  } else if (slv->grid.nd == 3) {
-		PetscScalar ***bcoefvec;
-		double ***bcostella_state;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.bcoef, &bcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					bcoefvec[k][j][i] = bcostella_state[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &bcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-  }
-
-  ierr = DMGlobalToLocalBegin(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
-  ierr = DMGlobalToLocalEnd(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
-
-	return 0;
-}
-
-
-PetscErrorCode efs_set_sol(efs *slv, double sol[])
-{
-	PetscErrorCode ierr;
-
-	ierr = DMCreateGlobalVector(slv->dm, &slv->sol);
-	slv->state.sol = sol;
-
-	if (slv->grid.nd == 2) {
-		PetscScalar **svec;
-		double **sol_state;
-		PetscInt i, j;
-		PetscInt xs, ys, xm, ym;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.sol, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				svec[j][i] = sol_state[j][i];
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		PetscScalar ***svec;
-		double ***sol_state;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.sol, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					svec[k][j][i] = sol_state[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-	}
-
-	return 0;
-}
-
-
-PetscErrorCode efs_set_rhs(efs *slv, double rhs[])
-{
-	PetscErrorCode ierr;
-
-	slv->state.rhs = rhs;
-	ierr = efs_setup_rhs(slv);CHKERRQ(ierr);
-
-	return ierr;
-}
-
-
-PetscErrorCode efs_set_grid(efs *slv, int is[], int ie[], int num_cells, double xyz[])
-{
-	PetscErrorCode ierr;
-	PetscInt i, j, k;
-	PetscInt xs, ys, zs, xm, ym, zm;
-	DM cda;
-	Vec gc;
-
-	for (i = 0; i < slv->grid.nd; i++) {
-		slv->grid.is[i] = is[i];
-		slv->grid.ie[i] = ie[i];
-	}
-	slv->grid.num_cells = num_cells;
-	slv->grid.xyz = xyz;
-
-	ierr = DMGetCoordinateDM(slv->dm, &cda);CHKERRQ(ierr);
-	ierr = DMGetCoordinates(slv->dm, &gc);CHKERRQ(ierr);
-	ierr = DMDAGetCorners(cda, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-	if (slv->grid.nd == 2) {
-		DMDACoor2d **coors;
-		double **x, **y;
-		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz, &x);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz + num_cells, &y);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(cda, gc, &coors);CHKERRQ(ierr);
-
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				coors[j][i].x = x[j][i];
-				coors[j][i].y = y[j][i];
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &x);CHKERRQ(ierr);
-		ierr = stella_dmap_restore(slv->dmap, &y);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(cda, gc, &coors);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		DMDACoor3d ***coors;
-		double ***x, ***y, ***z;
-		ierr = DMDAVecGetArray(cda, gc, &coors);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz, &x);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz + num_cells, &y);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz + 2*num_cells, &z);CHKERRQ(ierr);
-
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					coors[k][j][i].x = x[k][j][i];
-					coors[k][j][i].y = y[k][j][i];
-					coors[k][j][i].z = z[k][j][i];
-				}
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &x);CHKERRQ(ierr);
-		ierr = stella_dmap_restore(slv->dmap, &y);CHKERRQ(ierr);
-		ierr = stella_dmap_restore(slv->dmap, &z);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(cda, gc, &coors);CHKERRQ(ierr);
-
-	}
-
-	ierr = stella_metric_create(&slv->level.metric, slv->dm, slv->fd);CHKERRQ(ierr);
-
-	if (efs_log(slv, EFS_LOG_PROBLEM)) {
-		PetscViewer vout;
-		ierr = PetscViewerBinaryOpen(slv->comm, "grid.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
-		ierr = VecView(gc, vout);CHKERRQ(ierr);
-		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
-	}
-
-	return 0;
-}
-
-
-PetscErrorCode efs_setup_op(efs *slv)
-{
-	PetscErrorCode ierr;
-    Vec Vec_tmp;
-    PetscScalar    **array;
-    PetscInt         m,n;
-
-	ierr = stella_operator_assemble(slv->op, slv->A, slv->dm);CHKERRQ(ierr);
-	ierr = stella_boundary_apply(slv->boundary, slv->A, slv->dm);CHKERRQ(ierr);
-
-	if (efs_log(slv, EFS_LOG_STATUS)) {
-		ierr = stella_io_print(slv->comm, "Matrix assembled");CHKERRQ(ierr);
-	}
-
-	if (slv->options.algebraic) {
-		ierr = MatAssemblyBegin(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
-		ierr = MatAssemblyEnd(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
-		if (efs_log(slv, EFS_LOG_PROBLEM)) {
-			PetscViewer vout;
-			ierr = PetscViewerBinaryOpen(slv->comm, "a.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
-			ierr = MatView(slv->A, vout);CHKERRQ(ierr);
-			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
-		}
-	} else {
-		#ifdef WITH_BOXMG
-		if (efs_log(slv, EFS_LOG_PROBLEM)) {
-			stella_bmg2_mat *ctx;
-			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			bmg2_operator_dump(ctx->op);
-		}
-		#endif
-	}
-
-	ierr = KSPSetOperators(slv->ksp, slv->A, slv->A);CHKERRQ(ierr);
-#if VisAndStop 
-       PetscViewer bout;
-        PetscViewerASCIIOpen(slv->comm, "Mat.m", &bout);
-        PetscViewerSetFormat(bout,PETSC_VIEWER_ASCII_MATLAB);
-        ierr = MatView(slv->A, bout);CHKERRQ(ierr);
-        PetscViewerDestroy(&bout);
-#endif
-
-	return 0;
-}
-
-PetscErrorCode efs_setup_rhs(efs *slv)
+/**
+ * Calls callbacks required when the rhs is changed
+ */
+static PetscErrorCode stella_setup_rhs(stella *slv)
 {
 	PetscErrorCode ierr;
 	PetscInt i, j, k, xs, ys, zs, xm, ym, zm, ngx, ngy, ngz;
@@ -741,7 +159,7 @@ PetscErrorCode efs_setup_rhs(efs *slv)
 	ierr = VecAXPY(b, 1, slv->level.add_cont);CHKERRQ(ierr);
 	ierr = VecPointwiseMult(b, slv->level.nscale, b);CHKERRQ(ierr);
 
-	if (efs_log(slv, EFS_LOG_PROBLEM)) {
+	if (stella_log(slv, STELLA_LOG_PROBLEM)) {
 		PetscViewer bout;
 		PetscViewerASCIIOpen(slv->comm, "b.txt", &bout);
 		ierr = VecView(b, bout);CHKERRQ(ierr);
@@ -751,19 +169,575 @@ PetscErrorCode efs_setup_rhs(efs *slv)
 }
 
 
-int efs_log(efs *slv, efs_log_level level)
+/**
+ * Creates and initializes data needed for setting up elliptic discretization.
+ */
+static PetscErrorCode stella_setup(stella *slv, int offset[], int stride[])
+{
+	PetscErrorCode ierr;
+	PetscInt xs, ys, zs, xm, ym, zm, ngx, ngy, ngz;
+	stella_pc *shell;
+	PCType pc_type;
+
+	if (stella_log(slv, STELLA_LOG_STATUS)) {
+		ierr = stella_io_print(slv->comm, "Setting up electric field solver");CHKERRQ(ierr);
+	}
+
+	slv->ts = 0;
+
+	if (stella_log(slv, STELLA_LOG_RESIDUAL)) {
+		ierr = petsc_options_set_value("-ksp_monitor_short", NULL);CHKERRQ(ierr);
+	}
+
+	ierr = DMDASetFieldName(slv->dm, 0,"potential");CHKERRQ(ierr);
+
+	if (slv->grid.nd == 2) {
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
+		slv->dmap = stella_dmap_create_2d(xs - offset[0], ys - offset[1], xm, ym, stride);
+	} else if (slv->grid.nd == 3) {
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+		slv->dmap = stella_dmap_create_3d(xs - offset[0], ys - offset[1], zs - offset[2], xm, ym, zm, stride);
+	} else {
+		SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_SUP, "Unsupported dimmension: %d", slv->grid.nd);
+	}
+	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
+
+	ierr = KSPCreate(slv->comm, &slv->ksp);CHKERRQ(ierr);
+	if (stella_log(slv, STELLA_LOG_EIGS)) {
+		ierr = KSPSetComputeEigenvalues(slv->ksp, PETSC_TRUE);CHKERRQ(ierr);
+	}
+
+	ierr = KSPSetFromOptions(slv->ksp);CHKERRQ(ierr);
+
+	if (!slv->options.algebraic) {
+		ierr = KSPGetPC(slv->ksp, &slv->pc);
+		ierr = PCSetType(slv->pc, PCSHELL);CHKERRQ(ierr);
+		ierr = stella_pc_create(&shell);CHKERRQ(ierr);
+		ierr = PCShellSetApply(slv->pc, stella_pc_apply);CHKERRQ(ierr);
+		ierr = PCShellSetDestroy(slv->pc, stella_pc_destroy);CHKERRQ(ierr);
+		ierr = PCShellSetContext(slv->pc, shell);CHKERRQ(ierr);
+		ierr = PCShellSetName(slv->pc, "boxmg");CHKERRQ(ierr);
+		ierr = PCShellSetSetUp(slv->pc, stella_pc_setup);CHKERRQ(ierr);
+	}
+
+	ierr = stella_fd_create(&slv->fd, STELLA_FD_STANDARD_O2);CHKERRQ(ierr);
+	ierr = stella_operator_create(&slv->op, &slv->level, slv->fd, slv->grid.nd);CHKERRQ(ierr);
+	ierr = stella_boundary_create(&slv->boundary, &slv->level,
+	                              slv->dmap, &slv->state, slv->fd);CHKERRQ(ierr);
+	slv->op->axisymmetric = slv->options.axisymmetric;
+	slv->boundary->axisymmetric = slv->options.axisymmetric;
+
+	ierr = DMCreateGlobalVector(slv->dm, &slv->level.dcoef);CHKERRQ(ierr);
+	ierr = DMCreateLocalVector(slv->dm, &slv->level.ldcoef);CHKERRQ(ierr);
+	ierr = DMCreateGlobalVector(slv->dm, &slv->level.bcoef);CHKERRQ(ierr);
+	ierr = DMCreateLocalVector(slv->dm, &slv->level.lbcoef);CHKERRQ(ierr);
+	ierr = DMCreateGlobalVector(slv->dm, &slv->level.add_cont);CHKERRQ(ierr);
+	ierr = DMCreateLocalVector(slv->dm, &slv->level.ladd_cont);CHKERRQ(ierr);
+	ierr = DMCreateGlobalVector(slv->dm, &slv->level.nscale);CHKERRQ(ierr);
+	ierr = DMCreateGlobalVector(slv->dm, &slv->level.pm);CHKERRQ(ierr);
+	ierr = VecSet(slv->level.pm, 1.0);CHKERRQ(ierr);
+	ierr = VecSet(slv->level.add_cont, 0.0);CHKERRQ(ierr);
+	ierr = VecSet(slv->level.nscale, 1.0);CHKERRQ(ierr);
+	ierr = DMCreateGlobalVector(slv->dm, &slv->rhs);CHKERRQ(ierr);
+	ierr = DMCreateGlobalVector(slv->dm, &slv->x);CHKERRQ(ierr);
+
+	if (!slv->options.algebraic) {
+		#ifdef WITH_BOXMG
+		stella_bmg2_mat *mat_ctx = (stella_bmg2_mat*) malloc(sizeof(stella_bmg2_mat));
+		mat_ctx->op = bmg2_operator_create(slv->grid.topo);
+		ierr = MatCreateShell(slv->comm, xm*ym, xm*ym, ngx*ngy, ngx*ngy, mat_ctx, &slv->A);CHKERRQ(ierr);
+		ierr = MatShellSetOperation(slv->A, MATOP_MULT, (void(*)(void)) stella_bmg2_mult);CHKERRQ(ierr);
+		#endif
+	} else {
+		ierr = DMCreateMatrix(slv->dm, &slv->A);CHKERRQ(ierr);
+	}
+
+	if (stella_log(slv, STELLA_LOG_STATUS)) {
+		ierr = stella_io_print(slv->comm, "set-up is finished");CHKERRQ(ierr);
+	}
+	return 0;
+}
+
+
+PetscErrorCode stella_init(stella **solver_ctx, MPI_Comm comm,
+                           int nGlobal[], int nProcs[], int nLocal[],
+                           int offset[], int stride[],
+                           int cartCoord[], int periodic[], int periodic_storage,
+                           int nd, int axisymmetric)
+{
+	PetscErrorCode ierr;
+
+	stella *slv = (stella*) malloc(sizeof(stella));
+	slv->comm = comm;
+	slv->options.axisymmetric = axisymmetric;
+	{
+		PetscBool flg;
+		ierr = petsc_options_has_name("-boxmg", &flg);CHKERRQ(ierr);
+		if (flg) {
+		#ifdef WITH_BOXMG
+			slv->options.algebraic = 0;
+		#endif
+		} else {
+			slv->options.algebraic = 1;
+		}
+	}
+
+	stella_set_log(slv, STELLA_LOG_STATUS | STELLA_LOG_RESIDUAL);
+	ierr = stella_grid_setup(&slv->grid, &slv->dm, &slv->comm, nGlobal, nProcs,
+	                         nLocal, cartCoord, periodic, periodic_storage, nd);CHKERRQ(ierr);
+	slv->level.dm = slv->dm;
+	ierr = stella_setup(slv, offset, stride);CHKERRQ(ierr);
+
+	*solver_ctx = slv;
+
+	return 0;
+}
+
+
+static PetscErrorCode stella_updatebc(stella *slv)
+{
+	PetscErrorCode ierr;
+	ierr = VecSet(slv->level.pm, 1.0);CHKERRQ(ierr);
+	ierr = VecSet(slv->level.add_cont, 0.0);CHKERRQ(ierr);
+	ierr = VecSet(slv->level.nscale, 1.0);CHKERRQ(ierr);
+
+	ierr = stella_boundary_apply(slv->boundary, slv->A, slv->dm);CHKERRQ(ierr);
+
+	if (slv->options.algebraic) {
+		ierr = MatAssemblyBegin(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
+		ierr = MatAssemblyEnd(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
+		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
+			PetscViewer vout;
+			ierr = PetscViewerBinaryOpen(slv->comm, "a.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
+			ierr = MatView(slv->A, vout);CHKERRQ(ierr);
+			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
+		}
+	} else {
+		#ifdef WITH_BOXMG
+		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
+			stella_bmg2_mat *ctx;
+			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
+			bmg2_operator_dump(ctx->op);
+		}
+		#endif
+	}
+
+	ierr = KSPSetOperators(slv->ksp, slv->A, slv->A);CHKERRQ(ierr);
+
+	ierr = stella_setup_rhs(slv);CHKERRQ(ierr);
+
+	return 0;
+}
+
+
+PetscErrorCode stella_solve(stella *slv)
+{
+	PetscErrorCode ierr;
+	PetscInt i, j, k, xs, ys, zs, xm, ym, zm;
+	PetscInt ngx,ngy,ngz;
+	DMBoundaryType bx, by, bz;
+	PetscBool boxmg_direct = 0;
+	slv->ts++;
+
+	ierr = petsc_options_has_name("-boxmg_direct", &boxmg_direct);CHKERRQ(ierr);
+
+	ierr = stella_updatebc(slv);CHKERRQ(ierr);
+	ierr = VecSet(slv->x, 0);CHKERRQ(ierr);
+	if (!slv->options.algebraic && boxmg_direct) {
+		PC bmg_pc;
+		ierr = KSPGetPC(slv->ksp, &bmg_pc);CHKERRQ(ierr);
+		ierr = PCApply(bmg_pc, slv->rhs, slv->x);CHKERRQ(ierr);
+	} else {
+		ierr = KSPSolve(slv->ksp, slv->rhs, slv->x);CHKERRQ(ierr);
+	}
+
+	if (slv->state.sol) {
+	  ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", 0, slv->ts);CHKERRQ(ierr);
+	  ierr = stella_io_vtkwrite(slv->dm, slv->sol, "sol", 0, 0);CHKERRQ(ierr);
+	  Vec err;
+	  ierr = VecDuplicate(slv->sol, &err);CHKERRQ(ierr);
+	  ierr = VecWAXPY(err, -1, slv->x, slv->sol);CHKERRQ(ierr);
+	  ierr = VecAbs(err);CHKERRQ(ierr);
+	  ierr = stella_io_vtkwrite(slv->dm, err, "err", 0, 0);CHKERRQ(ierr);
+	  ierr = VecDestroy(&err);CHKERRQ(ierr);
+	}
+
+
+	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0, &bx, &by, &bz,0);CHKERRQ(ierr);
+
+	ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+
+	if (slv->grid.nd == 2) {
+		Vec loc_x;
+		PetscScalar **xvec;
+		double **phi;
+
+		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
+		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+
+		for (j = ys; j < ys + ym; j++) {
+			for (i = xs; i < xs + xm; i++) {
+				phi[j][i] = xvec[j][i];
+			}
+		}
+
+		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
+			for (i = xs; i < xs + xm; i++) {
+				phi[ngy][i] = xvec[ngy][i];
+			}
+		}
+
+		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
+			for (j = ys; j < ys + ym; j++) {
+				phi[j][ngx] = xvec[j][ngx];
+			}
+		}
+
+		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+		if (stella_log(slv, STELLA_LOG_VTK)) {
+			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
+		}
+		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+	} else if (slv->grid.nd == 3) {
+		PetscScalar ***xvec;
+		double ***phi;
+		Vec loc_x;
+
+		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
+		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					phi[k][j][i] = xvec[k][j][i];
+				}
+			}
+		}
+
+		if ((bz == DM_BOUNDARY_PERIODIC) && (zs + zm == ngz) && slv->grid.overlap_periodic) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					phi[ngz][j][i] = xvec[ngz][j][i];
+				}
+			}
+		}
+		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
+			for (k = zs; k < zs + zm; k++) {
+				for (i = xs; i < xs + xm; i++) {
+					phi[k][ngy][i] = xvec[k][ngy][i];
+				}
+			}
+		}
+		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
+			for (k = zs; k < zs + zm; k++) {
+				for (j = ys; j < ys + ym; j++) {
+					phi[k][j][ngx] = xvec[k][j][ngx];
+				}
+			}
+		}
+
+		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+		if (stella_log(slv, STELLA_LOG_VTK)) {
+			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
+		}
+		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+	}
+
+	if (stella_log(slv, STELLA_LOG_PROBLEM)) {
+		PetscViewer vout;
+		ierr = PetscViewerBinaryOpen(slv->comm, "sol.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
+		ierr = VecView(slv->x, vout);CHKERRQ(ierr);
+		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
+	}
+
+	return 0;
+}
+
+
+PetscErrorCode stella_set_state(stella *slv, double phi[], double dcoef[],
+                                double bcoef[], double jump[])
+{
+	PetscErrorCode ierr;
+
+	slv->state.phi = phi;
+	slv->state.dcoef = dcoef;
+	slv->state.bcoef = bcoef;
+	slv->state.jump = jump;
+	slv->state.sol = NULL;
+
+	if (slv->grid.nd == 2) {
+		PetscScalar **dcoefvec;
+		double **dcostella_state;
+		PetscInt i, j;
+		PetscInt xs, ys, xm, ym;
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->state.dcoef, &dcostella_state);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
+		for (j = ys; j < ys + ym; j++) {
+			for (i = xs; i < xs + xm; i++) {
+				dcoefvec[j][i] = dcostella_state[j][i];
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &dcostella_state);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
+	} else if (slv->grid.nd == 3) {
+		PetscScalar ***dcoefvec;
+		double ***dcostella_state;
+		PetscInt i, j, k;
+		PetscInt xs, ys, zs, xm, ym, zm;
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->state.dcoef, &dcostella_state);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					dcoefvec[k][j][i] = dcostella_state[k][j][i];
+				}
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &dcostella_state);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
+
+	}
+
+	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
+	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
+
+  if (slv->grid.nd == 2) {
+    PetscScalar **bcoefvec;
+    double **bcostella_state;
+    PetscInt i, j;
+    PetscInt xs, ys, xm, ym;
+    ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
+    ierr = stella_dmap_get(slv->dmap, slv->state.bcoef, &bcostella_state);CHKERRQ(ierr);
+    ierr = DMDAVecGetArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
+    for (j = ys; j < ys + ym; j++) {
+        for (i = xs; i < xs + xm; i++) {
+            bcoefvec[j][i] = bcostella_state[j][i];
+        }
+    }
+    ierr = stella_dmap_restore(slv->dmap, &bcostella_state);CHKERRQ(ierr);
+    ierr = DMDAVecRestoreArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
+  } else if (slv->grid.nd == 3) {
+		PetscScalar ***bcoefvec;
+		double ***bcostella_state;
+		PetscInt i, j, k;
+		PetscInt xs, ys, zs, xm, ym, zm;
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->state.bcoef, &bcostella_state);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					bcoefvec[k][j][i] = bcostella_state[k][j][i];
+				}
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &bcostella_state);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
+  }
+
+  ierr = DMGlobalToLocalBegin(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
+  ierr = DMGlobalToLocalEnd(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
+
+	return 0;
+}
+
+
+PetscErrorCode stella_set_sol(stella *slv, double sol[])
+{
+	PetscErrorCode ierr;
+
+	ierr = DMCreateGlobalVector(slv->dm, &slv->sol);
+	slv->state.sol = sol;
+
+	if (slv->grid.nd == 2) {
+		PetscScalar **svec;
+		double **sol_state;
+		PetscInt i, j;
+		PetscInt xs, ys, xm, ym;
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->state.sol, &sol_state);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
+
+		for (j = ys; j < ys + ym; j++) {
+			for (i = xs; i < xs + xm; i++) {
+				svec[j][i] = sol_state[j][i];
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &sol_state);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
+	} else if (slv->grid.nd == 3) {
+		PetscScalar ***svec;
+		double ***sol_state;
+		PetscInt i, j, k;
+		PetscInt xs, ys, zs, xm, ym, zm;
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->state.sol, &sol_state);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					svec[k][j][i] = sol_state[k][j][i];
+				}
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &sol_state);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
+	}
+
+	return 0;
+}
+
+
+PetscErrorCode stella_set_rhs(stella *slv, double rhs[])
+{
+	PetscErrorCode ierr;
+
+	slv->state.rhs = rhs;
+	ierr = stella_setup_rhs(slv);CHKERRQ(ierr);
+
+	return ierr;
+}
+
+
+PetscErrorCode stella_set_grid(stella *slv, int is[], int ie[], int num_cells, double xyz[])
+{
+	PetscErrorCode ierr;
+	PetscInt i, j, k;
+	PetscInt xs, ys, zs, xm, ym, zm;
+	DM cda;
+	Vec gc;
+
+	for (i = 0; i < slv->grid.nd; i++) {
+		slv->grid.is[i] = is[i];
+		slv->grid.ie[i] = ie[i];
+	}
+	slv->grid.num_cells = num_cells;
+	slv->grid.xyz = xyz;
+
+	ierr = DMGetCoordinateDM(slv->dm, &cda);CHKERRQ(ierr);
+	ierr = DMGetCoordinates(slv->dm, &gc);CHKERRQ(ierr);
+	ierr = DMDAGetCorners(cda, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+	if (slv->grid.nd == 2) {
+		DMDACoor2d **coors;
+		double **x, **y;
+		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz, &x);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz + num_cells, &y);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(cda, gc, &coors);CHKERRQ(ierr);
+
+		for (j = ys; j < ys + ym; j++) {
+			for (i = xs; i < xs + xm; i++) {
+				coors[j][i].x = x[j][i];
+				coors[j][i].y = y[j][i];
+			}
+		}
+
+		ierr = stella_dmap_restore(slv->dmap, &x);CHKERRQ(ierr);
+		ierr = stella_dmap_restore(slv->dmap, &y);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(cda, gc, &coors);CHKERRQ(ierr);
+	} else if (slv->grid.nd == 3) {
+		DMDACoor3d ***coors;
+		double ***x, ***y, ***z;
+		ierr = DMDAVecGetArray(cda, gc, &coors);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz, &x);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz + num_cells, &y);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->grid.xyz + 2*num_cells, &z);CHKERRQ(ierr);
+
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					coors[k][j][i].x = x[k][j][i];
+					coors[k][j][i].y = y[k][j][i];
+					coors[k][j][i].z = z[k][j][i];
+				}
+			}
+		}
+
+		ierr = stella_dmap_restore(slv->dmap, &x);CHKERRQ(ierr);
+		ierr = stella_dmap_restore(slv->dmap, &y);CHKERRQ(ierr);
+		ierr = stella_dmap_restore(slv->dmap, &z);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(cda, gc, &coors);CHKERRQ(ierr);
+
+	}
+
+	ierr = stella_metric_create(&slv->level.metric, slv->dm, slv->fd);CHKERRQ(ierr);
+
+	if (stella_log(slv, STELLA_LOG_PROBLEM)) {
+		PetscViewer vout;
+		ierr = PetscViewerBinaryOpen(slv->comm, "grid.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
+		ierr = VecView(gc, vout);CHKERRQ(ierr);
+		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
+	}
+
+	return 0;
+}
+
+
+PetscErrorCode stella_setup_op(stella *slv)
+{
+	PetscErrorCode ierr;
+    Vec Vec_tmp;
+    PetscScalar    **array;
+    PetscInt         m,n;
+
+	ierr = stella_operator_assemble(slv->op, slv->A, slv->dm);CHKERRQ(ierr);
+	ierr = stella_boundary_apply(slv->boundary, slv->A, slv->dm);CHKERRQ(ierr);
+
+	if (stella_log(slv, STELLA_LOG_STATUS)) {
+		ierr = stella_io_print(slv->comm, "Matrix assembled");CHKERRQ(ierr);
+	}
+
+	if (slv->options.algebraic) {
+		ierr = MatAssemblyBegin(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
+		ierr = MatAssemblyEnd(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
+		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
+			PetscViewer vout;
+			ierr = PetscViewerBinaryOpen(slv->comm, "a.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
+			ierr = MatView(slv->A, vout);CHKERRQ(ierr);
+			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
+		}
+	} else {
+		#ifdef WITH_BOXMG
+		if (efs_log(slv, EFS_LOG_PROBLEM)) {
+			stella_bmg2_mat *ctx;
+			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
+			bmg2_operator_dump(ctx->op);
+		}
+		#endif
+	}
+
+	ierr = KSPSetOperators(slv->ksp, slv->A, slv->A);CHKERRQ(ierr);
+
+	return 0;
+}
+
+
+int stella_log(stella *slv, stella_log_level level)
 {
 	return slv->options.log_level & level;
 }
 
 
-void efs_set_log(efs *slv, efs_log_level level)
+void stella_set_log(stella *slv, stella_log_level level)
 {
 	slv->options.log_level = level;
 }
 
 
-PetscErrorCode efs_destroy(efs *slv)
+PetscErrorCode stella_cleanup(stella *slv)
 {
 	PetscErrorCode ierr;
 	int i;

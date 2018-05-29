@@ -29,23 +29,22 @@ PetscErrorCode solver_init(solver *slv, grid *grd)
 
 	ierr = PetscInitialize(NULL, NULL, "PETScOptions.txt", NULL);CHKERRQ(ierr);
 	int overlap_periodic = 1;
-	stella_init(&slv->ptr, &grd->comm, grd->num_global, grd->num_procs,
-	        grd->num_local,
-	        offset, stride,
-	        grd->cart_coord, grd->periodic, overlap_periodic, &grd->nd, &grd->id, slv->axisymmetric,
-	        &ierr);CHKERRQ(ierr);
-	stella_set_grid(&slv->ptr, grd->is, grd->ie, &grd->num_pts, &grd->xyz,
-	            &ierr);CHKERRQ(ierr);
-	stella_set_state(&slv->ptr, &slv->state->phi, &slv->state->eps,
-	             &slv->state->debye, &slv->state->jc, &ierr);CHKERRQ(ierr);
-	stella_set_sol(&slv->ptr, slv->state->sol, &ierr);CHKERRQ(ierr);
+	ierr = stella_init(&slv->ptr, grd->comm, grd->num_global, grd->num_procs,
+	                   grd->num_local,
+	                   offset, stride,
+	                   grd->cart_coord, grd->periodic, overlap_periodic, grd->nd,
+	                   slv->axisymmetric);CHKERRQ(ierr);
+	ierr = stella_set_grid(slv->ptr, grd->is, grd->ie, grd->num_pts, grd->xyz);CHKERRQ(ierr);
+	ierr = stella_set_state(slv->ptr, slv->state->phi, slv->state->eps,
+	                        slv->state->debye, slv->state->jc);CHKERRQ(ierr);
+	ierr = stella_set_sol(slv->ptr, slv->state->sol);CHKERRQ(ierr);
 
 	for(i = 0; i < bnd->len; i++) {
-		stella_set_patch(&slv->ptr, bnd->v[i].is, bnd->v[i].ie, (int*) &bnd->v[i].type,
-		             &bnd->v[i].norm_dir, &bnd->v[i].dirichlet);
+		ierr = stella_boundary_add(slv->ptr->boundary, (stella_bctype) bnd->v[i].type, bnd->v[i].norm_dir,
+		                           bnd->v[i].is, bnd->v[i].ie, bnd->v[i].dirichlet);CHKERRQ(ierr);
 	}
 
-	stella_setup_op(&slv->ptr, &ierr);CHKERRQ(ierr);
+	ierr = stella_setup_op(slv->ptr);CHKERRQ(ierr);
 
 	return 0;
 }
@@ -55,8 +54,8 @@ PetscErrorCode solver_run(solver *slv)
 {
 	PetscErrorCode ierr;
 
-	stella_set_rhs(&slv->ptr, &slv->state->rhs, &ierr);CHKERRQ(ierr);
-	stella_solve(&slv->ptr, &ierr);CHKERRQ(ierr);
+	ierr = stella_set_rhs(slv->ptr, slv->state->rhs);CHKERRQ(ierr);
+	ierr = stella_solve(slv->ptr);CHKERRQ(ierr);
 
 	return 0;
 }
@@ -66,7 +65,7 @@ PetscErrorCode solver_destroy(solver *slv)
 {
 	PetscErrorCode ierr;
 
-	stella_cleanup(&slv->ptr, &ierr);CHKERRQ(ierr);
+	ierr = stella_cleanup(slv->ptr);CHKERRQ(ierr);
 	boundary_destroy(slv->bnd);
 	free(slv->bnd);
 	state_destroy(slv->state);

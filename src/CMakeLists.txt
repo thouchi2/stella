@@ -5,7 +5,6 @@ set(stella_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_dmap.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_fd.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_grid.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/stella_interface.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_io.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_metric.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_neumann.c
