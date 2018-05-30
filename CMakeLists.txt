@@ -22,4 +22,4 @@ target_link_libraries(stella PUBLIC
   m
 )
 
-add_subdirectory(examples)
+add_subdirectory(tools)
