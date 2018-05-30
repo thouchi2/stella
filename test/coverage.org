@@ -1,0 +1,16 @@
+| Feature                   | Test 2D           | Test 3D       |
+|---------------------------+-------------------+---------------|
+| Homogenous Dirichlet      | UniformSine       | UniformSine3  |
+| Inhomogenous Dirichlet    | UniformTSine      | UniformTSine3 |
+| Neumann                   | UniformMixed{1,2} | UniformMixed3 |
+| Anisotropy                | StretchSine       |               |
+| Anisotropy + Neumann      | StretchMixed      |               |
+| Divergence Free           | CurlSine          |               |
+| Moderate Anisotropy       | SecondTutorial    |               |
+| Rotation                  | Rot               |               |
+| Axisymmetric              | Axisymmetric      |               |
+| Periodic                  |                   | Periodic      |
+| Electrode                 | Electrode         |               |
+| Jump                      | Jump              |               |
+| Mesh Anisotropy (Warping) | Warping           |               |
+| Mesh Anisotropy (Annulus) | HalfAnnulus       | Periodic      |
