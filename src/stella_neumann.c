@@ -161,7 +161,7 @@ static PetscErrorCode apply_neumann(stella_bc *bc, Mat A, DM da)
 
 			ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
 			if (is_boxmg) {
-				ierr = stella_bmg2_SetValuesStencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
+				ierr = stella_bmg_SetValuesStencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
 			} else {
 				ierr = MatSetValuesStencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
 			}
@@ -195,6 +195,8 @@ static PetscErrorCode apply_neumann_3d(stella_bc *bc, Mat A, DM da)
 	PetscScalar v[19];
 	PetscInt cnt;
 	MatStencil row, col[19];
+	MatType mtype;
+	PetscBool is_boxmg;
 	double dcoefh[19];
 	stella_patch *patch = bc->patch;
 	PetscScalar ***acont;
@@ -206,6 +208,17 @@ static PetscErrorCode apply_neumann_3d(stella_bc *bc, Mat A, DM da)
 	double acc, scale;
 	DMBoundaryType bx, by, bz;
 	int per_x, per_y, per_z;
+
+	ierr = MatGetType(A, &mtype);
+	PetscErrorCode (*set_stencil)(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
+	                              const MatStencil idxn[], const PetscScalar v[],
+	                              InsertMode addv);
+	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
+	if (is_boxmg) {
+		set_stencil = &stella_bmg_SetValuesStencil;
+	} else {
+		set_stencil = &MatSetValuesStencil;
+	}
 
 	met = bc->level->metric;
 	enum dir {
@@ -418,12 +431,13 @@ static PetscErrorCode apply_neumann_3d(stella_bc *bc, Mat A, DM da)
 
 					scale = .5;
 
-					if(abs(normdOut)==3)
+					if(abs(normdOut)==3) {
 						for(sj=-1; sj<=1; sj++)
 							for(si=-1; si<=1; si++) {
 								DCOEF[0][sj+1][si+1] *= 2.0;
 								DCOEF[2][sj+1][si+1] *= 2.0;
 							}
+					}
 					else if(abs(normdOut)==2)
 						for(sk=-1; sk<=1; sk++)
 							for(si=-1; si<=1; si++) {
@@ -468,7 +482,7 @@ static PetscErrorCode apply_neumann_3d(stella_bc *bc, Mat A, DM da)
 				}
 				v[0] += PetscSign(v[0]) * bscale*PetscAbsScalar(diag_cont);
 
-				ierr = MatSetValuesStencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
+				ierr = set_stencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
 			}
 		}
 	}

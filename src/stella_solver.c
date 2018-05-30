@@ -14,35 +14,33 @@
 
 static inline int smallerValue(int i1, int i2, double v1, double v2)
 {
-  return   (v1==v2) ? i1 : ( v1<v2 ? i1 : i2 );
+	return   (v1==v2) ? i1 : ( v1<v2 ? i1 : i2 );
 }
 
 static inline PetscErrorCode petsc_options_has_name(const char name[], PetscBool *set) {
 
-  PetscErrorCode ierr;
+	PetscErrorCode ierr;
 
-  #ifdef PETSC_OPTIONS_TAKES_DATABASE
-  ierr = PetscOptionsHasName(PETSC_NULL, PETSC_NULL, name, set);CHKERRQ(ierr);
-  #else
-  ierr = PetscOptionsHasName(PETSC_NULL, name, set);CHKERRQ(ierr);
-  #endif
+	#ifdef PETSC_OPTIONS_TAKES_DATABASE
+	ierr = PetscOptionsHasName(PETSC_NULL, PETSC_NULL, name, set);CHKERRQ(ierr);
+	#else
+	ierr = PetscOptionsHasName(PETSC_NULL, name, set);CHKERRQ(ierr);
+	#endif
 
-  return 0;
-
+	return 0;
 }
 
 static inline PetscErrorCode petsc_options_set_value(const char name[], const char value[]) {
 
-  PetscErrorCode ierr;
+	PetscErrorCode ierr;
 
-  #ifdef PETSC_OPTIONS_TAKES_DATABASE
-  ierr = PetscOptionsSetValue(PETSC_NULL, name, value);CHKERRQ(ierr);
-  #else
-  ierr = PetscOptionsSetValue(name, value);CHKERRQ(ierr);
-  #endif
+	#ifdef PETSC_OPTIONS_TAKES_DATABASE
+	ierr = PetscOptionsSetValue(PETSC_NULL, name, value);CHKERRQ(ierr);
+	#else
+	ierr = PetscOptionsSetValue(name, value);CHKERRQ(ierr);
+	#endif
 
-  return 0;
-
+	return 0;
 }
 
 
@@ -130,23 +128,71 @@ static PetscErrorCode stella_setup_rhs(stella *slv)
 			}
 		}
 
+		ierr = stella_dmap_restore(slv->dmap, &jump);CHKERRQ(ierr);
 		ierr = stella_dmap_restore(slv->dmap, &rhs);CHKERRQ(ierr);
 		ierr = DMDAVecRestoreArray(slv->dm, b, &bvec);CHKERRQ(ierr);
 	} else {
-		double ***rhs;
+		double ***rhs, ***jump;
 		PetscScalar ***bvec, ***dcoef;
+
+		double fxp, fxm, fyp, fym, fzp, fzm;
+		PetscScalar ***jac[6];
+		PetscScalar ***x_r, ***y_s, ***z_t;
+		stella_metric *met;
+		met = slv->level.metric;
+
+		for (i = 0; i < 6; i++) {
+			ierr = DMDAVecGetArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
+		}
+
+		x_r = jac[met->t3map[0][0]];
+		y_s = jac[met->t3map[1][1]];
+		z_t = jac[met->t3map[2][2]];
 
 		ierr = DMDAVecGetArray(slv->dm, slv->level.ldcoef, &dcoef);CHKERRQ(ierr);
 		ierr = stella_dmap_get(slv->dmap, slv->state.rhs, &rhs);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, slv->state.jump, &jump);CHKERRQ(ierr);
 		ierr = DMDAVecGetArray(slv->dm, b, &bvec);CHKERRQ(ierr);
 		for (k = zs; k < zs + zm; k++) {
 			for (j = ys; j < ys + ym; j++) {
 				for (i = xs; i < xs + xm; i++) {
-					bvec[k][j][i] = rhs[k][j][i];
+					int ip = smallerValue(i, i+1, dcoef[k][j][i], dcoef[k][j][i+1]);
+					int im = smallerValue(i, i-1, dcoef[k][j][i], dcoef[k][j][i-1]);
+					int jp = smallerValue(j, j+1, dcoef[k][j][i], dcoef[k][j+1][i]);
+					int jm = smallerValue(j, j-1, dcoef[k][j][i], dcoef[k][j-1][i]);
+					int kp = smallerValue(k, k+1, dcoef[k][j][i], dcoef[k+1][j][i]);
+					int km = smallerValue(k, k-1, dcoef[k][j][i], dcoef[k-1][j][i]);
+
+					if ((i != ngx-1) && (dcoef[k][j][i] != dcoef[k][j][i+1]))
+						fxp = 2.0*dcoef[k][j][i]*jump[k][j][ip] / (dcoef[k][j][i] + dcoef[k][j][i+1]) / (x_r[k][j][i]+x_r[k][j][i+1]);
+					else fxp = 0;
+					if ((i != 0) && (dcoef[k][j][i] != dcoef[k][j][i-1]))
+						fxm = 2.0*dcoef[k][j][i]*jump[k][j][im] / (dcoef[k][j][i] + dcoef[k][j][i-1]) / (x_r[k][j][i]+x_r[k][j][i-1]);
+					else fxm = 0;
+					if ((j != ngy-1) && (dcoef[k][j][i] != dcoef[k][j+1][i]))
+						fyp = 2.0*dcoef[k][j][i]*jump[k][jp][i] / (dcoef[k][j][i] + dcoef[k][j+1][i]) / (y_s[k][j][i]+y_s[k][j+1][i]);
+					else fyp = 0;
+					if ((j != 0) && (dcoef[k][j][i] != dcoef[k][j-1][i]))
+						fym = 2.0*dcoef[k][j][i]*jump[k][jm][i] / (dcoef[k][j][i] + dcoef[k][j-1][i]) / (y_s[k][j][i]+y_s[k][j-1][i]);
+					else fym = 0;
+					if ((k != ngz-1) && (dcoef[k][j][i] != dcoef[k+1][j][i]))
+						fzp = 2.0*dcoef[k][j][i]*jump[kp][j][i] / (dcoef[k][j][i] + dcoef[k+1][j][i]) / (z_t[k][j][i]+z_t[k+1][j][i]);
+					else fzp = 0;
+					if ((k != 0) && (dcoef[k][j][i] != dcoef[k-1][j][i]))
+						fzm = 2.0*dcoef[k][j][i]*jump[km][j][i] / (dcoef[k][j][i] + dcoef[k-1][j][i]) / (z_t[k][j][i]+z_t[k-1][j][i]);
+					else fzm = 0;
+
+
+					bvec[k][j][i] = rhs[k][j][i] - fxp - fxm - fyp - fym - fzp - fzm;
 				}
 			}
 		}
+
+		for (i = 0; i < 6; i++) {
+			ierr = DMDAVecRestoreArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
+		}
 		ierr = stella_dmap_restore(slv->dmap, &rhs);CHKERRQ(ierr);
+		ierr = stella_dmap_restore(slv->dmap, &jump);CHKERRQ(ierr);
 		ierr = DMDAVecRestoreArray(slv->dm, b, &bvec);CHKERRQ(ierr);
 		ierr = DMDAVecRestoreArray(slv->dm, slv->level.ldcoef, &dcoef);CHKERRQ(ierr);
 	}
@@ -243,10 +289,19 @@ static PetscErrorCode stella_setup(stella *slv, int offset[], int stride[])
 
 	if (!slv->options.algebraic) {
 		#ifdef WITH_BOXMG
-		stella_bmg2_mat *mat_ctx = (stella_bmg2_mat*) malloc(sizeof(stella_bmg2_mat));
-		mat_ctx->op = bmg2_operator_create(slv->grid.topo);
-		ierr = MatCreateShell(slv->comm, xm*ym, xm*ym, ngx*ngy, ngx*ngy, mat_ctx, &slv->A);CHKERRQ(ierr);
-		ierr = MatShellSetOperation(slv->A, MATOP_MULT, (void(*)(void)) stella_bmg2_mult);CHKERRQ(ierr);
+		ef_bmg_mat *mat_ctx = (ef_bmg_mat*) malloc(sizeof(ef_bmg_mat));
+		if (slv->grid.nd == 2) {
+			mat_ctx->op2 = bmg2_operator_create(slv->grid.topo2);
+			mat_ctx->nd = 2;
+			ierr = MatCreateShell(slv->comm, xm*ym, xm*ym, ngx*ngy, ngx*ngy, mat_ctx, &slv->A);CHKERRQ(ierr);
+
+		} else {
+			ef_bmg_mat *mat_ctx = (ef_bmg_mat*) malloc(sizeof(ef_bmg_mat));
+			mat_ctx->op3 = bmg3_operator_create(slv->grid.topo3);
+			mat_ctx->nd = 3;
+			ierr = MatCreateShell(slv->comm, xm*ym*zm, xm*ym*zm, ngx*ngy*ngz, ngx*ngy*ngz, mat_ctx, &slv->A);CHKERRQ(ierr);
+		}
+		ierr = MatShellSetOperation(slv->A, MATOP_MULT, (void(*)(void)) ef_bmg_mult);CHKERRQ(ierr);
 		#endif
 	} else {
 		ierr = DMCreateMatrix(slv->dm, &slv->A);CHKERRQ(ierr);
@@ -315,9 +370,12 @@ static PetscErrorCode stella_updatebc(stella *slv)
 	} else {
 		#ifdef WITH_BOXMG
 		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
-			stella_bmg2_mat *ctx;
+			stella_bmg_mat *ctx;
 			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			bmg2_operator_dump(ctx->op);
+			if (ctx->nd == 2)
+				bmg2_operator_dump(ctx->op2);
+			else
+				bmg3_operator_dump(ctx->op3);
 		}
 		#endif
 	}
@@ -711,10 +769,13 @@ PetscErrorCode stella_setup_op(stella *slv)
 		}
 	} else {
 		#ifdef WITH_BOXMG
-		if (efs_log(slv, EFS_LOG_PROBLEM)) {
-			stella_bmg2_mat *ctx;
+		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
+			stella_bmg_mat *ctx;
 			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			bmg2_operator_dump(ctx->op);
+			if (ctx->nd == 2)
+				bmg2_operator_dump(ctx->op2);
+			else
+				bmg3_operator_dump(ctx->op3);
 		}
 		#endif
 	}

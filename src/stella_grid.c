@@ -67,8 +67,8 @@ static PetscErrorCode setup_2d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	ierr = DMDASetUniformCoordinates(*dm, 0, 1, 0, 1, 0.0, 0.0);CHKERRQ(ierr);
 
 	#ifdef WITH_BOXMG
-	grid->topo = bmg2_topo_create(comm, nGlobal[0], nGlobal[1],
-	                              nPerProcx_uint, nPerProcy_uint, nProcs[0], nProcs[1]);
+	grid->topo = bmg_topo_create(comm, nGlobal[0], nGlobal[1],
+	                             nPerProcx_uint, nPerProcy_uint, nProcs[0], nProcs[1]);
 	#endif
 
 	// BEGIN DEBUG
@@ -94,6 +94,7 @@ static PetscErrorCode setup_3d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	int i;
 	int *lnPerProcx, *lnPerProcy, *lnPerProcz,
 		*rnPerProcx, *rnPerProcy, *rnPerProcz;
+	unsigned int *nPerProcx_uint, *nPerProcy_uint, *nPerProcz_uint;
 	PetscInt *nPerProcx, *nPerProcy, *nPerProcz;
 	DMBoundaryType btx, bty, btz;
 
@@ -106,6 +107,9 @@ static PetscErrorCode setup_3d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	nPerProcx = (PetscInt*)malloc((nProcs[0])*sizeof(PetscInt));
 	nPerProcy = (PetscInt*)malloc((nProcs[1])*sizeof(PetscInt));
 	nPerProcz = (PetscInt*)malloc((nProcs[2])*sizeof(PetscInt));
+	nPerProcx_uint = (unsigned int*)malloc((nProcs[0])*sizeof(unsigned int));
+	nPerProcy_uint = (unsigned int*)malloc((nProcs[1])*sizeof(unsigned int));
+	nPerProcz_uint = (unsigned int*)malloc((nProcs[2])*sizeof(unsigned int));
 
 	for (i=0;i<(nProcs[0]);i++) lnPerProcx[i] = 0;
 	for (i=0;i<(nProcs[1]);i++) lnPerProcy[i] = 0;
@@ -125,12 +129,18 @@ static PetscErrorCode setup_3d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	ierr = MPI_Allreduce(lnPerProcy, rnPerProcy, nProcs[1], MPI_INT, MPI_SUM, comm);CHKERRQ(ierr);
 	ierr = MPI_Allreduce(lnPerProcz, rnPerProcz, nProcs[2], MPI_INT, MPI_SUM, comm);CHKERRQ(ierr);
 
-	for (i=0;i<(nProcs[0]); i++)
+	for (i=0;i<(nProcs[0]); i++) {
 		nPerProcx[i] = rnPerProcx[i];
-	for (i=0;i<(nProcs[1]);i++)
+		nPerProcx_uint[i] = (unsigned int) nPerProcx[i];
+	}
+	for (i=0;i<(nProcs[1]);i++) {
 		nPerProcy[i] = rnPerProcy[i];
-	for (i=0;i<(nProcs[2]);i++)
+		nPerProcy_uint[i] = (unsigned int) nPerProcy[i];
+	}
+	for (i=0;i<(nProcs[2]);i++) {
 		nPerProcz[i] = rnPerProcz[i];
+		nPerProcz_uint[i] = (unsigned int) nPerProcz[i];
+	}
 
 	if (periodic[0]) btx = DM_BOUNDARY_PERIODIC;
 	else btx = DM_BOUNDARY_GHOSTED;
@@ -171,6 +181,12 @@ static PetscErrorCode setup_3d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	/* SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_SUP,"HERE"); */
 	// END DEBUG
 
+	#ifdef WITH_BOXMG
+	grid->topo3 = bmg3_topo_create(comm, nGlobal[0], nGlobal[1], nGlobal[2],
+	                               nPerProcx_uint, nPerProcy_uint, nPerProcz_uint,
+	                               nProcs[0], nProcs[1], nProcs[2]);
+	#endif
+
 	free(lnPerProcx);
 	free(lnPerProcy);
 	free(lnPerProcz);
@@ -180,6 +196,7 @@ static PetscErrorCode setup_3d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	free(nPerProcx);
 	free(nPerProcy);
 	free(nPerProcz);
+	free(nPerProcx_uint);  free(nPerProcy_uint); free(nPerProcz_uint);
 
 	return 0;
 }

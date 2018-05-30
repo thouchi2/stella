@@ -4,19 +4,21 @@
 #include "petscmat.h"
 
 #ifdef WITH_BOXMG
-#include <boxmg/capi.h>
+#include <cedar/capi.h>
 
 typedef struct
 {
-	bmg2_operator op;
+	int nd;
+	bmg2_operator op2;
+	bmg3_operator op3;
 } stella_bmg2_mat;
 #endif
 
-PetscErrorCode stella_bmg2_SetValuesStencil(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
+PetscErrorCode stella_bmg_SetValuesStencil(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
                                         const MatStencil idxn[], const PetscScalar v[],
                                         InsertMode addv);
 
 
-PetscErrorCode stella_bmg2_mult(Mat mat, Vec, Vec);
+PetscErrorCode stella_bmg_mult(Mat mat, Vec, Vec);
 
 #endif

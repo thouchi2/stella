@@ -5,7 +5,7 @@
 #include "mpi.h"
 
 #ifdef WITH_BOXMG
-#include <boxmg/capi.h>
+#include <cedar/capi.h>
 #endif
 
 /**
@@ -27,7 +27,8 @@ typedef struct {
 	int overlap_periodic;  /**< are there duplicate grid points if periodic */
 	double *xyz;   /**< grid coordinates */
 	#ifdef WITH_BOXMG
-	bmg2_topo topo;/**< holds boxmg topology object */
+	bmg2_topo topo2;/**< holds boxmg topology object */
+	bmg3_topo topo3;/**< holds boxmg topology object */
 	#endif
 } stella_grid;
 

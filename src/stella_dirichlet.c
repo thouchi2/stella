@@ -12,8 +12,8 @@ static PetscErrorCode update_dirichlet_sym(stella_bc *bc, Mat A, DM da)
 	PetscErrorCode ierr;
 	PetscInt i,j,cnt;
 	PetscInt ngx, ngy;
-	PetscScalar v[8];
-	MatStencil row[8], col;
+	PetscScalar v[9];
+	MatStencil row[9], col;
 	PetscInt level;
 	stella_patch *patch = bc->patch;
 
@@ -93,8 +93,8 @@ static PetscErrorCode update_dirichlet_sym_3d(stella_bc *bc, Mat A, DM da)
 	PetscErrorCode ierr;
 	PetscInt i, j, k, cnt;
 	PetscInt ngx, ngy, ngz;
-	PetscScalar v[19];
-	MatStencil row[19], col;
+	PetscScalar v[64];
+	MatStencil row[64], col;
 	stella_patch *patch = bc->patch;
 
 	ierr = DMDAGetInfo(da, 0, &ngx, &ngy, &ngz,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
@@ -384,7 +384,7 @@ static PetscErrorCode apply_dirichlet(stella_bc *bc, Mat A, DM da)
 
 			ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
 			if (is_boxmg) {
-				ierr = stella_bmg2_SetValuesStencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
+				ierr = stella_bmg_SetValuesStencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
 			} else {
 				ierr = MatSetValuesStencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
 			}
@@ -415,6 +415,8 @@ static PetscErrorCode apply_dirichlet_3d(stella_bc *bc, Mat A, DM da)
 	PetscInt ngx, ngy, ngz;
 	PetscScalar v[19];
 	MatStencil row, col[19];
+	MatType mtype;
+	PetscBool is_boxmg;
 	double dcoefh[19];
 	stella_patch *patch = bc->patch;
 	PetscScalar ***acont;
@@ -426,6 +428,17 @@ static PetscErrorCode apply_dirichlet_3d(stella_bc *bc, Mat A, DM da)
 	int offset[3];
 	double ***dirichlet;
 	stella_dmap *dmap;
+
+	ierr = MatGetType(A, &mtype);
+	PetscErrorCode (*set_stencil)(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
+	                              const MatStencil idxn[], const PetscScalar v[],
+	                              InsertMode addv);
+	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
+	if (is_boxmg) {
+		set_stencil = &stella_bmg_SetValuesStencil;
+	} else {
+		set_stencil = &MatSetValuesStencil;
+	}
 
 	met = bc->level->metric;
 	ys = patch->corners.is[1]; xs = patch->corners.is[0]; zs = patch->corners.is[2];
@@ -648,7 +661,7 @@ static PetscErrorCode apply_dirichlet_3d(stella_bc *bc, Mat A, DM da)
 						acont[k+1][j+1][i] += weight;
 					}
 				}
-				ierr = MatSetValuesStencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
+				ierr = set_stencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
 			}
 		}
 	}

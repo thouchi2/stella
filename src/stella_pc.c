@@ -23,13 +23,17 @@ PetscErrorCode stella_pc_setup(PC pc)
 	PetscErrorCode ierr;
 	Mat pmat;
 	stella_pc *pc_ctx;
-	stella_bmg2_mat *mat_ctx;
+	stella_bmg_mat *mat_ctx;
 
 	ierr = PCGetOperators(pc,PETSC_NULL,&pmat);CHKERRQ(ierr);
 	ierr = PCShellGetContext(pc, (void**)&pc_ctx);CHKERRQ(ierr);
 	ierr = MatShellGetContext(pmat, (void**)&mat_ctx);CHKERRQ(ierr);
 
-	pc_ctx->solver = bmg2_solver_create(&mat_ctx->op);
+	pc_ctx->nd = mat_ctx->nd;
+	if (pc_ctx->nd == 2)
+		pc_ctx->solver2 = bmg2_solver_create(&mat_ctx->op2);
+	else
+		pc_ctx->solver3 = bmg3_solver_create(&mat_ctx->op3);
 	#endif
 
 	return 0;
@@ -50,7 +54,10 @@ PetscErrorCode stella_pc_apply(PC pc, Vec x, Vec y)
 	ierr = VecGetArrayRead(x, &xarr);CHKERRQ(ierr);
 	ierr = VecGetArray(y, &yarr);CHKERRQ(ierr);
 
-	bmg2_solver_run(pc_ctx->solver, yarr, xarr);
+	if (pc_ctx->nd == 2)
+		bmg2_solver_run(pc_ctx->solver2, yarr, xarr);
+	else
+		bmg3_solver_run(pc_ctx->solver3, yarr, xarr);
 
 	ierr = VecRestoreArrayRead(x, &xarr);CHKERRQ(ierr);
 	ierr = VecRestoreArray(y, &yarr);CHKERRQ(ierr);

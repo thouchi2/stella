@@ -42,7 +42,7 @@ static PetscErrorCode centered_2d(stella_operator *op, Mat A, DM da)
 	                              InsertMode addv);
 	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
 	if (is_boxmg) {
-		set_stencil = &stella_bmg2_SetValuesStencil;
+		set_stencil = &stella_bmg_SetValuesStencil;
 	} else {
 		set_stencil = &MatSetValuesStencil;
 	}
@@ -184,7 +184,7 @@ static PetscErrorCode centered_3d(stella_operator *op, Mat A, DM da)
 	                              InsertMode addv);
 	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
 	if (is_boxmg) {
-		set_stencil = &stella_bmg2_SetValuesStencil;
+		set_stencil = &stella_bmg_SetValuesStencil;
 	} else {
 		set_stencil = &MatSetValuesStencil;
 	}

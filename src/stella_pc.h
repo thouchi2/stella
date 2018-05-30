@@ -14,8 +14,10 @@
  */
 
 typedef struct {
+	int nd;
 	#ifdef WITH_BOXMG
-	bmg2_solver solver;
+	bmg2_solver solver2;
+	bmg2_solver solver3;
 	#endif
 } stella_pc;
 
