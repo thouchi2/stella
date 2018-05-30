@@ -2,6 +2,7 @@
 
 #include "stella_solver.h"
 #include "stella_io.h"
+#include "stella_signals.h"
 
 #include "stella_mat.h"
 #include "stella_pc.h"
@@ -11,11 +12,6 @@
 #endif
 
 #include "petscmat.h"
-
-static inline int smallerValue(int i1, int i2, double v1, double v2)
-{
-	return   (v1==v2) ? i1 : ( v1<v2 ? i1 : i2 );
-}
 
 static inline PetscErrorCode petsc_options_has_name(const char name[], PetscBool *set) {
 
@@ -39,177 +35,6 @@ static inline PetscErrorCode petsc_options_set_value(const char name[], const ch
 	#else
 	ierr = PetscOptionsSetValue(name, value);CHKERRQ(ierr);
 	#endif
-
-	return 0;
-}
-
-
-/**
- * Calls callbacks required when the rhs is changed
- */
-static PetscErrorCode stella_setup_rhs(stella *slv)
-{
-	PetscErrorCode ierr;
-	PetscInt i, j, k, xs, ys, zs, xm, ym, zm, ngx, ngy, ngz;
-	Vec b;
-
-	b = slv->rhs;
-
-	ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0,0,0,0,0);CHKERRQ(ierr);
-
-	if (slv->grid.nd == 2) {
-		double **rhs, **jump;
-		PetscScalar **bvec, **dcoef;
-
-		ierr = stella_dmap_get(slv->dmap, slv->state.rhs, &rhs);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.jump, &jump);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.ldcoef, &dcoef);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, b, &bvec);CHKERRQ(ierr);
-		if (slv->op->axisymmetric) {
-			DM cda;
-			DMDACoor2d **coors;
-			Vec gc;
-
-			ierr = DMGetCoordinateDM(slv->dm, &cda);CHKERRQ(ierr);
-			ierr = DMGetCoordinates(slv->dm, &gc);CHKERRQ(ierr);
-			ierr = DMDAVecGetArray(cda, gc, &coors);CHKERRQ(ierr);
-
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					bvec[j][i] = rhs[j][i] * coors[j][i].x;
-				}
-			}
-
-			ierr = DMDAVecRestoreArray(cda, gc, &coors);CHKERRQ(ierr);
-		} else {
-			double fxp, fxm, fyp, fym;
-			PetscScalar **jac[4];
-			PetscScalar **x_s, **x_t, **y_s, **y_t;
-			stella_metric *met;
-			met = slv->level.metric;
-
-			for (i = 0; i < 4; i++) {
-				ierr = DMDAVecGetArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
-			}
-
-			x_s = jac[met->t2map[0][0]];
-			x_t = jac[met->t2map[0][1]];
-			y_s = jac[met->t2map[1][0]];
-			y_t = jac[met->t2map[1][1]];
-
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-
-					int ip = smallerValue(i, i+1, dcoef[j][i], dcoef[j][i+1]);
-					int im = smallerValue(i, i-1, dcoef[j][i], dcoef[j][i-1]);
-					int jp = smallerValue(j, j+1, dcoef[j][i], dcoef[j+1][i]);
-					int jm = smallerValue(j, j-1, dcoef[j][i], dcoef[j-1][i]);
-
-					if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]))
-						fxp = 2.0*dcoef[j][i]*jump[j][ip] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
-					else fxp = 0;
-					if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]))
-						fxm = 2.0*dcoef[j][i]*jump[j][im] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
-					else fxm = 0;
-					if ((j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i]))
-						fyp = 2.0*dcoef[j][i]*jump[jp][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
-					else fyp = 0;
-					if ((j != 0) && (dcoef[j][i] != dcoef[j-1][i]))
-						fym = 2.0*dcoef[j][i]*jump[jm][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
-					else fym = 0;
-					bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
-				}
-			}
-
-			for (i = 0; i < 4; i++) {
-				ierr = DMDAVecRestoreArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
-
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &jump);CHKERRQ(ierr);
-		ierr = stella_dmap_restore(slv->dmap, &rhs);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, b, &bvec);CHKERRQ(ierr);
-	} else {
-		double ***rhs, ***jump;
-		PetscScalar ***bvec, ***dcoef;
-
-		double fxp, fxm, fyp, fym, fzp, fzm;
-		PetscScalar ***jac[6];
-		PetscScalar ***x_r, ***y_s, ***z_t;
-		stella_metric *met;
-		met = slv->level.metric;
-
-		for (i = 0; i < 6; i++) {
-			ierr = DMDAVecGetArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
-		}
-
-		x_r = jac[met->t3map[0][0]];
-		y_s = jac[met->t3map[1][1]];
-		z_t = jac[met->t3map[2][2]];
-
-		ierr = DMDAVecGetArray(slv->dm, slv->level.ldcoef, &dcoef);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.rhs, &rhs);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.jump, &jump);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, b, &bvec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					int ip = smallerValue(i, i+1, dcoef[k][j][i], dcoef[k][j][i+1]);
-					int im = smallerValue(i, i-1, dcoef[k][j][i], dcoef[k][j][i-1]);
-					int jp = smallerValue(j, j+1, dcoef[k][j][i], dcoef[k][j+1][i]);
-					int jm = smallerValue(j, j-1, dcoef[k][j][i], dcoef[k][j-1][i]);
-					int kp = smallerValue(k, k+1, dcoef[k][j][i], dcoef[k+1][j][i]);
-					int km = smallerValue(k, k-1, dcoef[k][j][i], dcoef[k-1][j][i]);
-
-					if ((i != ngx-1) && (dcoef[k][j][i] != dcoef[k][j][i+1]))
-						fxp = 2.0*dcoef[k][j][i]*jump[k][j][ip] / (dcoef[k][j][i] + dcoef[k][j][i+1]) / (x_r[k][j][i]+x_r[k][j][i+1]);
-					else fxp = 0;
-					if ((i != 0) && (dcoef[k][j][i] != dcoef[k][j][i-1]))
-						fxm = 2.0*dcoef[k][j][i]*jump[k][j][im] / (dcoef[k][j][i] + dcoef[k][j][i-1]) / (x_r[k][j][i]+x_r[k][j][i-1]);
-					else fxm = 0;
-					if ((j != ngy-1) && (dcoef[k][j][i] != dcoef[k][j+1][i]))
-						fyp = 2.0*dcoef[k][j][i]*jump[k][jp][i] / (dcoef[k][j][i] + dcoef[k][j+1][i]) / (y_s[k][j][i]+y_s[k][j+1][i]);
-					else fyp = 0;
-					if ((j != 0) && (dcoef[k][j][i] != dcoef[k][j-1][i]))
-						fym = 2.0*dcoef[k][j][i]*jump[k][jm][i] / (dcoef[k][j][i] + dcoef[k][j-1][i]) / (y_s[k][j][i]+y_s[k][j-1][i]);
-					else fym = 0;
-					if ((k != ngz-1) && (dcoef[k][j][i] != dcoef[k+1][j][i]))
-						fzp = 2.0*dcoef[k][j][i]*jump[kp][j][i] / (dcoef[k][j][i] + dcoef[k+1][j][i]) / (z_t[k][j][i]+z_t[k+1][j][i]);
-					else fzp = 0;
-					if ((k != 0) && (dcoef[k][j][i] != dcoef[k-1][j][i]))
-						fzm = 2.0*dcoef[k][j][i]*jump[km][j][i] / (dcoef[k][j][i] + dcoef[k-1][j][i]) / (z_t[k][j][i]+z_t[k-1][j][i]);
-					else fzm = 0;
-
-
-					bvec[k][j][i] = rhs[k][j][i] - fxp - fxm - fyp - fym - fzp - fzm;
-				}
-			}
-		}
-
-		for (i = 0; i < 6; i++) {
-			ierr = DMDAVecRestoreArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
-		}
-		ierr = stella_dmap_restore(slv->dmap, &rhs);CHKERRQ(ierr);
-		ierr = stella_dmap_restore(slv->dmap, &jump);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, b, &bvec);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.ldcoef, &dcoef);CHKERRQ(ierr);
-	}
-
-	ierr = VecPointwiseMult(b, slv->level.metric->jac, b);CHKERRQ(ierr);
-
-	ierr = stella_boundary_apply_rhs(slv->boundary, slv->dm, slv->rhs);CHKERRQ(ierr);
-
-	ierr = VecPointwiseMult(slv->level.add_cont, slv->level.pm, slv->level.add_cont);CHKERRQ(ierr);
-	ierr = VecAXPY(b, 1, slv->level.add_cont);CHKERRQ(ierr);
-	ierr = VecPointwiseMult(b, slv->level.nscale, b);CHKERRQ(ierr);
-
-	if (stella_log(slv, STELLA_LOG_PROBLEM)) {
-		PetscViewer bout;
-		PetscViewerASCIIOpen(slv->comm, "b.txt", &bout);
-		ierr = VecView(b, bout);CHKERRQ(ierr);
-	}
 
 	return 0;
 }
@@ -349,45 +174,6 @@ PetscErrorCode stella_init(stella **solver_ctx, MPI_Comm comm,
 }
 
 
-static PetscErrorCode stella_updatebc(stella *slv)
-{
-	PetscErrorCode ierr;
-	ierr = VecSet(slv->level.pm, 1.0);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.add_cont, 0.0);CHKERRQ(ierr);
-	ierr = VecSet(slv->level.nscale, 1.0);CHKERRQ(ierr);
-
-	ierr = stella_boundary_apply(slv->boundary, slv->A, slv->dm);CHKERRQ(ierr);
-
-	if (slv->options.algebraic) {
-		ierr = MatAssemblyBegin(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
-		ierr = MatAssemblyEnd(slv->A, MAT_FINAL_ASSEMBLY);CHKERRQ(ierr);
-		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
-			PetscViewer vout;
-			ierr = PetscViewerBinaryOpen(slv->comm, "a.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
-			ierr = MatView(slv->A, vout);CHKERRQ(ierr);
-			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
-		}
-	} else {
-		#ifdef WITH_BOXMG
-		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
-			stella_bmg_mat *ctx;
-			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			if (ctx->nd == 2)
-				bmg2_operator_dump(ctx->op2);
-			else
-				bmg3_operator_dump(ctx->op3);
-		}
-		#endif
-	}
-
-	ierr = KSPSetOperators(slv->ksp, slv->A, slv->A);CHKERRQ(ierr);
-
-	ierr = stella_setup_rhs(slv);CHKERRQ(ierr);
-
-	return 0;
-}
-
-
 PetscErrorCode stella_solve(stella *slv)
 {
 	PetscErrorCode ierr;
@@ -399,7 +185,8 @@ PetscErrorCode stella_solve(stella *slv)
 
 	ierr = petsc_options_has_name("-boxmg_direct", &boxmg_direct);CHKERRQ(ierr);
 
-	ierr = stella_updatebc(slv);CHKERRQ(ierr);
+	// Temporarily signal bcs have changed to be safe
+	ierr = stella_changed_bc(slv);CHKERRQ(ierr);
 	ierr = VecSet(slv->x, 0);CHKERRQ(ierr);
 	if (!slv->options.algebraic && boxmg_direct) {
 		PC bmg_pc;
@@ -665,7 +452,7 @@ PetscErrorCode stella_set_rhs(stella *slv, double rhs[])
 	PetscErrorCode ierr;
 
 	slv->state.rhs = rhs;
-	ierr = stella_setup_rhs(slv);CHKERRQ(ierr);
+	ierr = stella_changed_rhs(slv);CHKERRQ(ierr);
 
 	return ierr;
 }

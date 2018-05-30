@@ -13,4 +13,5 @@ set(stella_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_mat.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_pc.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_stencil.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/stella_signals.c
   PARENT_SCOPE)
