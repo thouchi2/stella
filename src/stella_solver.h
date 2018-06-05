@@ -93,16 +93,17 @@ PetscErrorCode stella_solve(stella*);
 
 
 /**
- * Sets solver state.
+ * Gives stella the location of external arrays used in the discretization
+ * for input and output.
  *
  * @param slv solver object
- * @param phi array where solver will put the solution
- * @param dcoef permittivity of electric field
- * @param jump  jump condition
+ * @param[out] phi array where solver will put the solution
+ * @param[in] dcoef variable coefficient for elliptic operator (- div dcoef grad phi)
+ * @param[in] bcoef diagonal contribution (- div dcoef grad phi - bcoef)
+ * @param[in] jump interface condition ([n . dcoef grad phi] = jump).  Interface must be grid aligned.
  */
-PetscErrorCode stella_set_state(stella *slv, double phi[], double dcoef[],
-                                double bcoef[], double jump[]);
-
+PetscErrorCode stella_set_external(stella *slv, double phi[], double dcoef[],
+                                   double bcoef[], double jump[]);
 
 /**
  * Sets solver rhs.

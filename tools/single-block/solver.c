@@ -35,8 +35,8 @@ PetscErrorCode solver_init(solver *slv, grid *grd)
 	                   grd->cart_coord, grd->periodic, overlap_periodic, grd->nd,
 	                   slv->axisymmetric);CHKERRQ(ierr);
 	ierr = stella_set_grid(slv->ptr, grd->is, grd->ie, grd->num_pts, grd->xyz);CHKERRQ(ierr);
-	ierr = stella_set_state(slv->ptr, slv->state->phi, slv->state->eps,
-	                        slv->state->debye, slv->state->jc);CHKERRQ(ierr);
+	ierr = stella_set_external(slv->ptr, slv->state->phi, slv->state->eps,
+	                           slv->state->debye, slv->state->jc);CHKERRQ(ierr);
 	ierr = stella_set_sol(slv->ptr, slv->state->sol);CHKERRQ(ierr);
 
 	for(i = 0; i < bnd->len; i++) {
