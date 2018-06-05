@@ -1,0 +1,15 @@
+<%def name="si(i)">\
+% if fdir < 0:
+sm[i]\
+% else:
+sp[${-1*int(i)}]\
+% endif
+</%def>\
+<%def name="idx(i)">\
+% if fdir < 0:
+[${"k" if l != "t" else i}][${"j" if l != "s" else i}][${"i" if l != "r" else i}]\
+% else:
+[${"k" if l != "t" else "ngz-" + str(i+1)}][${"j" if l != "s" else "ngy-" + str(i+1)}][${"i" if l != "r" else "ngx-" + str(i+1)}]\
+% endif
+</%def>\
+${p}_${l}[c] = ${si(0)}*coors${idx(0)}.${p} + ${si(1)}*coors${idx(1)}.${p} + ${si(2)}*coors${idx(2)}.${p};

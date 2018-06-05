@@ -1,0 +1,17 @@
+<%def name="idx(i,offset)">\
+<%
+inames=["i","j","k"]
+lnames=["r","s","t"]
+pnames=["x","y","z"]
+%>\
+% if (abs(fdir)-1) == i and fdir < 0:
+0\
+% elif (abs(fdir) -1) == i and fdir > 0:
+ng${pnames[i]}-1\
+% elif l == lnames[i]:
+${inames[i] + offset}\
+% else:
+${inames[i]}\
+% endif
+</%def>\
+${p}_${l}[c] = si[-1]*coors[${idx(2,'-1')}][${idx(1,'-1')}][${idx(0,'-1')}].${p} + si[1]*coors[${idx(2,'+1')}][${idx(1,'+1')}][${idx(0,'+1')}].${p};

@@ -1,0 +1,6 @@
+for (${ind} = ${beg}; ${ind} < ${end}; ${ind}++)
+{
+% for line in body.split('\n'):
+    ${line}
+% endfor
+}
