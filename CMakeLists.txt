@@ -5,10 +5,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
 include(cxx11)
 include(cxx_config)
+include(testing)
 
 enable_language(C CXX Fortran)
 
-find_package(MPI REQUIRED)
 find_package(PETSc REQUIRED)
 
 include_directories(${MPI_INCLUDE_PATH} ${PETSC_INCLUDES} src)
