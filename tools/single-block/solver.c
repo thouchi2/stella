@@ -22,7 +22,14 @@ PetscErrorCode solver_init(solver *slv, grid *grd)
 	int i;
 	int stride[3], offset[3];
 
-	blist *bnd = slv->bnd;
+	boundary *bnd = slv->bnd;
+	char *classify = bnd->classify;
+	char *norm_dir = bnd->norm_dir;
+	double *values = bnd->values;
+
+	stella_ptypes ptypes;
+	ptypes.dirichlet = DIRICHLET;
+	ptypes.neumann = NEUMANN;
 
 	for (i = 0; i < 3; i++) offset[i] = 0;
 	stride[0] = grd->nx; stride[1] = grd->ny; stride[2] = grd->nz;
@@ -38,11 +45,7 @@ PetscErrorCode solver_init(solver *slv, grid *grd)
 	ierr = stella_set_external(slv->ptr, slv->state->phi, slv->state->eps,
 	                           slv->state->debye, slv->state->jc);CHKERRQ(ierr);
 	ierr = stella_set_sol(slv->ptr, slv->state->sol);CHKERRQ(ierr);
-
-	for(i = 0; i < bnd->len; i++) {
-		ierr = stella_boundary_add(slv->ptr->boundary, (stella_bctype) bnd->v[i].type, bnd->v[i].norm_dir,
-		                           bnd->v[i].is, bnd->v[i].ie, bnd->v[i].dirichlet);CHKERRQ(ierr);
-	}
+	ierr = stella_set_boundary(slv->ptr, ptypes, classify, norm_dir, values);CHKERRQ(ierr);
 
 	ierr = stella_setup_op(slv->ptr);CHKERRQ(ierr);
 

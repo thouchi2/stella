@@ -16,32 +16,10 @@
  * This module is used for defining common functions among boundary conditions.
  */
 typedef enum {
-	STELLA_DIRICHLET_G = 600,
-	STELLA_DIRICHLET_P = 601,
+	STELLA_DIRICHLET = 600,
 	STELLA_NEUMANN = 602,
 	STELLA_SCHWARZ = 698
 } stella_bctype;
-
-
-/**
- * Contains indexing information for corners of boundary condition
- */
-typedef struct {
-	int is[3], ie[3]; /**< index of bc's starting and ending grid point in each dimension */
-} stella_corner;
-
-
-/**
- * Holds boundary condition information from PlasComCM (dupcliates patch Fortran ds)
- */
-typedef struct {
-	stella_corner corners;
-	stella_bctype bc_type;
-	int norm_dir; /**< Direction of the normal */
-	double *dirichlet; /**< Dirichlet BC specification for each grid point contained in BC */
-	int offset[3]; /**< offset of fortran arrays (see stella_interface.h) */
-	int stride[3];  /**< stride of fortran arrays (see stella_interface.h) */
-} stella_patch;
 
 
 /**
@@ -55,9 +33,10 @@ typedef struct stella_bc_ {
 	stella_level *level;
 	int axisymmetric;
 	stella_dmap *slv_dmap;
-	stella_patch *patch;
 	stella_state *state;
 	stella_fd *fd;
+	char *norm_dirs;
+	double *values;
 	stella_bctype btype;
 	void *sub; /** pointer for child specific data */
 } stella_bc;
@@ -77,9 +56,9 @@ typedef struct stella_bc_ {
  * @param state state variable object
  * @param fd object that contains finite difference coefficients
  */
-PetscErrorCode stella_bc_create(stella_bc **efbc, stella_bctype btype, int norm_dir, int is[], int ie[],
-                            double *dirichlet, stella_level *level, stella_dmap *dmap,
-                            stella_state *state, stella_fd *fd);
+PetscErrorCode stella_bc_create(stella_bc **efbc, stella_bctype btype, char *norm_dir, double *values,
+                                stella_level *level, stella_dmap *dmap,
+                                stella_state *state, stella_fd *fd);
 
 
 /**

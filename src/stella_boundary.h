@@ -32,6 +32,16 @@ PetscErrorCode stella_boundary_create(stella_boundary **stella_bnd, stella_level
 
 
 /**
+ * Set boundary conditions for elliptic solve.
+ *
+ * @param bnd boundary object
+ * @param norm_dir grid array specifying the outward normal of a boundary condition (if applicable)
+ * @param values grid array of boundary values
+ */
+PetscErrorCode stella_boundary_set(stella_boundary *bnd, char *norm_dir, double *values);
+
+
+/**
  * Adds boundary conditions to matrix.
  *
  * @param bnd boundary object
@@ -39,20 +49,6 @@ PetscErrorCode stella_boundary_create(stella_boundary **stella_bnd, stella_level
  * @param da data structure for structured grid
  */
 PetscErrorCode stella_boundary_apply(stella_boundary *bnd, Mat A, DM da);
-
-
-/**
- * Adds a boundary condition to a grid's boundary.
- *
- * @param bnd boundary object
- * @param btype type of boundary condition (Dirichlet, Neumann, ...)
- * @param norm_dir Direction of outward normal
- * @param is global index of this processors starting grid point in each dimension
- * @param ie global index of this processors ending grid point in each dimension
- * @param Dirichlet values of Dirichlet boundary (ignored if btype is not Dirichlet)
- */
-PetscErrorCode stella_boundary_add(stella_boundary *bnd, stella_bctype btype, int norm_dir,
-                               int is[], int ie[], double *dirichlet);
 
 
 /**

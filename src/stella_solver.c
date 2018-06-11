@@ -6,6 +6,7 @@
 
 #include "stella_mat.h"
 #include "stella_pc.h"
+#include "stella_classify.h"
 
 #ifdef WITH_BOXMG
 #include <boxmg/capi.h>
@@ -487,6 +488,18 @@ PetscErrorCode stella_set_grid(stella *slv, int is[], int ie[], int num_cells, d
 		ierr = VecView(gc, vout);CHKERRQ(ierr);
 		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
 	}
+
+	return 0;
+}
+
+
+PetscErrorCode stella_set_boundary(stella *slv, stella_ptypes ptypes,
+                                   char classify[], char norm_dir[], double values[])
+{
+	PetscErrorCode ierr;
+
+	ierr = stella_classify_create(&slv->level.classify, slv->dm, slv->dmap, classify, ptypes);CHKERRQ(ierr);
+	ierr = stella_boundary_set(slv->boundary, norm_dir, values);CHKERRQ(ierr);
 
 	return 0;
 }

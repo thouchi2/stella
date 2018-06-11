@@ -136,6 +136,19 @@ PetscErrorCode stella_set_grid(stella *slv, int is[], int ie[], int num_cells, d
 
 
 /**
+ * Set boundary conditions.
+ *
+ * @param slv solver object
+ * @param ptypes specifies values for boundary condition flags (so classify array can be interpreted)
+ * @param classify grid array that classifies each grid point as specific boundary condition or interior
+ * @param norm_dir grid array that specifies the normal direction for the boundary condition applied at each point (if applicable)
+ * @param values grid array that specifies the value of a boundary condition for each point (e.g., solution[idx] = value[idx] if classify[idx] == dirichlet)
+ */
+PetscErrorCode stella_set_boundary(stella *slv, stella_ptypes ptypes,
+                                   char classify[], char norms[], double values[]);
+
+
+/**
  * Checks if log level is active
  */
 int stella_log(stella*, stella_log_level);
