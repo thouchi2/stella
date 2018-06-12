@@ -30,7 +30,7 @@ static PetscErrorCode get_3d_char(stella_dmap *idx, char *src, char ****dest)
 	char **b;
 	int i, j;
 
-	dest = (char****) malloc((idx->stride[2] + idx->stride[2]*idx->stride[1])*sizeof(char*));
+	*dest = malloc((idx->stride[2] + idx->stride[2]*idx->stride[1])*sizeof(char*));
 
 	b = (char**)((*dest) + idx->stride[2]);
 	for (i = 0; i < idx->stride[2]; i++) (*dest)[i] = b + i*idx->stride[1] - idx->ys;
