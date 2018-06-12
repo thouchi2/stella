@@ -1,0 +1,80 @@
+\hypertarget{stella__pc_8c}{}\section{src/stella\+\_\+pc.c File Reference}
+\label{stella__pc_8c}\index{src/stella\+\_\+pc.\+c@{src/stella\+\_\+pc.\+c}}
+{\ttfamily \#include \char`\"{}stella\+\_\+mat.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+pc.\+h\char`\"{}}\newline
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}~\char`\"{}stella\+\_\+pc\+\_\+create\char`\"{}
+\item 
+\#define \mbox{\hyperlink{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}~\char`\"{}stella\+\_\+pc\+\_\+setup\char`\"{}
+\item 
+\#define \mbox{\hyperlink{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}~\char`\"{}stella\+\_\+pc\+\_\+apply\char`\"{}
+\item 
+\#define \mbox{\hyperlink{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}~\char`\"{}stella\+\_\+pc\+\_\+destroy\char`\"{}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__pc_8c_a8775774222b89e9a1acfca036d8cebfa}{stella\+\_\+pc\+\_\+create}} (\mbox{\hyperlink{structstella__pc}{stella\+\_\+pc}} $\ast$$\ast$pc)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__pc_8c_ae3f02d8132c97c4e1019cecabeeb925e}{stella\+\_\+pc\+\_\+setup}} (PC pc)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__pc_8c_ae09a9b77b8768d3ffa27214175b8af51}{stella\+\_\+pc\+\_\+apply}} (PC pc, Vec x, Vec y)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__pc_8c_aca60e793a7942feb769aae210db5cb4b}{stella\+\_\+pc\+\_\+destroy}} (PC pc)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}\label{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}{\_\_FUNCT\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+~\char`\"{}stella\+\_\+pc\+\_\+create\char`\"{}}
+
+\mbox{\Hypertarget{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}\label{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}{\_\_FUNCT\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+~\char`\"{}stella\+\_\+pc\+\_\+setup\char`\"{}}
+
+\mbox{\Hypertarget{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}\label{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}{\_\_FUNCT\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+~\char`\"{}stella\+\_\+pc\+\_\+apply\char`\"{}}
+
+\mbox{\Hypertarget{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}\label{stella__pc_8c_ae60511a9aa5cbf216a00a1bb81006bc5}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+@{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{\+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+}{\_\_FUNCT\_\_}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily \#define \+\_\+\+\_\+\+F\+U\+N\+C\+T\+\_\+\+\_\+~\char`\"{}stella\+\_\+pc\+\_\+destroy\char`\"{}}
+
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__pc_8c_ae09a9b77b8768d3ffa27214175b8af51}\label{stella__pc_8c_ae09a9b77b8768d3ffa27214175b8af51}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!stella\+\_\+pc\+\_\+apply@{stella\+\_\+pc\+\_\+apply}}
+\index{stella\+\_\+pc\+\_\+apply@{stella\+\_\+pc\+\_\+apply}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+pc\+\_\+apply()}{stella\_pc\_apply()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+pc\+\_\+apply (\begin{DoxyParamCaption}\item[{PC}]{pc,  }\item[{Vec}]{x,  }\item[{Vec}]{y }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__pc_8c_a8775774222b89e9a1acfca036d8cebfa}\label{stella__pc_8c_a8775774222b89e9a1acfca036d8cebfa}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!stella\+\_\+pc\+\_\+create@{stella\+\_\+pc\+\_\+create}}
+\index{stella\+\_\+pc\+\_\+create@{stella\+\_\+pc\+\_\+create}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+pc\+\_\+create()}{stella\_pc\_create()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+pc\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__pc}{stella\+\_\+pc}} $\ast$$\ast$}]{pc }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__pc_8c_aca60e793a7942feb769aae210db5cb4b}\label{stella__pc_8c_aca60e793a7942feb769aae210db5cb4b}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!stella\+\_\+pc\+\_\+destroy@{stella\+\_\+pc\+\_\+destroy}}
+\index{stella\+\_\+pc\+\_\+destroy@{stella\+\_\+pc\+\_\+destroy}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+pc\+\_\+destroy()}{stella\_pc\_destroy()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+pc\+\_\+destroy (\begin{DoxyParamCaption}\item[{PC}]{pc }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__pc_8c_ae3f02d8132c97c4e1019cecabeeb925e}\label{stella__pc_8c_ae3f02d8132c97c4e1019cecabeeb925e}} 
+\index{stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}!stella\+\_\+pc\+\_\+setup@{stella\+\_\+pc\+\_\+setup}}
+\index{stella\+\_\+pc\+\_\+setup@{stella\+\_\+pc\+\_\+setup}!stella\+\_\+pc.\+c@{stella\+\_\+pc.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+pc\+\_\+setup()}{stella\_pc\_setup()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+pc\+\_\+setup (\begin{DoxyParamCaption}\item[{PC}]{pc }\end{DoxyParamCaption})}
+

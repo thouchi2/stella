@@ -1,0 +1,63 @@
+\hypertarget{stella__fd_8h}{}\section{src/stella\+\_\+fd.h File Reference}
+\label{stella__fd_8h}\index{src/stella\+\_\+fd.\+h@{src/stella\+\_\+fd.\+h}}
+{\ttfamily \#include $<$petscsys.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+stencil.\+h\char`\"{}}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}}
+\begin{DoxyCompactList}\small\item\em Contains finite difference stencil coefficients. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \mbox{\hyperlink{stella__fd_8h_af846b314d99e175f3bf3a7e1c62e86e7}{S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2}}~\char`\"{}standard second order\char`\"{}
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef const char $\ast$ \mbox{\hyperlink{stella__fd_8h_adcce97872fa6093ccd0f766114685feb}{stella\+\_\+fd\+\_\+type}}
+\begin{DoxyCompactList}\small\item\em file\+: \mbox{\hyperlink{stella__fd_8h}{stella\+\_\+fd.\+h}} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__fd_8h_aea9d2c022171594a049837c9e6c341f7}{stella\+\_\+fd\+\_\+create}} (\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$$\ast$fd, \mbox{\hyperlink{stella__fd_8h_adcce97872fa6093ccd0f766114685feb}{stella\+\_\+fd\+\_\+type}} type)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__fd_8h_a5888cacd615cf0c5edc1a14832e9805f}{stella\+\_\+fd\+\_\+destroy}} (\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$fd)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\mbox{\Hypertarget{stella__fd_8h_af846b314d99e175f3bf3a7e1c62e86e7}\label{stella__fd_8h_af846b314d99e175f3bf3a7e1c62e86e7}} 
+\index{stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}!S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2@{S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2}}
+\index{S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2@{S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2}!stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}}
+\subsubsection{\texorpdfstring{S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2}{STELLA\_FD\_STANDARD\_O2}}
+{\footnotesize\ttfamily \#define S\+T\+E\+L\+L\+A\+\_\+\+F\+D\+\_\+\+S\+T\+A\+N\+D\+A\+R\+D\+\_\+\+O2~\char`\"{}standard second order\char`\"{}}
+
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{stella__fd_8h_adcce97872fa6093ccd0f766114685feb}\label{stella__fd_8h_adcce97872fa6093ccd0f766114685feb}} 
+\index{stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}!stella\+\_\+fd\+\_\+type@{stella\+\_\+fd\+\_\+type}}
+\index{stella\+\_\+fd\+\_\+type@{stella\+\_\+fd\+\_\+type}!stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+fd\+\_\+type}{stella\_fd\_type}}
+{\footnotesize\ttfamily typedef const char$\ast$ \mbox{\hyperlink{stella__fd_8h_adcce97872fa6093ccd0f766114685feb}{stella\+\_\+fd\+\_\+type}}}
+
+
+
+file\+: \mbox{\hyperlink{stella__fd_8h}{stella\+\_\+fd.\+h}} 
+
+Class that is used to hold finite difference coefficients on a grid with unit spacing 
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__fd_8h_aea9d2c022171594a049837c9e6c341f7}\label{stella__fd_8h_aea9d2c022171594a049837c9e6c341f7}} 
+\index{stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}!stella\+\_\+fd\+\_\+create@{stella\+\_\+fd\+\_\+create}}
+\index{stella\+\_\+fd\+\_\+create@{stella\+\_\+fd\+\_\+create}!stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+fd\+\_\+create()}{stella\_fd\_create()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+fd\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$$\ast$}]{fd,  }\item[{\mbox{\hyperlink{stella__fd_8h_adcce97872fa6093ccd0f766114685feb}{stella\+\_\+fd\+\_\+type}}}]{type }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__fd_8h_a5888cacd615cf0c5edc1a14832e9805f}\label{stella__fd_8h_a5888cacd615cf0c5edc1a14832e9805f}} 
+\index{stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}!stella\+\_\+fd\+\_\+destroy@{stella\+\_\+fd\+\_\+destroy}}
+\index{stella\+\_\+fd\+\_\+destroy@{stella\+\_\+fd\+\_\+destroy}!stella\+\_\+fd.\+h@{stella\+\_\+fd.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+fd\+\_\+destroy()}{stella\_fd\_destroy()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+fd\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$}]{fd }\end{DoxyParamCaption})}
+

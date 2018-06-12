@@ -1,0 +1,131 @@
+\hypertarget{structstella__dmap}{}\section{stella\+\_\+dmap Struct Reference}
+\label{structstella__dmap}\index{stella\+\_\+dmap@{stella\+\_\+dmap}}
+
+
+Data mapping object.  
+
+
+
+
+{\ttfamily \#include $<$stella\+\_\+dmap.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{structstella__dmap_ae1538110e94bee9026b476a681c44946}{xs}}
+\item 
+int \mbox{\hyperlink{structstella__dmap_a94190e8f2f3c1efee08b51752d95c6ec}{ys}}
+\item 
+int \mbox{\hyperlink{structstella__dmap_a06bde1f9d13046c7f907a2ccdd38345e}{zs}}
+\item 
+int \mbox{\hyperlink{structstella__dmap_a44f81af4ad90a0daaa293a5b27d23cd8}{xm}}
+\item 
+int \mbox{\hyperlink{structstella__dmap_a1a8ce114a2fbc771a693a14353588ab9}{ym}}
+\item 
+int \mbox{\hyperlink{structstella__dmap_af16139e8ef8d7724bbeb8af004176c68}{zm}}
+\item 
+int \mbox{\hyperlink{structstella__dmap_a70743458c3c20e0bc910126f429ef45b}{nd}}
+\begin{DoxyCompactList}\small\item\em number of dimensions of structured grid \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{structstella__dmap_afe5870832e891c0254aa65a3f2f72e3e}{stride}} \mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em strides of array that will be mapped \end{DoxyCompactList}\item 
+Petsc\+Error\+Code($\ast$ \mbox{\hyperlink{structstella__dmap_a66a98f3b85ce77dbfdfbfc72040c6e3c}{get\+\_\+2d}} )(struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$src, double $\ast$$\ast$$\ast$array)
+\item 
+Petsc\+Error\+Code($\ast$ \mbox{\hyperlink{structstella__dmap_ada758dbdff7819b7c7d6e89ee84bcde2}{restore\+\_\+2d}} )(struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$$\ast$$\ast$array)
+\item 
+Petsc\+Error\+Code($\ast$ \mbox{\hyperlink{structstella__dmap_a255fe3be53c3cc120d903111569fa168}{get\+\_\+3d}} )(struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$src, double $\ast$$\ast$$\ast$$\ast$array)
+\item 
+Petsc\+Error\+Code($\ast$ \mbox{\hyperlink{structstella__dmap_a6cfc7c2d169e5b575b4e0f999304f092}{restore\+\_\+3d}} )(struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$$\ast$$\ast$$\ast$array)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Data mapping object. 
+
+This object manages mapping data from a given source. For example, arrays on 2 or 3 dimensional grids may include ghost points or have different strides. This object provides a general interface from which the efield solver can map contiguous data arrays from different sources to two or three dimensional arrays on a structured grid. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structstella__dmap_a66a98f3b85ce77dbfdfbfc72040c6e3c}\label{structstella__dmap_a66a98f3b85ce77dbfdfbfc72040c6e3c}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!get\+\_\+2d@{get\+\_\+2d}}
+\index{get\+\_\+2d@{get\+\_\+2d}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{get\+\_\+2d}{get\_2d}}
+{\footnotesize\ttfamily Petsc\+Error\+Code($\ast$ stella\+\_\+dmap\+::get\+\_\+2d) (struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$src, double $\ast$$\ast$$\ast$array)}
+
+\mbox{\Hypertarget{structstella__dmap_a255fe3be53c3cc120d903111569fa168}\label{structstella__dmap_a255fe3be53c3cc120d903111569fa168}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!get\+\_\+3d@{get\+\_\+3d}}
+\index{get\+\_\+3d@{get\+\_\+3d}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{get\+\_\+3d}{get\_3d}}
+{\footnotesize\ttfamily Petsc\+Error\+Code($\ast$ stella\+\_\+dmap\+::get\+\_\+3d) (struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$src, double $\ast$$\ast$$\ast$$\ast$array)}
+
+\mbox{\Hypertarget{structstella__dmap_a70743458c3c20e0bc910126f429ef45b}\label{structstella__dmap_a70743458c3c20e0bc910126f429ef45b}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!nd@{nd}}
+\index{nd@{nd}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{nd}{nd}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::nd}
+
+
+
+number of dimensions of structured grid 
+
+\mbox{\Hypertarget{structstella__dmap_ada758dbdff7819b7c7d6e89ee84bcde2}\label{structstella__dmap_ada758dbdff7819b7c7d6e89ee84bcde2}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!restore\+\_\+2d@{restore\+\_\+2d}}
+\index{restore\+\_\+2d@{restore\+\_\+2d}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{restore\+\_\+2d}{restore\_2d}}
+{\footnotesize\ttfamily Petsc\+Error\+Code($\ast$ stella\+\_\+dmap\+::restore\+\_\+2d) (struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$$\ast$$\ast$array)}
+
+\mbox{\Hypertarget{structstella__dmap_a6cfc7c2d169e5b575b4e0f999304f092}\label{structstella__dmap_a6cfc7c2d169e5b575b4e0f999304f092}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!restore\+\_\+3d@{restore\+\_\+3d}}
+\index{restore\+\_\+3d@{restore\+\_\+3d}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{restore\+\_\+3d}{restore\_3d}}
+{\footnotesize\ttfamily Petsc\+Error\+Code($\ast$ stella\+\_\+dmap\+::restore\+\_\+3d) (struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$$\ast$$\ast$$\ast$array)}
+
+\mbox{\Hypertarget{structstella__dmap_afe5870832e891c0254aa65a3f2f72e3e}\label{structstella__dmap_afe5870832e891c0254aa65a3f2f72e3e}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!stride@{stride}}
+\index{stride@{stride}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{stride}{stride}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::stride\mbox{[}3\mbox{]}}
+
+
+
+strides of array that will be mapped 
+
+\mbox{\Hypertarget{structstella__dmap_a44f81af4ad90a0daaa293a5b27d23cd8}\label{structstella__dmap_a44f81af4ad90a0daaa293a5b27d23cd8}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!xm@{xm}}
+\index{xm@{xm}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{xm}{xm}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::xm}
+
+\mbox{\Hypertarget{structstella__dmap_ae1538110e94bee9026b476a681c44946}\label{structstella__dmap_ae1538110e94bee9026b476a681c44946}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!xs@{xs}}
+\index{xs@{xs}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{xs}{xs}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::xs}
+
+\mbox{\Hypertarget{structstella__dmap_a1a8ce114a2fbc771a693a14353588ab9}\label{structstella__dmap_a1a8ce114a2fbc771a693a14353588ab9}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!ym@{ym}}
+\index{ym@{ym}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{ym}{ym}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::ym}
+
+\mbox{\Hypertarget{structstella__dmap_a94190e8f2f3c1efee08b51752d95c6ec}\label{structstella__dmap_a94190e8f2f3c1efee08b51752d95c6ec}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!ys@{ys}}
+\index{ys@{ys}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{ys}{ys}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::ys}
+
+\mbox{\Hypertarget{structstella__dmap_af16139e8ef8d7724bbeb8af004176c68}\label{structstella__dmap_af16139e8ef8d7724bbeb8af004176c68}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!zm@{zm}}
+\index{zm@{zm}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{zm}{zm}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::zm}
+
+\mbox{\Hypertarget{structstella__dmap_a06bde1f9d13046c7f907a2ccdd38345e}\label{structstella__dmap_a06bde1f9d13046c7f907a2ccdd38345e}} 
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!zs@{zs}}
+\index{zs@{zs}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\subsubsection{\texorpdfstring{zs}{zs}}
+{\footnotesize\ttfamily int stella\+\_\+dmap\+::zs}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{stella__dmap_8h}{stella\+\_\+dmap.\+h}}\end{DoxyCompactItemize}

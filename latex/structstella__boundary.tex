@@ -1,0 +1,105 @@
+\hypertarget{structstella__boundary}{}\section{stella\+\_\+boundary Struct Reference}
+\label{structstella__boundary}\index{stella\+\_\+boundary@{stella\+\_\+boundary}}
+
+
+Contains all boundary conditions for a grid.  
+
+
+
+
+{\ttfamily \#include $<$stella\+\_\+boundary.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$$\ast$ \mbox{\hyperlink{structstella__boundary_af712b858f672194c13f7e0ce86537f25}{bc}}
+\item 
+int \mbox{\hyperlink{structstella__boundary_a55a9f53e7fdf2f2f8022fc16aec14d30}{num\+\_\+bc}}
+\begin{DoxyCompactList}\small\item\em number of boundary conditions \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structstella__level}{stella\+\_\+level}} $\ast$ \mbox{\hyperlink{structstella__boundary_a38bf65e2918d41490b536af9478d97be}{level}}
+\begin{DoxyCompactList}\small\item\em data needed on each level \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$ \mbox{\hyperlink{structstella__boundary_ad7a6e474dfc00d9200c215d2a2799d85}{slv\+\_\+dmap}}
+\begin{DoxyCompactList}\small\item\em efield solver\textquotesingle{}s datamapping object \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structstella__state}{stella\+\_\+state}} $\ast$ \mbox{\hyperlink{structstella__boundary_ae7b56bc4c6920cc10b7a433814d97713}{state}}
+\begin{DoxyCompactList}\small\item\em state data for efield solver \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{structstella__boundary_aa48ec578f176edf7dcb02d2503506651}{axisymmetric}}
+\begin{DoxyCompactList}\small\item\em flag to indicate axisymmetric operator \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$ \mbox{\hyperlink{structstella__boundary_ab465b7c329e9b4a4450729e0b241600a}{fd}}
+\begin{DoxyCompactList}\small\item\em finite difference coefficients \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Contains all boundary conditions for a grid. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structstella__boundary_aa48ec578f176edf7dcb02d2503506651}\label{structstella__boundary_aa48ec578f176edf7dcb02d2503506651}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!axisymmetric@{axisymmetric}}
+\index{axisymmetric@{axisymmetric}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{axisymmetric}{axisymmetric}}
+{\footnotesize\ttfamily int stella\+\_\+boundary\+::axisymmetric}
+
+
+
+flag to indicate axisymmetric operator 
+
+\mbox{\Hypertarget{structstella__boundary_af712b858f672194c13f7e0ce86537f25}\label{structstella__boundary_af712b858f672194c13f7e0ce86537f25}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!bc@{bc}}
+\index{bc@{bc}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{bc}{bc}}
+{\footnotesize\ttfamily \mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}}$\ast$$\ast$ stella\+\_\+boundary\+::bc}
+
+\mbox{\Hypertarget{structstella__boundary_ab465b7c329e9b4a4450729e0b241600a}\label{structstella__boundary_ab465b7c329e9b4a4450729e0b241600a}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!fd@{fd}}
+\index{fd@{fd}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{fd}{fd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}}$\ast$ stella\+\_\+boundary\+::fd}
+
+
+
+finite difference coefficients 
+
+\mbox{\Hypertarget{structstella__boundary_a38bf65e2918d41490b536af9478d97be}\label{structstella__boundary_a38bf65e2918d41490b536af9478d97be}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!level@{level}}
+\index{level@{level}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{level}{level}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__level}{stella\+\_\+level}}$\ast$ stella\+\_\+boundary\+::level}
+
+
+
+data needed on each level 
+
+\mbox{\Hypertarget{structstella__boundary_a55a9f53e7fdf2f2f8022fc16aec14d30}\label{structstella__boundary_a55a9f53e7fdf2f2f8022fc16aec14d30}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!num\+\_\+bc@{num\+\_\+bc}}
+\index{num\+\_\+bc@{num\+\_\+bc}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{num\+\_\+bc}{num\_bc}}
+{\footnotesize\ttfamily int stella\+\_\+boundary\+::num\+\_\+bc}
+
+
+
+number of boundary conditions 
+
+\mbox{\Hypertarget{structstella__boundary_ad7a6e474dfc00d9200c215d2a2799d85}\label{structstella__boundary_ad7a6e474dfc00d9200c215d2a2799d85}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!slv\+\_\+dmap@{slv\+\_\+dmap}}
+\index{slv\+\_\+dmap@{slv\+\_\+dmap}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{slv\+\_\+dmap}{slv\_dmap}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}$\ast$ stella\+\_\+boundary\+::slv\+\_\+dmap}
+
+
+
+efield solver\textquotesingle{}s datamapping object 
+
+\mbox{\Hypertarget{structstella__boundary_ae7b56bc4c6920cc10b7a433814d97713}\label{structstella__boundary_ae7b56bc4c6920cc10b7a433814d97713}} 
+\index{stella\+\_\+boundary@{stella\+\_\+boundary}!state@{state}}
+\index{state@{state}!stella\+\_\+boundary@{stella\+\_\+boundary}}
+\subsubsection{\texorpdfstring{state}{state}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__state}{stella\+\_\+state}}$\ast$ stella\+\_\+boundary\+::state}
+
+
+
+state data for efield solver 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{stella__boundary_8h}{stella\+\_\+boundary.\+h}}\end{DoxyCompactItemize}

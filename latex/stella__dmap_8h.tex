@@ -1,0 +1,127 @@
+\hypertarget{stella__dmap_8h}{}\section{src/stella\+\_\+dmap.h File Reference}
+\label{stella__dmap_8h}\index{src/stella\+\_\+dmap.\+h@{src/stella\+\_\+dmap.\+h}}
+{\ttfamily \#include \char`\"{}petscsys.\+h\char`\"{}}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}
+\begin{DoxyCompactList}\small\item\em Data mapping object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} \mbox{\hyperlink{stella__dmap_8h_a38a3786379f724b5f91826662047cd98}{stella\+\_\+dmap}}
+\begin{DoxyCompactList}\small\item\em Data mapping object. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$ \mbox{\hyperlink{stella__dmap_8h_a33a1eacd31f5648e56995789cc748cc6}{stella\+\_\+dmap\+\_\+create\+\_\+3d}} (int xs, int ys, int zs, int xm, int ym, int zm, int stride\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Constructor for a data mapping object on a three dimensional grid. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$ \mbox{\hyperlink{stella__dmap_8h_aa3d59e7dabe6499129d661a3fd84ef0c}{stella\+\_\+dmap\+\_\+create\+\_\+2d}} (int xs, int ys, int xm, int ym, int stride\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Constructor for a data mapping object on a two dimensional grid. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__dmap_8h_a22a372d23bce1c75f6958da70d81d3e4}{stella\+\_\+dmap\+\_\+get}} (\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, double $\ast$src, void $\ast$array)
+\begin{DoxyCompactList}\small\item\em Gives a multidimensional array of mapped data indexed globally on the two or three dimensional structured grid. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__dmap_8h_ac30584985485c328cb9e9ede13048834}{stella\+\_\+dmap\+\_\+restore}} (\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp, void $\ast$array)
+\begin{DoxyCompactList}\small\item\em Frees memory created when using stella\+\_\+dmap\+\_\+get. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__dmap_8h_a2d6140fe2dd610c6af9c666bea8f4f1f}{stella\+\_\+dmap\+\_\+destroy}} (\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$mp)
+\end{DoxyCompactItemize}
+
+
+\subsection{Typedef Documentation}
+\mbox{\Hypertarget{stella__dmap_8h_a38a3786379f724b5f91826662047cd98}\label{stella__dmap_8h_a38a3786379f724b5f91826662047cd98}} 
+\index{stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}!stella\+\_\+dmap@{stella\+\_\+dmap}}
+\index{stella\+\_\+dmap@{stella\+\_\+dmap}!stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+dmap}{stella\_dmap}}
+{\footnotesize\ttfamily typedef struct \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}  \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}}
+
+
+
+Data mapping object. 
+
+This object manages mapping data from a given source. For example, arrays on 2 or 3 dimensional grids may include ghost points or have different strides. This object provides a general interface from which the efield solver can map contiguous data arrays from different sources to two or three dimensional arrays on a structured grid. 
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__dmap_8h_aa3d59e7dabe6499129d661a3fd84ef0c}\label{stella__dmap_8h_aa3d59e7dabe6499129d661a3fd84ef0c}} 
+\index{stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}!stella\+\_\+dmap\+\_\+create\+\_\+2d@{stella\+\_\+dmap\+\_\+create\+\_\+2d}}
+\index{stella\+\_\+dmap\+\_\+create\+\_\+2d@{stella\+\_\+dmap\+\_\+create\+\_\+2d}!stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+dmap\+\_\+create\+\_\+2d()}{stella\_dmap\_create\_2d()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}$\ast$ stella\+\_\+dmap\+\_\+create\+\_\+2d (\begin{DoxyParamCaption}\item[{int}]{xs,  }\item[{int}]{ys,  }\item[{int}]{xm,  }\item[{int}]{ym,  }\item[{int}]{stride\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Constructor for a data mapping object on a two dimensional grid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em xs} & index of first grid point in the first dimension \\
+\hline
+{\em ys} & index of first grid point in the second dimension \\
+\hline
+{\em xm} & number of grid points in the first dimension \\
+\hline
+{\em ym} & number of grid points in the second dimension \\
+\hline
+{\em stride} & stride of array in each dimension \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{stella__dmap_8h_a33a1eacd31f5648e56995789cc748cc6}\label{stella__dmap_8h_a33a1eacd31f5648e56995789cc748cc6}} 
+\index{stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}!stella\+\_\+dmap\+\_\+create\+\_\+3d@{stella\+\_\+dmap\+\_\+create\+\_\+3d}}
+\index{stella\+\_\+dmap\+\_\+create\+\_\+3d@{stella\+\_\+dmap\+\_\+create\+\_\+3d}!stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+dmap\+\_\+create\+\_\+3d()}{stella\_dmap\_create\_3d()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}$\ast$ stella\+\_\+dmap\+\_\+create\+\_\+3d (\begin{DoxyParamCaption}\item[{int}]{xs,  }\item[{int}]{ys,  }\item[{int}]{zs,  }\item[{int}]{xm,  }\item[{int}]{ym,  }\item[{int}]{zm,  }\item[{int}]{stride\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Constructor for a data mapping object on a three dimensional grid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em xs} & index of first grid point in the first dimension \\
+\hline
+{\em ys} & index of first grid point in the second dimension \\
+\hline
+{\em zs} & index of first grid point in the third dimension \\
+\hline
+{\em xm} & number of grid points in the first dimension \\
+\hline
+{\em ym} & number of grid points in the second dimension \\
+\hline
+{\em zm} & number of grid points in the third dimension \\
+\hline
+{\em stride} & stride of array in each dimension \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{stella__dmap_8h_a2d6140fe2dd610c6af9c666bea8f4f1f}\label{stella__dmap_8h_a2d6140fe2dd610c6af9c666bea8f4f1f}} 
+\index{stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}!stella\+\_\+dmap\+\_\+destroy@{stella\+\_\+dmap\+\_\+destroy}}
+\index{stella\+\_\+dmap\+\_\+destroy@{stella\+\_\+dmap\+\_\+destroy}!stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+dmap\+\_\+destroy()}{stella\_dmap\_destroy()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+dmap\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$}]{mp }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__dmap_8h_a22a372d23bce1c75f6958da70d81d3e4}\label{stella__dmap_8h_a22a372d23bce1c75f6958da70d81d3e4}} 
+\index{stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}!stella\+\_\+dmap\+\_\+get@{stella\+\_\+dmap\+\_\+get}}
+\index{stella\+\_\+dmap\+\_\+get@{stella\+\_\+dmap\+\_\+get}!stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+dmap\+\_\+get()}{stella\_dmap\_get()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+dmap\+\_\+get (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$}]{mp,  }\item[{double $\ast$}]{src,  }\item[{void $\ast$}]{array }\end{DoxyParamCaption})}
+
+
+
+Gives a multidimensional array of mapped data indexed globally on the two or three dimensional structured grid. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em mp} & data mapping object \\
+\hline
+{\em src} & data mapping source array \\
+\hline
+{\em array} & multidimensional array of mapped data \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{stella__dmap_8h_ac30584985485c328cb9e9ede13048834}\label{stella__dmap_8h_ac30584985485c328cb9e9ede13048834}} 
+\index{stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}!stella\+\_\+dmap\+\_\+restore@{stella\+\_\+dmap\+\_\+restore}}
+\index{stella\+\_\+dmap\+\_\+restore@{stella\+\_\+dmap\+\_\+restore}!stella\+\_\+dmap.\+h@{stella\+\_\+dmap.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+dmap\+\_\+restore()}{stella\_dmap\_restore()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+dmap\+\_\+restore (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$}]{mp,  }\item[{void $\ast$}]{array }\end{DoxyParamCaption})}
+
+
+
+Frees memory created when using stella\+\_\+dmap\+\_\+get. 
+

@@ -1,0 +1,100 @@
+\hypertarget{stella__metric_8h}{}\section{src/stella\+\_\+metric.h File Reference}
+\label{stella__metric_8h}\index{src/stella\+\_\+metric.\+h@{src/stella\+\_\+metric.\+h}}
+{\ttfamily \#include $<$petscdmda.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+fd.\+h\char`\"{}}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstella__metric}{stella\+\_\+metric}}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0ab}{stella\+\_\+met\+\_\+dir}} \{ \newline
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba14f7c99f5f0eb2ba97aa6410e8725438}{M\+E\+T\+\_\+C}} =0, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba5e9fffb4f21b89166ba9dfbb5fb681cd}{M\+E\+T\+\_\+S}} =1, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba6bf75df973bf2309242b1fdacbbeca0b}{M\+E\+T\+\_\+W}} =2, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba9039401a782f3d46aa40555d915c2910}{M\+E\+T\+\_\+\+SW}} =3, 
+\newline
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba6341cf20874fc3f9320d538b11a8bb36}{M\+E\+T\+\_\+\+SE}} =4, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0abaa41935082dfbc02f7720cbd2a650bb99}{M\+E\+T\+\_\+B}} =5, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba3f9fc02e7dd55c0cb6cec0545f722b17}{M\+E\+T\+\_\+\+WB}} =6, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba19c2210a8695508c0ea53293e1f995d3}{M\+E\+T\+\_\+\+EB}} =7, 
+\newline
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba0fb5a0a83eabe053661f1b0682bf3780}{M\+E\+T\+\_\+\+SB}} =8, 
+\mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba7934850c8c524390062e0ca7b74775e0}{M\+E\+T\+\_\+\+NB}} =9
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__metric_8h_ad26dde3c82c59d80497892772ffdb3ac}{stella\+\_\+metric\+\_\+create}} (\mbox{\hyperlink{structstella__metric}{stella\+\_\+metric}} $\ast$$\ast$, DM, \mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__metric_8h_a53943674d20d9e8ec2e1c06231b63b60}{stella\+\_\+metric\+\_\+destroy}} (\mbox{\hyperlink{structstella__metric}{stella\+\_\+metric}} $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0ab}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0ab}} 
+\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!stella\+\_\+met\+\_\+dir@{stella\+\_\+met\+\_\+dir}}
+\index{stella\+\_\+met\+\_\+dir@{stella\+\_\+met\+\_\+dir}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+met\+\_\+dir}{stella\_met\_dir}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0ab}{stella\+\_\+met\+\_\+dir}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+C@{M\+E\+T\+\_\+C}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+C@{M\+E\+T\+\_\+C}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba14f7c99f5f0eb2ba97aa6410e8725438}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba14f7c99f5f0eb2ba97aa6410e8725438}} 
+M\+E\+T\+\_\+C&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+S@{M\+E\+T\+\_\+S}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+S@{M\+E\+T\+\_\+S}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba5e9fffb4f21b89166ba9dfbb5fb681cd}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba5e9fffb4f21b89166ba9dfbb5fb681cd}} 
+M\+E\+T\+\_\+S&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+W@{M\+E\+T\+\_\+W}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+W@{M\+E\+T\+\_\+W}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba6bf75df973bf2309242b1fdacbbeca0b}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba6bf75df973bf2309242b1fdacbbeca0b}} 
+M\+E\+T\+\_\+W&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+\+SW@{M\+E\+T\+\_\+\+SW}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+\+SW@{M\+E\+T\+\_\+\+SW}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba9039401a782f3d46aa40555d915c2910}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba9039401a782f3d46aa40555d915c2910}} 
+M\+E\+T\+\_\+\+SW&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+\+SE@{M\+E\+T\+\_\+\+SE}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+\+SE@{M\+E\+T\+\_\+\+SE}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba6341cf20874fc3f9320d538b11a8bb36}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba6341cf20874fc3f9320d538b11a8bb36}} 
+M\+E\+T\+\_\+\+SE&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+B@{M\+E\+T\+\_\+B}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+B@{M\+E\+T\+\_\+B}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0abaa41935082dfbc02f7720cbd2a650bb99}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0abaa41935082dfbc02f7720cbd2a650bb99}} 
+M\+E\+T\+\_\+B&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+\+WB@{M\+E\+T\+\_\+\+WB}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+\+WB@{M\+E\+T\+\_\+\+WB}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba3f9fc02e7dd55c0cb6cec0545f722b17}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba3f9fc02e7dd55c0cb6cec0545f722b17}} 
+M\+E\+T\+\_\+\+WB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+\+EB@{M\+E\+T\+\_\+\+EB}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+\+EB@{M\+E\+T\+\_\+\+EB}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba19c2210a8695508c0ea53293e1f995d3}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba19c2210a8695508c0ea53293e1f995d3}} 
+M\+E\+T\+\_\+\+EB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+\+SB@{M\+E\+T\+\_\+\+SB}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+\+SB@{M\+E\+T\+\_\+\+SB}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba0fb5a0a83eabe053661f1b0682bf3780}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba0fb5a0a83eabe053661f1b0682bf3780}} 
+M\+E\+T\+\_\+\+SB&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{M\+E\+T\+\_\+\+NB@{M\+E\+T\+\_\+\+NB}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!M\+E\+T\+\_\+\+NB@{M\+E\+T\+\_\+\+NB}}}\mbox{\Hypertarget{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba7934850c8c524390062e0ca7b74775e0}\label{stella__metric_8h_a45a1cb2a1215d67e723dae7250bba0aba7934850c8c524390062e0ca7b74775e0}} 
+M\+E\+T\+\_\+\+NB&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__metric_8h_ad26dde3c82c59d80497892772ffdb3ac}\label{stella__metric_8h_ad26dde3c82c59d80497892772ffdb3ac}} 
+\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!stella\+\_\+metric\+\_\+create@{stella\+\_\+metric\+\_\+create}}
+\index{stella\+\_\+metric\+\_\+create@{stella\+\_\+metric\+\_\+create}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+metric\+\_\+create()}{stella\_metric\_create()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+metric\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__metric}{stella\+\_\+metric}} $\ast$$\ast$}]{,  }\item[{DM}]{,  }\item[{\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__metric_8h_a53943674d20d9e8ec2e1c06231b63b60}\label{stella__metric_8h_a53943674d20d9e8ec2e1c06231b63b60}} 
+\index{stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}!stella\+\_\+metric\+\_\+destroy@{stella\+\_\+metric\+\_\+destroy}}
+\index{stella\+\_\+metric\+\_\+destroy@{stella\+\_\+metric\+\_\+destroy}!stella\+\_\+metric.\+h@{stella\+\_\+metric.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+metric\+\_\+destroy()}{stella\_metric\_destroy()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+metric\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__metric}{stella\+\_\+metric}} $\ast$}]{ }\end{DoxyParamCaption})}
+

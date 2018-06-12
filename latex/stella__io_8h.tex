@@ -1,0 +1,60 @@
+\hypertarget{stella__io_8h}{}\section{src/stella\+\_\+io.h File Reference}
+\label{stella__io_8h}\index{src/stella\+\_\+io.\+h@{src/stella\+\_\+io.\+h}}
+{\ttfamily \#include $<$petscdmda.\+h$>$}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__io_8h_a2e504078e3f0355faef7213203686e56}{stella\+\_\+io\+\_\+vtkwrite}} (DM da, Vec v, char $\ast$name, int grid\+\_\+id, int ts)
+\begin{DoxyCompactList}\small\item\em file\+: \mbox{\hyperlink{stella__io_8h}{stella\+\_\+io.\+h}} \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__io_8h_a4287bd507726318b12c995224bb1ad89}{stella\+\_\+io\+\_\+eigwrite}} (Petsc\+Real r\mbox{[}$\,$\mbox{]}, Petsc\+Real c\mbox{[}$\,$\mbox{]}, Petsc\+Int neig)
+\begin{DoxyCompactList}\small\item\em Writes estimation of the operators eigenvalues. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__io_8h_a1097df8e7d28fe7be61017da761ad27c}{stella\+\_\+io\+\_\+print}} (M\+P\+I\+\_\+\+Comm comm, char $\ast$msg)
+\begin{DoxyCompactList}\small\item\em Prints message to console. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__io_8h_a4287bd507726318b12c995224bb1ad89}\label{stella__io_8h_a4287bd507726318b12c995224bb1ad89}} 
+\index{stella\+\_\+io.\+h@{stella\+\_\+io.\+h}!stella\+\_\+io\+\_\+eigwrite@{stella\+\_\+io\+\_\+eigwrite}}
+\index{stella\+\_\+io\+\_\+eigwrite@{stella\+\_\+io\+\_\+eigwrite}!stella\+\_\+io.\+h@{stella\+\_\+io.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+io\+\_\+eigwrite()}{stella\_io\_eigwrite()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+io\+\_\+eigwrite (\begin{DoxyParamCaption}\item[{Petsc\+Real}]{r\mbox{[}$\,$\mbox{]},  }\item[{Petsc\+Real}]{c\mbox{[}$\,$\mbox{]},  }\item[{Petsc\+Int}]{neig }\end{DoxyParamCaption})}
+
+
+
+Writes estimation of the operators eigenvalues. 
+
+\mbox{\Hypertarget{stella__io_8h_a1097df8e7d28fe7be61017da761ad27c}\label{stella__io_8h_a1097df8e7d28fe7be61017da761ad27c}} 
+\index{stella\+\_\+io.\+h@{stella\+\_\+io.\+h}!stella\+\_\+io\+\_\+print@{stella\+\_\+io\+\_\+print}}
+\index{stella\+\_\+io\+\_\+print@{stella\+\_\+io\+\_\+print}!stella\+\_\+io.\+h@{stella\+\_\+io.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+io\+\_\+print()}{stella\_io\_print()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+io\+\_\+print (\begin{DoxyParamCaption}\item[{M\+P\+I\+\_\+\+Comm}]{comm,  }\item[{char $\ast$}]{msg }\end{DoxyParamCaption})}
+
+
+
+Prints message to console. 
+
+\mbox{\Hypertarget{stella__io_8h_a2e504078e3f0355faef7213203686e56}\label{stella__io_8h_a2e504078e3f0355faef7213203686e56}} 
+\index{stella\+\_\+io.\+h@{stella\+\_\+io.\+h}!stella\+\_\+io\+\_\+vtkwrite@{stella\+\_\+io\+\_\+vtkwrite}}
+\index{stella\+\_\+io\+\_\+vtkwrite@{stella\+\_\+io\+\_\+vtkwrite}!stella\+\_\+io.\+h@{stella\+\_\+io.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+io\+\_\+vtkwrite()}{stella\_io\_vtkwrite()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+io\+\_\+vtkwrite (\begin{DoxyParamCaption}\item[{DM}]{da,  }\item[{Vec}]{v,  }\item[{char $\ast$}]{name,  }\item[{int}]{grid\+\_\+id,  }\item[{int}]{ts }\end{DoxyParamCaption})}
+
+
+
+file\+: \mbox{\hyperlink{stella__io_8h}{stella\+\_\+io.\+h}} 
+
+General input/output utility functions for efield solver\+Writes a function over a structured grid to a vtk file
+
+
+\begin{DoxyParams}{Parameters}
+{\em da} & DM object that holds structured grid information \\
+\hline
+{\em v} & function to output \\
+\hline
+{\em name} & filename for vtkfile \\
+\hline
+{\em grid\+\_\+id} & unique id for multiple grid cases \\
+\hline
+{\em ts} & time step \\
+\hline
+\end{DoxyParams}

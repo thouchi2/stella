@@ -1,0 +1,44 @@
+\hypertarget{solver_8c}{}\section{tools/single-\/block/solver.c File Reference}
+\label{solver_8c}\index{tools/single-\/block/solver.\+c@{tools/single-\/block/solver.\+c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}solver.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}problem.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}grid.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structsolver}{solver}} $\ast$ \mbox{\hyperlink{solver_8c_a2dd55bc8e0358744f6f2b8de4e08e35a}{solver\+\_\+create}} (\mbox{\hyperlink{structgrid}{grid}} $\ast$grd, \mbox{\hyperlink{structproblem}{problem}} $\ast$pb)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{solver_8c_a28fc7a1fc4870b134c4fdea0ad858bd3}{solver\+\_\+init}} (\mbox{\hyperlink{structsolver}{solver}} $\ast$slv, \mbox{\hyperlink{structgrid}{grid}} $\ast$grd)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{solver_8c_a0ba913414a0df7b282b19d925b18559c}{solver\+\_\+run}} (\mbox{\hyperlink{structsolver}{solver}} $\ast$slv)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{solver_8c_adfbf6017a83c74e7cdff9e24d8dcd72d}{solver\+\_\+destroy}} (\mbox{\hyperlink{structsolver}{solver}} $\ast$slv)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{solver_8c_a2dd55bc8e0358744f6f2b8de4e08e35a}\label{solver_8c_a2dd55bc8e0358744f6f2b8de4e08e35a}} 
+\index{solver.\+c@{solver.\+c}!solver\+\_\+create@{solver\+\_\+create}}
+\index{solver\+\_\+create@{solver\+\_\+create}!solver.\+c@{solver.\+c}}
+\subsubsection{\texorpdfstring{solver\+\_\+create()}{solver\_create()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structsolver}{solver}}$\ast$ solver\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{grd,  }\item[{\mbox{\hyperlink{structproblem}{problem}} $\ast$}]{pb }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{solver_8c_adfbf6017a83c74e7cdff9e24d8dcd72d}\label{solver_8c_adfbf6017a83c74e7cdff9e24d8dcd72d}} 
+\index{solver.\+c@{solver.\+c}!solver\+\_\+destroy@{solver\+\_\+destroy}}
+\index{solver\+\_\+destroy@{solver\+\_\+destroy}!solver.\+c@{solver.\+c}}
+\subsubsection{\texorpdfstring{solver\+\_\+destroy()}{solver\_destroy()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code solver\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsolver}{solver}} $\ast$}]{slv }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{solver_8c_a28fc7a1fc4870b134c4fdea0ad858bd3}\label{solver_8c_a28fc7a1fc4870b134c4fdea0ad858bd3}} 
+\index{solver.\+c@{solver.\+c}!solver\+\_\+init@{solver\+\_\+init}}
+\index{solver\+\_\+init@{solver\+\_\+init}!solver.\+c@{solver.\+c}}
+\subsubsection{\texorpdfstring{solver\+\_\+init()}{solver\_init()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code solver\+\_\+init (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsolver}{solver}} $\ast$}]{slv,  }\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{grd }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{solver_8c_a0ba913414a0df7b282b19d925b18559c}\label{solver_8c_a0ba913414a0df7b282b19d925b18559c}} 
+\index{solver.\+c@{solver.\+c}!solver\+\_\+run@{solver\+\_\+run}}
+\index{solver\+\_\+run@{solver\+\_\+run}!solver.\+c@{solver.\+c}}
+\subsubsection{\texorpdfstring{solver\+\_\+run()}{solver\_run()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code solver\+\_\+run (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structsolver}{solver}} $\ast$}]{slv }\end{DoxyParamCaption})}
+

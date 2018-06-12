@@ -1,0 +1,101 @@
+\hypertarget{boundary_8h}{}\section{tools/single-\/block/boundary.h File Reference}
+\label{boundary_8h}\index{tools/single-\/block/boundary.\+h@{tools/single-\/block/boundary.\+h}}
+{\ttfamily \#include \char`\"{}grid.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}problem.\+h\char`\"{}}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structboundary}{boundary}}
+\item 
+struct \mbox{\hyperlink{structblist}{blist}}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bc}{bdir}} \{ \newline
+\mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcad0611de6f28d4a9c9eac959f5344698e}{N\+O\+R\+TH}} = 0, 
+\mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bca8ef5c0bce69283a9986011a63eea8a6b}{S\+O\+U\+TH}} = 1, 
+\mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcae9449e8683a8199dad36b07a63b2f523}{W\+E\+ST}} = 2, 
+\mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcab5b3793b961949c817c7c0d99c05dad7}{E\+A\+ST}} = 3, 
+\newline
+\mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcac921ff2cfc571c1d19b0485d7f6926ee}{B\+A\+CK}} = 4, 
+\mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bca76bd5ec6ea9d8a1b582d8d5e43102a02}{F\+R\+O\+NT}} = 5
+ \}
+\item 
+enum \mbox{\hyperlink{boundary_8h_a421e1789e91f264d28c9fb0f244402bc}{btype}} \{ \mbox{\hyperlink{boundary_8h_a421e1789e91f264d28c9fb0f244402bca1c2adefa6a3b7015b29913c49ee050c7}{D\+I\+R\+I\+C\+H\+L\+ET}} =600, 
+\mbox{\hyperlink{boundary_8h_a421e1789e91f264d28c9fb0f244402bcae58d114453737f3084aa5c645eba3412}{N\+E\+U\+M\+A\+NN}} =602
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structblist}{blist}} $\ast$ \mbox{\hyperlink{boundary_8h_a1f6ec5f72fb49f986e8e49acb2f09ae5}{boundary\+\_\+create}} (\mbox{\hyperlink{structgrid}{grid}} $\ast$, \mbox{\hyperlink{structproblem}{problem}} $\ast$)
+\item 
+void \mbox{\hyperlink{boundary_8h_a1d10ef94ef76272dea838fccc927443c}{boundary\+\_\+destroy}} (\mbox{\hyperlink{structblist}{blist}} $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Enumeration Type Documentation}
+\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bc}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bc}} 
+\index{boundary.\+h@{boundary.\+h}!bdir@{bdir}}
+\index{bdir@{bdir}!boundary.\+h@{boundary.\+h}}
+\subsubsection{\texorpdfstring{bdir}{bdir}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bc}{bdir}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N\+O\+R\+TH@{N\+O\+R\+TH}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!N\+O\+R\+TH@{N\+O\+R\+TH}}}\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcad0611de6f28d4a9c9eac959f5344698e}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcad0611de6f28d4a9c9eac959f5344698e}} 
+N\+O\+R\+TH&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{S\+O\+U\+TH@{S\+O\+U\+TH}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!S\+O\+U\+TH@{S\+O\+U\+TH}}}\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bca8ef5c0bce69283a9986011a63eea8a6b}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bca8ef5c0bce69283a9986011a63eea8a6b}} 
+S\+O\+U\+TH&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{W\+E\+ST@{W\+E\+ST}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!W\+E\+ST@{W\+E\+ST}}}\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcae9449e8683a8199dad36b07a63b2f523}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcae9449e8683a8199dad36b07a63b2f523}} 
+W\+E\+ST&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{E\+A\+ST@{E\+A\+ST}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!E\+A\+ST@{E\+A\+ST}}}\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcab5b3793b961949c817c7c0d99c05dad7}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcab5b3793b961949c817c7c0d99c05dad7}} 
+E\+A\+ST&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{B\+A\+CK@{B\+A\+CK}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!B\+A\+CK@{B\+A\+CK}}}\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcac921ff2cfc571c1d19b0485d7f6926ee}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bcac921ff2cfc571c1d19b0485d7f6926ee}} 
+B\+A\+CK&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{F\+R\+O\+NT@{F\+R\+O\+NT}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!F\+R\+O\+NT@{F\+R\+O\+NT}}}\mbox{\Hypertarget{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bca76bd5ec6ea9d8a1b582d8d5e43102a02}\label{boundary_8h_a9a227d2af1e7a3a9964b093fcecba9bca76bd5ec6ea9d8a1b582d8d5e43102a02}} 
+F\+R\+O\+NT&\\
+\hline
+
+\end{DoxyEnumFields}
+\mbox{\Hypertarget{boundary_8h_a421e1789e91f264d28c9fb0f244402bc}\label{boundary_8h_a421e1789e91f264d28c9fb0f244402bc}} 
+\index{boundary.\+h@{boundary.\+h}!btype@{btype}}
+\index{btype@{btype}!boundary.\+h@{boundary.\+h}}
+\subsubsection{\texorpdfstring{btype}{btype}}
+{\footnotesize\ttfamily enum \mbox{\hyperlink{boundary_8h_a421e1789e91f264d28c9fb0f244402bc}{btype}}}
+
+\begin{DoxyEnumFields}{Enumerator}
+\raisebox{\heightof{T}}[0pt][0pt]{\index{D\+I\+R\+I\+C\+H\+L\+ET@{D\+I\+R\+I\+C\+H\+L\+ET}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!D\+I\+R\+I\+C\+H\+L\+ET@{D\+I\+R\+I\+C\+H\+L\+ET}}}\mbox{\Hypertarget{boundary_8h_a421e1789e91f264d28c9fb0f244402bca1c2adefa6a3b7015b29913c49ee050c7}\label{boundary_8h_a421e1789e91f264d28c9fb0f244402bca1c2adefa6a3b7015b29913c49ee050c7}} 
+D\+I\+R\+I\+C\+H\+L\+ET&\\
+\hline
+
+\raisebox{\heightof{T}}[0pt][0pt]{\index{N\+E\+U\+M\+A\+NN@{N\+E\+U\+M\+A\+NN}!boundary.\+h@{boundary.\+h}}\index{boundary.\+h@{boundary.\+h}!N\+E\+U\+M\+A\+NN@{N\+E\+U\+M\+A\+NN}}}\mbox{\Hypertarget{boundary_8h_a421e1789e91f264d28c9fb0f244402bcae58d114453737f3084aa5c645eba3412}\label{boundary_8h_a421e1789e91f264d28c9fb0f244402bcae58d114453737f3084aa5c645eba3412}} 
+N\+E\+U\+M\+A\+NN&\\
+\hline
+
+\end{DoxyEnumFields}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{boundary_8h_a1f6ec5f72fb49f986e8e49acb2f09ae5}\label{boundary_8h_a1f6ec5f72fb49f986e8e49acb2f09ae5}} 
+\index{boundary.\+h@{boundary.\+h}!boundary\+\_\+create@{boundary\+\_\+create}}
+\index{boundary\+\_\+create@{boundary\+\_\+create}!boundary.\+h@{boundary.\+h}}
+\subsubsection{\texorpdfstring{boundary\+\_\+create()}{boundary\_create()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structblist}{blist}}$\ast$ boundary\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{,  }\item[{\mbox{\hyperlink{structproblem}{problem}} $\ast$}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{boundary_8h_a1d10ef94ef76272dea838fccc927443c}\label{boundary_8h_a1d10ef94ef76272dea838fccc927443c}} 
+\index{boundary.\+h@{boundary.\+h}!boundary\+\_\+destroy@{boundary\+\_\+destroy}}
+\index{boundary\+\_\+destroy@{boundary\+\_\+destroy}!boundary.\+h@{boundary.\+h}}
+\subsubsection{\texorpdfstring{boundary\+\_\+destroy()}{boundary\_destroy()}}
+{\footnotesize\ttfamily void boundary\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structblist}{blist}} $\ast$}]{ }\end{DoxyParamCaption})}
+

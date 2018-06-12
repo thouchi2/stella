@@ -1,0 +1,197 @@
+\hypertarget{structstella}{}\section{stella Struct Reference}
+\label{structstella}\index{stella@{stella}}
+
+
+Main datastructure for stella.  
+
+
+
+
+{\ttfamily \#include $<$stella\+\_\+solver.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Mat \mbox{\hyperlink{structstella_a09d8cdb7d92810c812f7d698a0f1a4b4}{A}}
+\begin{DoxyCompactList}\small\item\em Matrix for linear solve. \end{DoxyCompactList}\item 
+DM \mbox{\hyperlink{structstella_ac724e6b2d361304142c67ce93ff57501}{dm}}
+\begin{DoxyCompactList}\small\item\em Datastructure for structured grid. \end{DoxyCompactList}\item 
+K\+SP \mbox{\hyperlink{structstella_a18c7afda86d38f4cb8fe7eb32daf1325}{ksp}}
+\item 
+PC \mbox{\hyperlink{structstella_a0f8ea4b1a1bab930af2569bfdcc0bf4c}{pc}}
+\item 
+Vec \mbox{\hyperlink{structstella_a750f469d7d2f9ffaec59387b0f96f268}{x}}
+\item 
+Vec \mbox{\hyperlink{structstella_a5fba06f51a3081fbb1873a43e556e4ad}{rhs}}
+\item 
+Vec \mbox{\hyperlink{structstella_a58a97ffe5282902bff30e2ff96b9dddd}{sol}}
+\item 
+Vec \mbox{\hyperlink{structstella_ac54141fea0cae02df9eeb6d79e30ab01}{dcoef}}
+\item 
+Vec \mbox{\hyperlink{structstella_ad4c46753eded86dd2619f152f9fe45dc}{bcoef}}
+\item 
+M\+P\+I\+\_\+\+Comm \mbox{\hyperlink{structstella_a7e306c61cf9216d0efb54ad077c60e0d}{comm}}
+\item 
+\mbox{\hyperlink{structstella__state}{stella\+\_\+state}} \mbox{\hyperlink{structstella_aac56c924df3628157325df5abaece198}{state}}
+\item 
+\mbox{\hyperlink{structstella__grid}{stella\+\_\+grid}} \mbox{\hyperlink{structstella_adae4ed751e9c9791ef5af4eb459a3761}{grid}}
+\item 
+\mbox{\hyperlink{structstella__option}{stella\+\_\+option}} \mbox{\hyperlink{structstella_a8d0ae54054c80ff5762f183c45c21939}{options}}
+\item 
+\mbox{\hyperlink{structstella__level}{stella\+\_\+level}} \mbox{\hyperlink{structstella_a67297e1354ac246b9150d546c4db65af}{level}}
+\item 
+\mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}} $\ast$ \mbox{\hyperlink{structstella_aa9dd28e08c583f4b2232f74d6d440395}{dmap}}
+\item 
+\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$ \mbox{\hyperlink{structstella_aa0964f9d0ea3d925fbb938489336499b}{op}}
+\item 
+\mbox{\hyperlink{structstella__boundary}{stella\+\_\+boundary}} $\ast$ \mbox{\hyperlink{structstella_a0ff53b3335986ac428d5adaaf43acdfe}{boundary}}
+\item 
+\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$ \mbox{\hyperlink{structstella_a2b9a931f9cf44797836bb26724063467}{fd}}
+\item 
+int \mbox{\hyperlink{structstella_af60ea7b3a8326d7bbc5c336e8c5f133b}{num\+\_\+patches}}
+\item 
+int \mbox{\hyperlink{structstella_acc8da3f8945e90877d65acb6d89e3e09}{ts}}
+\begin{DoxyCompactList}\small\item\em Timestep (only used for logging). \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Main datastructure for stella. 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structstella_a09d8cdb7d92810c812f7d698a0f1a4b4}\label{structstella_a09d8cdb7d92810c812f7d698a0f1a4b4}} 
+\index{stella@{stella}!A@{A}}
+\index{A@{A}!stella@{stella}}
+\subsubsection{\texorpdfstring{A}{A}}
+{\footnotesize\ttfamily Mat stella\+::A}
+
+
+
+Matrix for linear solve. 
+
+\mbox{\Hypertarget{structstella_ad4c46753eded86dd2619f152f9fe45dc}\label{structstella_ad4c46753eded86dd2619f152f9fe45dc}} 
+\index{stella@{stella}!bcoef@{bcoef}}
+\index{bcoef@{bcoef}!stella@{stella}}
+\subsubsection{\texorpdfstring{bcoef}{bcoef}}
+{\footnotesize\ttfamily Vec stella\+::bcoef}
+
+\mbox{\Hypertarget{structstella_a0ff53b3335986ac428d5adaaf43acdfe}\label{structstella_a0ff53b3335986ac428d5adaaf43acdfe}} 
+\index{stella@{stella}!boundary@{boundary}}
+\index{boundary@{boundary}!stella@{stella}}
+\subsubsection{\texorpdfstring{boundary}{boundary}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__boundary}{stella\+\_\+boundary}}$\ast$ stella\+::boundary}
+
+\mbox{\Hypertarget{structstella_a7e306c61cf9216d0efb54ad077c60e0d}\label{structstella_a7e306c61cf9216d0efb54ad077c60e0d}} 
+\index{stella@{stella}!comm@{comm}}
+\index{comm@{comm}!stella@{stella}}
+\subsubsection{\texorpdfstring{comm}{comm}}
+{\footnotesize\ttfamily M\+P\+I\+\_\+\+Comm stella\+::comm}
+
+\mbox{\Hypertarget{structstella_ac54141fea0cae02df9eeb6d79e30ab01}\label{structstella_ac54141fea0cae02df9eeb6d79e30ab01}} 
+\index{stella@{stella}!dcoef@{dcoef}}
+\index{dcoef@{dcoef}!stella@{stella}}
+\subsubsection{\texorpdfstring{dcoef}{dcoef}}
+{\footnotesize\ttfamily Vec stella\+::dcoef}
+
+\mbox{\Hypertarget{structstella_ac724e6b2d361304142c67ce93ff57501}\label{structstella_ac724e6b2d361304142c67ce93ff57501}} 
+\index{stella@{stella}!dm@{dm}}
+\index{dm@{dm}!stella@{stella}}
+\subsubsection{\texorpdfstring{dm}{dm}}
+{\footnotesize\ttfamily DM stella\+::dm}
+
+
+
+Datastructure for structured grid. 
+
+\mbox{\Hypertarget{structstella_aa9dd28e08c583f4b2232f74d6d440395}\label{structstella_aa9dd28e08c583f4b2232f74d6d440395}} 
+\index{stella@{stella}!dmap@{dmap}}
+\index{dmap@{dmap}!stella@{stella}}
+\subsubsection{\texorpdfstring{dmap}{dmap}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__dmap}{stella\+\_\+dmap}}$\ast$ stella\+::dmap}
+
+\mbox{\Hypertarget{structstella_a2b9a931f9cf44797836bb26724063467}\label{structstella_a2b9a931f9cf44797836bb26724063467}} 
+\index{stella@{stella}!fd@{fd}}
+\index{fd@{fd}!stella@{stella}}
+\subsubsection{\texorpdfstring{fd}{fd}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}}$\ast$ stella\+::fd}
+
+\mbox{\Hypertarget{structstella_adae4ed751e9c9791ef5af4eb459a3761}\label{structstella_adae4ed751e9c9791ef5af4eb459a3761}} 
+\index{stella@{stella}!grid@{grid}}
+\index{grid@{grid}!stella@{stella}}
+\subsubsection{\texorpdfstring{grid}{grid}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__grid}{stella\+\_\+grid}} stella\+::grid}
+
+\mbox{\Hypertarget{structstella_a18c7afda86d38f4cb8fe7eb32daf1325}\label{structstella_a18c7afda86d38f4cb8fe7eb32daf1325}} 
+\index{stella@{stella}!ksp@{ksp}}
+\index{ksp@{ksp}!stella@{stella}}
+\subsubsection{\texorpdfstring{ksp}{ksp}}
+{\footnotesize\ttfamily K\+SP stella\+::ksp}
+
+\mbox{\Hypertarget{structstella_a67297e1354ac246b9150d546c4db65af}\label{structstella_a67297e1354ac246b9150d546c4db65af}} 
+\index{stella@{stella}!level@{level}}
+\index{level@{level}!stella@{stella}}
+\subsubsection{\texorpdfstring{level}{level}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__level}{stella\+\_\+level}} stella\+::level}
+
+\mbox{\Hypertarget{structstella_af60ea7b3a8326d7bbc5c336e8c5f133b}\label{structstella_af60ea7b3a8326d7bbc5c336e8c5f133b}} 
+\index{stella@{stella}!num\+\_\+patches@{num\+\_\+patches}}
+\index{num\+\_\+patches@{num\+\_\+patches}!stella@{stella}}
+\subsubsection{\texorpdfstring{num\+\_\+patches}{num\_patches}}
+{\footnotesize\ttfamily int stella\+::num\+\_\+patches}
+
+\mbox{\Hypertarget{structstella_aa0964f9d0ea3d925fbb938489336499b}\label{structstella_aa0964f9d0ea3d925fbb938489336499b}} 
+\index{stella@{stella}!op@{op}}
+\index{op@{op}!stella@{stella}}
+\subsubsection{\texorpdfstring{op}{op}}
+{\footnotesize\ttfamily \mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}}$\ast$ stella\+::op}
+
+\mbox{\Hypertarget{structstella_a8d0ae54054c80ff5762f183c45c21939}\label{structstella_a8d0ae54054c80ff5762f183c45c21939}} 
+\index{stella@{stella}!options@{options}}
+\index{options@{options}!stella@{stella}}
+\subsubsection{\texorpdfstring{options}{options}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__option}{stella\+\_\+option}} stella\+::options}
+
+\mbox{\Hypertarget{structstella_a0f8ea4b1a1bab930af2569bfdcc0bf4c}\label{structstella_a0f8ea4b1a1bab930af2569bfdcc0bf4c}} 
+\index{stella@{stella}!pc@{pc}}
+\index{pc@{pc}!stella@{stella}}
+\subsubsection{\texorpdfstring{pc}{pc}}
+{\footnotesize\ttfamily PC stella\+::pc}
+
+\mbox{\Hypertarget{structstella_a5fba06f51a3081fbb1873a43e556e4ad}\label{structstella_a5fba06f51a3081fbb1873a43e556e4ad}} 
+\index{stella@{stella}!rhs@{rhs}}
+\index{rhs@{rhs}!stella@{stella}}
+\subsubsection{\texorpdfstring{rhs}{rhs}}
+{\footnotesize\ttfamily Vec stella\+::rhs}
+
+\mbox{\Hypertarget{structstella_a58a97ffe5282902bff30e2ff96b9dddd}\label{structstella_a58a97ffe5282902bff30e2ff96b9dddd}} 
+\index{stella@{stella}!sol@{sol}}
+\index{sol@{sol}!stella@{stella}}
+\subsubsection{\texorpdfstring{sol}{sol}}
+{\footnotesize\ttfamily Vec stella\+::sol}
+
+\mbox{\Hypertarget{structstella_aac56c924df3628157325df5abaece198}\label{structstella_aac56c924df3628157325df5abaece198}} 
+\index{stella@{stella}!state@{state}}
+\index{state@{state}!stella@{stella}}
+\subsubsection{\texorpdfstring{state}{state}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__state}{stella\+\_\+state}} stella\+::state}
+
+\mbox{\Hypertarget{structstella_acc8da3f8945e90877d65acb6d89e3e09}\label{structstella_acc8da3f8945e90877d65acb6d89e3e09}} 
+\index{stella@{stella}!ts@{ts}}
+\index{ts@{ts}!stella@{stella}}
+\subsubsection{\texorpdfstring{ts}{ts}}
+{\footnotesize\ttfamily int stella\+::ts}
+
+
+
+Timestep (only used for logging). 
+
+\mbox{\Hypertarget{structstella_a750f469d7d2f9ffaec59387b0f96f268}\label{structstella_a750f469d7d2f9ffaec59387b0f96f268}} 
+\index{stella@{stella}!x@{x}}
+\index{x@{x}!stella@{stella}}
+\subsubsection{\texorpdfstring{x}{x}}
+{\footnotesize\ttfamily Vec stella\+::x}
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{stella__solver_8h}{stella\+\_\+solver.\+h}}\end{DoxyCompactItemize}

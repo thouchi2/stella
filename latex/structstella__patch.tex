@@ -1,0 +1,89 @@
+\hypertarget{structstella__patch}{}\section{stella\+\_\+patch Struct Reference}
+\label{structstella__patch}\index{stella\+\_\+patch@{stella\+\_\+patch}}
+
+
+Holds boundary condition information from Plas\+Com\+CM (dupcliates patch Fortran ds)  
+
+
+
+
+{\ttfamily \#include $<$stella\+\_\+bc.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structstella__corner}{stella\+\_\+corner}} \mbox{\hyperlink{structstella__patch_a1ec928943533a75b00a4a9f6d971e27f}{corners}}
+\item 
+\mbox{\hyperlink{stella__bc_8h_a7959afa0ee9aae02dd31cfce273269ce}{stella\+\_\+bctype}} \mbox{\hyperlink{structstella__patch_a78d598141e7d9910347ec3a2df8728f9}{bc\+\_\+type}}
+\item 
+int \mbox{\hyperlink{structstella__patch_a37a6c777f399d723635457e2c8b43d05}{norm\+\_\+dir}}
+\begin{DoxyCompactList}\small\item\em Direction of the normal. \end{DoxyCompactList}\item 
+double $\ast$ \mbox{\hyperlink{structstella__patch_a59abdfc4d88960997cbcef83708fc856}{dirichlet}}
+\begin{DoxyCompactList}\small\item\em Dirichlet BC specification for each grid point contained in BC. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{structstella__patch_aa339447fec0da1774027d1b07389c14a}{offset}} \mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em offset of fortran arrays (see stella\+\_\+interface.\+h) \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{structstella__patch_ad5006aeed0381182eeb4ffd041c8332c}{stride}} \mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em stride of fortran arrays (see stella\+\_\+interface.\+h) \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Holds boundary condition information from Plas\+Com\+CM (dupcliates patch Fortran ds) 
+
+\subsection{Member Data Documentation}
+\mbox{\Hypertarget{structstella__patch_a78d598141e7d9910347ec3a2df8728f9}\label{structstella__patch_a78d598141e7d9910347ec3a2df8728f9}} 
+\index{stella\+\_\+patch@{stella\+\_\+patch}!bc\+\_\+type@{bc\+\_\+type}}
+\index{bc\+\_\+type@{bc\+\_\+type}!stella\+\_\+patch@{stella\+\_\+patch}}
+\subsubsection{\texorpdfstring{bc\+\_\+type}{bc\_type}}
+{\footnotesize\ttfamily \mbox{\hyperlink{stella__bc_8h_a7959afa0ee9aae02dd31cfce273269ce}{stella\+\_\+bctype}} stella\+\_\+patch\+::bc\+\_\+type}
+
+\mbox{\Hypertarget{structstella__patch_a1ec928943533a75b00a4a9f6d971e27f}\label{structstella__patch_a1ec928943533a75b00a4a9f6d971e27f}} 
+\index{stella\+\_\+patch@{stella\+\_\+patch}!corners@{corners}}
+\index{corners@{corners}!stella\+\_\+patch@{stella\+\_\+patch}}
+\subsubsection{\texorpdfstring{corners}{corners}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structstella__corner}{stella\+\_\+corner}} stella\+\_\+patch\+::corners}
+
+\mbox{\Hypertarget{structstella__patch_a59abdfc4d88960997cbcef83708fc856}\label{structstella__patch_a59abdfc4d88960997cbcef83708fc856}} 
+\index{stella\+\_\+patch@{stella\+\_\+patch}!dirichlet@{dirichlet}}
+\index{dirichlet@{dirichlet}!stella\+\_\+patch@{stella\+\_\+patch}}
+\subsubsection{\texorpdfstring{dirichlet}{dirichlet}}
+{\footnotesize\ttfamily double$\ast$ stella\+\_\+patch\+::dirichlet}
+
+
+
+Dirichlet BC specification for each grid point contained in BC. 
+
+\mbox{\Hypertarget{structstella__patch_a37a6c777f399d723635457e2c8b43d05}\label{structstella__patch_a37a6c777f399d723635457e2c8b43d05}} 
+\index{stella\+\_\+patch@{stella\+\_\+patch}!norm\+\_\+dir@{norm\+\_\+dir}}
+\index{norm\+\_\+dir@{norm\+\_\+dir}!stella\+\_\+patch@{stella\+\_\+patch}}
+\subsubsection{\texorpdfstring{norm\+\_\+dir}{norm\_dir}}
+{\footnotesize\ttfamily int stella\+\_\+patch\+::norm\+\_\+dir}
+
+
+
+Direction of the normal. 
+
+\mbox{\Hypertarget{structstella__patch_aa339447fec0da1774027d1b07389c14a}\label{structstella__patch_aa339447fec0da1774027d1b07389c14a}} 
+\index{stella\+\_\+patch@{stella\+\_\+patch}!offset@{offset}}
+\index{offset@{offset}!stella\+\_\+patch@{stella\+\_\+patch}}
+\subsubsection{\texorpdfstring{offset}{offset}}
+{\footnotesize\ttfamily int stella\+\_\+patch\+::offset\mbox{[}3\mbox{]}}
+
+
+
+offset of fortran arrays (see stella\+\_\+interface.\+h) 
+
+\mbox{\Hypertarget{structstella__patch_ad5006aeed0381182eeb4ffd041c8332c}\label{structstella__patch_ad5006aeed0381182eeb4ffd041c8332c}} 
+\index{stella\+\_\+patch@{stella\+\_\+patch}!stride@{stride}}
+\index{stride@{stride}!stella\+\_\+patch@{stella\+\_\+patch}}
+\subsubsection{\texorpdfstring{stride}{stride}}
+{\footnotesize\ttfamily int stella\+\_\+patch\+::stride\mbox{[}3\mbox{]}}
+
+
+
+stride of fortran arrays (see stella\+\_\+interface.\+h) 
+
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\mbox{\hyperlink{stella__bc_8h}{stella\+\_\+bc.\+h}}\end{DoxyCompactItemize}

@@ -1,0 +1,56 @@
+\hypertarget{grid_8h}{}\section{tools/single-\/block/grid.h File Reference}
+\label{grid_8h}\index{tools/single-\/block/grid.\+h@{tools/single-\/block/grid.\+h}}
+{\ttfamily \#include \char`\"{}mpi.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}base.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}map.\+h\char`\"{}}\newline
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structgrid}{grid}}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structgrid}{grid}} $\ast$ \mbox{\hyperlink{grid_8h_a98122be04342366b5574d341d2653e1d}{grid\+\_\+create}} (double startx, double endx, int nx, double starty, double endy, int ny, double startz, double endz, int nz)
+\item 
+void \mbox{\hyperlink{grid_8h_a5c7afba9aaa565f53f1f9cef4a999dba}{grid\+\_\+apply\+\_\+map}} (\mbox{\hyperlink{structgrid}{grid}} $\ast$, \mbox{\hyperlink{structmapping}{mapping}} $\ast$)
+\item 
+void \mbox{\hyperlink{grid_8h_a86118a9e39e08e5a447c56ead7e7b945}{grid\+\_\+eval}} (\mbox{\hyperlink{structgrid}{grid}} $\ast$, \mbox{\hyperlink{base_8h_a6dd92a1df4b8b4a265cd65db9907ebe5}{func}}, double $\ast$)
+\item 
+void \mbox{\hyperlink{grid_8h_a90982959647cddd66175f5f0b98aed02}{grid\+\_\+print}} (\mbox{\hyperlink{structgrid}{grid}} $\ast$, double $\ast$)
+\item 
+void \mbox{\hyperlink{grid_8h_abc95131cd8bd42f1f1be72c343b80008}{grid\+\_\+destroy}} (\mbox{\hyperlink{structgrid}{grid}} $\ast$)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{grid_8h_a5c7afba9aaa565f53f1f9cef4a999dba}\label{grid_8h_a5c7afba9aaa565f53f1f9cef4a999dba}} 
+\index{grid.\+h@{grid.\+h}!grid\+\_\+apply\+\_\+map@{grid\+\_\+apply\+\_\+map}}
+\index{grid\+\_\+apply\+\_\+map@{grid\+\_\+apply\+\_\+map}!grid.\+h@{grid.\+h}}
+\subsubsection{\texorpdfstring{grid\+\_\+apply\+\_\+map()}{grid\_apply\_map()}}
+{\footnotesize\ttfamily void grid\+\_\+apply\+\_\+map (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{,  }\item[{\mbox{\hyperlink{structmapping}{mapping}} $\ast$}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{grid_8h_a98122be04342366b5574d341d2653e1d}\label{grid_8h_a98122be04342366b5574d341d2653e1d}} 
+\index{grid.\+h@{grid.\+h}!grid\+\_\+create@{grid\+\_\+create}}
+\index{grid\+\_\+create@{grid\+\_\+create}!grid.\+h@{grid.\+h}}
+\subsubsection{\texorpdfstring{grid\+\_\+create()}{grid\_create()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structgrid}{grid}}$\ast$ grid\+\_\+create (\begin{DoxyParamCaption}\item[{double}]{startx,  }\item[{double}]{endx,  }\item[{int}]{nx,  }\item[{double}]{starty,  }\item[{double}]{endy,  }\item[{int}]{ny,  }\item[{double}]{startz,  }\item[{double}]{endz,  }\item[{int}]{nz }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{grid_8h_abc95131cd8bd42f1f1be72c343b80008}\label{grid_8h_abc95131cd8bd42f1f1be72c343b80008}} 
+\index{grid.\+h@{grid.\+h}!grid\+\_\+destroy@{grid\+\_\+destroy}}
+\index{grid\+\_\+destroy@{grid\+\_\+destroy}!grid.\+h@{grid.\+h}}
+\subsubsection{\texorpdfstring{grid\+\_\+destroy()}{grid\_destroy()}}
+{\footnotesize\ttfamily void grid\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{grid_8h_a86118a9e39e08e5a447c56ead7e7b945}\label{grid_8h_a86118a9e39e08e5a447c56ead7e7b945}} 
+\index{grid.\+h@{grid.\+h}!grid\+\_\+eval@{grid\+\_\+eval}}
+\index{grid\+\_\+eval@{grid\+\_\+eval}!grid.\+h@{grid.\+h}}
+\subsubsection{\texorpdfstring{grid\+\_\+eval()}{grid\_eval()}}
+{\footnotesize\ttfamily void grid\+\_\+eval (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{,  }\item[{\mbox{\hyperlink{base_8h_a6dd92a1df4b8b4a265cd65db9907ebe5}{func}}}]{,  }\item[{double $\ast$}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{grid_8h_a90982959647cddd66175f5f0b98aed02}\label{grid_8h_a90982959647cddd66175f5f0b98aed02}} 
+\index{grid.\+h@{grid.\+h}!grid\+\_\+print@{grid\+\_\+print}}
+\index{grid\+\_\+print@{grid\+\_\+print}!grid.\+h@{grid.\+h}}
+\subsubsection{\texorpdfstring{grid\+\_\+print()}{grid\_print()}}
+{\footnotesize\ttfamily void grid\+\_\+print (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structgrid}{grid}} $\ast$}]{,  }\item[{double $\ast$}]{ }\end{DoxyParamCaption})}
+

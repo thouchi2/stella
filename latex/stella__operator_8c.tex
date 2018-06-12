@@ -1,0 +1,84 @@
+\hypertarget{stella__operator_8c}{}\section{src/stella\+\_\+operator.c File Reference}
+\label{stella__operator_8c}\index{src/stella\+\_\+operator.\+c@{src/stella\+\_\+operator.\+c}}
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+operator.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+mat.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+io.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__operator_8c_a703e8c0402805a6331e4f3d4d5bdbae4}{centered\+\_\+2d}} (\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$op, Mat A, DM da)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__operator_8c_ae6bc72f5a538b35e88aa148b48a3be05}{centered\+\_\+3d}} (\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$op, Mat A, DM da)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__operator_8c_a951cf4195d4090b22338baafa24a58cb}{stella\+\_\+operator\+\_\+create}} (\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$$\ast$efop, \mbox{\hyperlink{structstella__level}{stella\+\_\+level}} $\ast$level, \mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$fd, int nd)
+\begin{DoxyCompactList}\small\item\em Constructor for the operator object. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__operator_8c_a00e6fc3d08f31c10f5fcbfe3edb87b62}{stella\+\_\+operator\+\_\+assemble}} (\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$op, Mat A, DM da)
+\begin{DoxyCompactList}\small\item\em Used to assemble the interior of the matrix (everywhere not owned by a boundary condition) \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__operator_8c_a6fabd2b80688c214631176915dc1ccb4}{stella\+\_\+operator\+\_\+destroy}} (\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$efop)
+\begin{DoxyCompactList}\small\item\em Destroys data structures owned by the operator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__operator_8c_a703e8c0402805a6331e4f3d4d5bdbae4}\label{stella__operator_8c_a703e8c0402805a6331e4f3d4d5bdbae4}} 
+\index{stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}!centered\+\_\+2d@{centered\+\_\+2d}}
+\index{centered\+\_\+2d@{centered\+\_\+2d}!stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}}
+\subsubsection{\texorpdfstring{centered\+\_\+2d()}{centered\_2d()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code centered\+\_\+2d (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$}]{op,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__operator_8c_ae6bc72f5a538b35e88aa148b48a3be05}\label{stella__operator_8c_ae6bc72f5a538b35e88aa148b48a3be05}} 
+\index{stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}!centered\+\_\+3d@{centered\+\_\+3d}}
+\index{centered\+\_\+3d@{centered\+\_\+3d}!stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}}
+\subsubsection{\texorpdfstring{centered\+\_\+3d()}{centered\_3d()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code centered\+\_\+3d (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$}]{op,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__operator_8c_a00e6fc3d08f31c10f5fcbfe3edb87b62}\label{stella__operator_8c_a00e6fc3d08f31c10f5fcbfe3edb87b62}} 
+\index{stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}!stella\+\_\+operator\+\_\+assemble@{stella\+\_\+operator\+\_\+assemble}}
+\index{stella\+\_\+operator\+\_\+assemble@{stella\+\_\+operator\+\_\+assemble}!stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+operator\+\_\+assemble()}{stella\_operator\_assemble()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+operator\+\_\+assemble (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$}]{op,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})}
+
+
+
+Used to assemble the interior of the matrix (everywhere not owned by a boundary condition) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em op} & operator object \\
+\hline
+{\em A} & P\+E\+T\+Sc matrix \\
+\hline
+{\em da} & P\+E\+T\+Sc DM object \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{stella__operator_8c_a951cf4195d4090b22338baafa24a58cb}\label{stella__operator_8c_a951cf4195d4090b22338baafa24a58cb}} 
+\index{stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}!stella\+\_\+operator\+\_\+create@{stella\+\_\+operator\+\_\+create}}
+\index{stella\+\_\+operator\+\_\+create@{stella\+\_\+operator\+\_\+create}!stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+operator\+\_\+create()}{stella\_operator\_create()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+operator\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$$\ast$}]{efop,  }\item[{\mbox{\hyperlink{structstella__level}{stella\+\_\+level}} $\ast$}]{level,  }\item[{\mbox{\hyperlink{structstella__fd}{stella\+\_\+fd}} $\ast$}]{fd,  }\item[{int}]{nd }\end{DoxyParamCaption})}
+
+
+
+Constructor for the operator object. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em efop} & operator object to create \\
+\hline
+ & {\em level} & level object \\
+\hline
+ & {\em fd} & finite difference coefficient object \\
+\hline
+ & {\em nd} & number of dimensions \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{stella__operator_8c_a6fabd2b80688c214631176915dc1ccb4}\label{stella__operator_8c_a6fabd2b80688c214631176915dc1ccb4}} 
+\index{stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}!stella\+\_\+operator\+\_\+destroy@{stella\+\_\+operator\+\_\+destroy}}
+\index{stella\+\_\+operator\+\_\+destroy@{stella\+\_\+operator\+\_\+destroy}!stella\+\_\+operator.\+c@{stella\+\_\+operator.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+operator\+\_\+destroy()}{stella\_operator\_destroy()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+operator\+\_\+destroy (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__operator_8h_a8b2b26003faf225af5fdf72f1b7f1783}{stella\+\_\+operator}} $\ast$}]{efop }\end{DoxyParamCaption})}
+
+
+
+Destroys data structures owned by the operator. 
+

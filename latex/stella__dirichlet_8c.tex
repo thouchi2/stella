@@ -1,0 +1,99 @@
+\hypertarget{stella__dirichlet_8c}{}\section{src/stella\+\_\+dirichlet.c File Reference}
+\label{stella__dirichlet_8c}\index{src/stella\+\_\+dirichlet.\+c@{src/stella\+\_\+dirichlet.\+c}}
+{\ttfamily \#include \char`\"{}stella\+\_\+dirichlet.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+mat.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stella\+\_\+operator.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a11d6852692fe0b4a841fede9a76feba4}{update\+\_\+dirichlet\+\_\+sym}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, Mat A, DM da)
+\begin{DoxyCompactList}\small\item\em Deletes connections from interior points that neighbor a Dirichlet boundary. \end{DoxyCompactList}\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a99bf46cc0dd9c1111838c13b7d62ba71}{update\+\_\+dirichlet\+\_\+sym\+\_\+3d}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, Mat A, DM da)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a072e8d2a7391a502b7e3df135055ddcd}{apply\+\_\+dirichlet}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, Mat A, DM da)
+\begin{DoxyCompactList}\small\item\em Eliminates connections from boundary to neighboring points. \end{DoxyCompactList}\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a21565a12f4a63ed2c6af9ea78a345c36}{apply\+\_\+dirichlet\+\_\+3d}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, Mat A, DM da)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_ab1aa734b5b123fd36393fb40e7ca6167}{apply\+\_\+dirichlet\+\_\+rhs}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, DM da, Vec rhs)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_ad86d7e3b5c45772ac61769812be38fcc}{apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, DM da, Vec rhs)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_ae5cf17a4e5ee6707b7b87f2dea3183dd}{apply\+\_\+op}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, Mat A, DM da)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a20313c52ea03c4795ef2b5fea2983c7e}{symmetric}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, Mat A, DM da)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a1d2aeb6b3d7b9e529fd24e7f37910366}{apply\+\_\+rhs}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc, DM da, Vec rhs)
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__dirichlet_8c_a801c62bdf9d7cf8dc72deb914a4b5cf5}{stella\+\_\+dirichlet\+\_\+create}} (\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$bc)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__dirichlet_8c_a072e8d2a7391a502b7e3df135055ddcd}\label{stella__dirichlet_8c_a072e8d2a7391a502b7e3df135055ddcd}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!apply\+\_\+dirichlet@{apply\+\_\+dirichlet}}
+\index{apply\+\_\+dirichlet@{apply\+\_\+dirichlet}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{apply\+\_\+dirichlet()}{apply\_dirichlet()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code apply\+\_\+dirichlet (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Eliminates connections from boundary to neighboring points. 
+
+Saves the weight of this connection as additive contribution to R\+HS. \mbox{\Hypertarget{stella__dirichlet_8c_a21565a12f4a63ed2c6af9ea78a345c36}\label{stella__dirichlet_8c_a21565a12f4a63ed2c6af9ea78a345c36}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!apply\+\_\+dirichlet\+\_\+3d@{apply\+\_\+dirichlet\+\_\+3d}}
+\index{apply\+\_\+dirichlet\+\_\+3d@{apply\+\_\+dirichlet\+\_\+3d}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{apply\+\_\+dirichlet\+\_\+3d()}{apply\_dirichlet\_3d()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code apply\+\_\+dirichlet\+\_\+3d (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_ab1aa734b5b123fd36393fb40e7ca6167}\label{stella__dirichlet_8c_ab1aa734b5b123fd36393fb40e7ca6167}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!apply\+\_\+dirichlet\+\_\+rhs@{apply\+\_\+dirichlet\+\_\+rhs}}
+\index{apply\+\_\+dirichlet\+\_\+rhs@{apply\+\_\+dirichlet\+\_\+rhs}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{apply\+\_\+dirichlet\+\_\+rhs()}{apply\_dirichlet\_rhs()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code apply\+\_\+dirichlet\+\_\+rhs (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{DM}]{da,  }\item[{Vec}]{rhs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_ad86d7e3b5c45772ac61769812be38fcc}\label{stella__dirichlet_8c_ad86d7e3b5c45772ac61769812be38fcc}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d@{apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d}}
+\index{apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d@{apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d()}{apply\_dirichlet\_rhs\_3d()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code apply\+\_\+dirichlet\+\_\+rhs\+\_\+3d (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{DM}]{da,  }\item[{Vec}]{rhs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_ae5cf17a4e5ee6707b7b87f2dea3183dd}\label{stella__dirichlet_8c_ae5cf17a4e5ee6707b7b87f2dea3183dd}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!apply\+\_\+op@{apply\+\_\+op}}
+\index{apply\+\_\+op@{apply\+\_\+op}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{apply\+\_\+op()}{apply\_op()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code apply\+\_\+op (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_a1d2aeb6b3d7b9e529fd24e7f37910366}\label{stella__dirichlet_8c_a1d2aeb6b3d7b9e529fd24e7f37910366}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!apply\+\_\+rhs@{apply\+\_\+rhs}}
+\index{apply\+\_\+rhs@{apply\+\_\+rhs}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{apply\+\_\+rhs()}{apply\_rhs()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code apply\+\_\+rhs (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{DM}]{da,  }\item[{Vec}]{rhs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_a801c62bdf9d7cf8dc72deb914a4b5cf5}\label{stella__dirichlet_8c_a801c62bdf9d7cf8dc72deb914a4b5cf5}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!stella\+\_\+dirichlet\+\_\+create@{stella\+\_\+dirichlet\+\_\+create}}
+\index{stella\+\_\+dirichlet\+\_\+create@{stella\+\_\+dirichlet\+\_\+create}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+dirichlet\+\_\+create()}{stella\_dirichlet\_create()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+dirichlet\+\_\+create (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_a20313c52ea03c4795ef2b5fea2983c7e}\label{stella__dirichlet_8c_a20313c52ea03c4795ef2b5fea2983c7e}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!symmetric@{symmetric}}
+\index{symmetric@{symmetric}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{symmetric()}{symmetric()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code symmetric (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__dirichlet_8c_a11d6852692fe0b4a841fede9a76feba4}\label{stella__dirichlet_8c_a11d6852692fe0b4a841fede9a76feba4}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!update\+\_\+dirichlet\+\_\+sym@{update\+\_\+dirichlet\+\_\+sym}}
+\index{update\+\_\+dirichlet\+\_\+sym@{update\+\_\+dirichlet\+\_\+sym}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{update\+\_\+dirichlet\+\_\+sym()}{update\_dirichlet\_sym()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code update\+\_\+dirichlet\+\_\+sym (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Deletes connections from interior points that neighbor a Dirichlet boundary. 
+
+This step is needed to get a symmetric operator. \mbox{\Hypertarget{stella__dirichlet_8c_a99bf46cc0dd9c1111838c13b7d62ba71}\label{stella__dirichlet_8c_a99bf46cc0dd9c1111838c13b7d62ba71}} 
+\index{stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}!update\+\_\+dirichlet\+\_\+sym\+\_\+3d@{update\+\_\+dirichlet\+\_\+sym\+\_\+3d}}
+\index{update\+\_\+dirichlet\+\_\+sym\+\_\+3d@{update\+\_\+dirichlet\+\_\+sym\+\_\+3d}!stella\+\_\+dirichlet.\+c@{stella\+\_\+dirichlet.\+c}}
+\subsubsection{\texorpdfstring{update\+\_\+dirichlet\+\_\+sym\+\_\+3d()}{update\_dirichlet\_sym\_3d()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code update\+\_\+dirichlet\+\_\+sym\+\_\+3d (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{stella__bc_8h_a8eccc1c3c3d83359ed0a620a0856d0ea}{stella\+\_\+bc}} $\ast$}]{bc,  }\item[{Mat}]{A,  }\item[{DM}]{da }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+

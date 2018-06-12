@@ -1,0 +1,65 @@
+\hypertarget{stella__signals_8c}{}\section{src/stella\+\_\+signals.c File Reference}
+\label{stella__signals_8c}\index{src/stella\+\_\+signals.\+c@{src/stella\+\_\+signals.\+c}}
+{\ttfamily \#include \char`\"{}stella\+\_\+signals.\+h\char`\"{}}\newline
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+static int \mbox{\hyperlink{stella__signals_8c_abde172666377bf1179f790dd6c9b702c}{smaller\+Value}} (int i1, int i2, double v1, double v2)
+\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__signals_8c_a2983fa2c85853ce3b95ff576a51e1f5a}{contribute\+\_\+axisymmetric}} (\mbox{\hyperlink{structstella}{stella}} $\ast$slv)
+\begin{DoxyCompactList}\small\item\em Contribution to rhs needed for axisymmetric solve. \end{DoxyCompactList}\item 
+static Petsc\+Error\+Code \mbox{\hyperlink{stella__signals_8c_a06cc20645ce9499b5cfb38c33ea88f2e}{contribute\+\_\+interface}} (\mbox{\hyperlink{structstella}{stella}} $\ast$slv)
+\begin{DoxyCompactList}\small\item\em Contribution to rhs needed for interface (jump) condition. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__signals_8c_a4de710fe4286900d58440ef6043ecfd7}{stella\+\_\+changed\+\_\+bc}} (\mbox{\hyperlink{structstella}{stella}} $\ast$slv)
+\begin{DoxyCompactList}\small\item\em Signal boundary conditions have changed. \end{DoxyCompactList}\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__signals_8c_ae179d871dc30799ddce5f2b7ba42a0a6}{stella\+\_\+changed\+\_\+rhs}} (\mbox{\hyperlink{structstella}{stella}} $\ast$slv)
+\begin{DoxyCompactList}\small\item\em Signal rhs has changed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__signals_8c_a2983fa2c85853ce3b95ff576a51e1f5a}\label{stella__signals_8c_a2983fa2c85853ce3b95ff576a51e1f5a}} 
+\index{stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}!contribute\+\_\+axisymmetric@{contribute\+\_\+axisymmetric}}
+\index{contribute\+\_\+axisymmetric@{contribute\+\_\+axisymmetric}!stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}}
+\subsubsection{\texorpdfstring{contribute\+\_\+axisymmetric()}{contribute\_axisymmetric()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code contribute\+\_\+axisymmetric (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella}{stella}} $\ast$}]{slv }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Contribution to rhs needed for axisymmetric solve. 
+
+\mbox{\Hypertarget{stella__signals_8c_a06cc20645ce9499b5cfb38c33ea88f2e}\label{stella__signals_8c_a06cc20645ce9499b5cfb38c33ea88f2e}} 
+\index{stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}!contribute\+\_\+interface@{contribute\+\_\+interface}}
+\index{contribute\+\_\+interface@{contribute\+\_\+interface}!stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}}
+\subsubsection{\texorpdfstring{contribute\+\_\+interface()}{contribute\_interface()}}
+{\footnotesize\ttfamily static Petsc\+Error\+Code contribute\+\_\+interface (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella}{stella}} $\ast$}]{slv }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Contribution to rhs needed for interface (jump) condition. 
+
+\mbox{\Hypertarget{stella__signals_8c_abde172666377bf1179f790dd6c9b702c}\label{stella__signals_8c_abde172666377bf1179f790dd6c9b702c}} 
+\index{stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}!smaller\+Value@{smaller\+Value}}
+\index{smaller\+Value@{smaller\+Value}!stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}}
+\subsubsection{\texorpdfstring{smaller\+Value()}{smallerValue()}}
+{\footnotesize\ttfamily static int smaller\+Value (\begin{DoxyParamCaption}\item[{int}]{i1,  }\item[{int}]{i2,  }\item[{double}]{v1,  }\item[{double}]{v2 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+\mbox{\Hypertarget{stella__signals_8c_a4de710fe4286900d58440ef6043ecfd7}\label{stella__signals_8c_a4de710fe4286900d58440ef6043ecfd7}} 
+\index{stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}!stella\+\_\+changed\+\_\+bc@{stella\+\_\+changed\+\_\+bc}}
+\index{stella\+\_\+changed\+\_\+bc@{stella\+\_\+changed\+\_\+bc}!stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+changed\+\_\+bc()}{stella\_changed\_bc()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+changed\+\_\+bc (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella}{stella}} $\ast$}]{slv }\end{DoxyParamCaption})}
+
+
+
+Signal boundary conditions have changed. 
+
+\mbox{\Hypertarget{stella__signals_8c_ae179d871dc30799ddce5f2b7ba42a0a6}\label{stella__signals_8c_ae179d871dc30799ddce5f2b7ba42a0a6}} 
+\index{stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}!stella\+\_\+changed\+\_\+rhs@{stella\+\_\+changed\+\_\+rhs}}
+\index{stella\+\_\+changed\+\_\+rhs@{stella\+\_\+changed\+\_\+rhs}!stella\+\_\+signals.\+c@{stella\+\_\+signals.\+c}}
+\subsubsection{\texorpdfstring{stella\+\_\+changed\+\_\+rhs()}{stella\_changed\_rhs()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+changed\+\_\+rhs (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella}{stella}} $\ast$}]{slv }\end{DoxyParamCaption})}
+
+
+
+Signal rhs has changed. 
+
