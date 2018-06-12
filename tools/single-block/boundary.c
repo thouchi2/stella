@@ -71,12 +71,15 @@ static void add_2d(boundary *bnd, grid *grd, problem *pb)
 		int j;
 		for (j = 0; j < len; j++) {
 			int ind = j*stride + offset;
-			classify[ind] = pb->boundary[i];
-			if (pb->boundary[i] == DIRICHLET)
-				values[ind] = pb->sol(grd->x[ind], grd->y[ind], 0);
-			else
-				values[ind] = 0.0;
-			norm_dirs[ind] = norm_dir;
+			// Give Dirichlet bc precedence
+			if (!((classify[ind] == DIRICHLET) && (pb->boundary[i] != DIRICHLET))) {
+				classify[ind] = pb->boundary[i];
+				if (pb->boundary[i] == DIRICHLET)
+					values[ind] = pb->sol(grd->x[ind], grd->y[ind], 0);
+				else
+					values[ind] = 0.0;
+				norm_dirs[ind] = norm_dir;
+			}
 		}
 	}
 }
@@ -157,12 +160,15 @@ static void add_3d(boundary *bnd, grid *grd, problem *pb)
 		for (ii = 0; ii < len[0]; ii++) {
 			for (jj = 0; jj < len[1]; jj++) {
 				int ind = ii*stride[0] + jj*stride[1] + offset;
-				classify[ind] = pb->boundary[i];
-				if (pb->boundary[i] == DIRICHLET)
-					values[ind] = pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-				else
-					values[ind] = 0.0;
-				norm_dirs[ind] = norm_dir;
+				// Give Dirichlet bc precedence
+				if (!((classify[ind] == DIRICHLET) && (pb->boundary[i] != DIRICHLET))) {
+					classify[ind] = pb->boundary[i];
+					if (pb->boundary[i] == DIRICHLET)
+						values[ind] = pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
+					else
+						values[ind] = 0.0;
+					norm_dirs[ind] = norm_dir;
+				}
 			}
 		}
 	}
