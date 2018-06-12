@@ -37,6 +37,7 @@ static void add_2d(boundary *bnd, grid *grd, problem *pb)
 		int len;
 		char norm_dir;
 
+		len = 0;
 		if (i == NORTH
 		    && grd->cart_coord[1] == grd->num_procs[1]-1
 		    && (!grd->periodic[1])) {
@@ -239,6 +240,9 @@ boundary *boundary_create(grid *grd, problem *pb)
 	bnd->classify = (char*) malloc(grd->num_pts*sizeof(char));
 	bnd->norm_dir = (char*) malloc(grd->num_pts*sizeof(char));
 	bnd->values = (double*) malloc(grd->num_pts*sizeof(double));
+
+	for (i = 0; i < grd->num_pts; i++)
+		bnd->classify[i] = 0;
 
 	if (grd->nd == 3) {
 		add_3d(bnd, grd, pb);
