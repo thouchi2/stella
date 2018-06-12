@@ -3,7 +3,7 @@
 
 static int classify_has_ghosts(stella_dmap *dmap)
 {
-	return !(stride[0] == xm);
+	return !(dmap->stride[0] == dmap->xm);
 }
 
 
@@ -169,7 +169,7 @@ PetscErrorCode stella_classify_get(stella_classify *cls, void *array)
 {
 	PetscErrorCode ierr;
 
-	ierr = stella_dmap_get_char(cls->dmap, cls->classify, &array);CHKERRQ(ierr);
+	ierr = stella_dmap_get_char(cls->dmap, cls->classify, array);CHKERRQ(ierr);
 
 	return 0;
 }
@@ -179,7 +179,7 @@ PetscErrorCode stella_classify_restore(stella_classify *cls, void *array)
 {
 	PetscErrorCode ierr;
 
-	ierr = stella_dmap_restore_char(cls->dmap, &array);CHKERRQ(ierr);
+	ierr = stella_dmap_restore_char(cls->dmap, array);CHKERRQ(ierr);
 
 	return 0;
 }

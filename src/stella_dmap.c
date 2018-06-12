@@ -29,7 +29,8 @@ static PetscErrorCode get_3d_char(stella_dmap *idx, char *src, char ****dest)
 	PetscErrorCode ierr;
 	char **b;
 	int i, j;
-	ierr = PetscMalloc1(idx->stride[2]*sizeof(char**) + idx->stride[2]*idx->stride[1], dest);CHKERRQ(ierr);
+
+	dest = (char****) malloc((idx->stride[2] + idx->stride[2]*idx->stride[1])*sizeof(char*));
 
 	b = (char**)((*dest) + idx->stride[2]);
 	for (i = 0; i < idx->stride[2]; i++) (*dest)[i] = b + i*idx->stride[1] - idx->ys;
@@ -59,11 +60,10 @@ static PetscErrorCode restore_3d_double(stella_dmap *idx, double ****arr)
 
 static PetscErrorCode restore_3d_char(stella_dmap *idx, char ****arr)
 {
-	PetscErrorCode ierr;
 	void *dummy;
 
 	dummy = (void*)(*arr + idx->zs);
-	ierr = PetscFree(dummy);CHKERRQ(ierr);
+	free(dummy);
 
 	return 0;
 }
@@ -87,10 +87,9 @@ static PetscErrorCode get_2d_double(stella_dmap *idx, double *src, double ***des
 
 static PetscErrorCode get_2d_char(stella_dmap *idx, char *src, char ***dest)
 {
-	PetscErrorCode ierr;
 	int i;
 
-	ierr = PetscMalloc1(idx->stride[1], dest);CHKERRQ(ierr);
+	*dest = malloc(idx->stride[1]*sizeof(char*));
 
 	for (i = 0; i < idx->stride[1]; i++) {
 		(*dest)[i] = src + i*idx->stride[0] - idx->xs;
@@ -115,11 +114,10 @@ static PetscErrorCode restore_2d_double(stella_dmap *idx, double ***arr)
 
 static PetscErrorCode restore_2d_char(stella_dmap *idx, char ***arr)
 {
-	PetscErrorCode ierr;
 	void *dummy;
 
 	dummy = (void*)(*arr + idx->ys);
-	ierr = PetscFree(dummy);CHKERRQ(ierr);
+	free(dummy);
 
 	return 0;
 }
