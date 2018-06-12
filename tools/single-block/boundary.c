@@ -11,7 +11,7 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #endif
 
-int contains(int *proc_is, int *proc_ie, int *hole_is, int *hole_ie, int nd)
+static int contains(int *proc_is, int *proc_ie, int *hole_is, int *hole_ie, int nd)
 {
 	int flag = 1;
 	int i;
@@ -24,331 +24,249 @@ int contains(int *proc_is, int *proc_ie, int *hole_is, int *hole_ie, int nd)
 }
 
 
-blist *boundary_create(grid *grd, problem *pb)
+static void add_2d(boundary *bnd, grid *grd, problem *pb)
 {
-	int i, j;
+	char *classify = bnd->classify;
+	char *norm_dirs = bnd->norm_dir;
+	double *values = bnd->values;
 
-	blist *lst = (blist*) malloc(sizeof(blist));
-	lst->len = 4;
-	if (pb->id == ELECTRODE) lst->len += pb->nholes;
-	if (grd->nd == 3) lst->len += 2;
-	lst->v = (boundary*) malloc(lst->len*sizeof(boundary));
+	int i;
+	for (i = 0; i < 4; i++) {
+		int stride;
+		int offset;
+		int len;
+		char norm_dir;
 
-	lst->len = 0;
-	if (grd->nd == 3) {
-		for (i = 0; i < 6; i++) {
-			if (i == NORTH
-			    && grd->cart_coord[1] == grd->num_procs[1]-1
-			    && (!grd->periodic[1])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-				int ii,kk;
-				for (kk = 0; kk < grd->nz; kk++) {
-					for (ii = 0; ii < grd->nx; ii++) {
-						int ind = kk*grd->nx*grd->ny+(grd->ny-1)*grd->nx+ii;
-						lst->v[lst->len].dirichlet[kk*grd->nx+ii] =
-							pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-					}
-				}
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[2] = grd->is[2];
-				lst->v[lst->len].ie[2] = grd->ie[2];
-				lst->v[lst->len].is[1] = grd->ie[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].norm_dir = -2;
-
-				lst->len++;
-			} else if (i == SOUTH
-			           && grd->cart_coord[1] == 0
-			           && (!grd->periodic[1])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-				int ii,kk;
-				for (kk = 0; kk < grd->nz; kk++) {
-					for (ii = 0; ii < grd->nx; ii++) {
-						int ind = kk*grd->nx*grd->ny + ii;
-						lst->v[lst->len].dirichlet[kk*grd->nx+ii] =
-							pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-					}
-				}
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[2] = grd->is[2];
-				lst->v[lst->len].ie[2] = grd->ie[2];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->is[1];
-				lst->v[lst->len].norm_dir = 2;
-
-				lst->len++;
-			} else if (i == EAST
-			           && grd->cart_coord[0] == grd->num_procs[0]-1
-			           && (!grd->periodic[0])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-
-				int jj,kk;
-				for (kk = 0; kk < grd->nz; kk++) {
-					for (jj = 0; jj < grd->ny; jj++) {
-						int ind = kk*grd->nx*grd->ny + jj*grd->nx + grd->nx-1;
-						lst->v[lst->len].dirichlet[kk*grd->ny+jj] =
-							pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-					}
-				}
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->ie[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = grd->is[2];
-				lst->v[lst->len].ie[2] = grd->ie[2];
-				lst->v[lst->len].norm_dir = -1;
-
-				lst->len++;
-			} else if (i == WEST
-			           && grd->cart_coord[0] == 0
-			           && (!grd->periodic[0])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-
-				int jj, kk;
-				for (kk = 0; kk < grd->nz; kk++) {
-					for (jj = 0; jj < grd->ny; jj++) {
-						int ind = kk*grd->nx*grd->ny + jj*grd->nx;
-						lst->v[lst->len].dirichlet[kk*grd->ny+jj] =
-							pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-					}
-				}
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->is[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = grd->is[2];
-				lst->v[lst->len].ie[2] = grd->ie[2];
-				lst->v[lst->len].norm_dir = 1;
-
-				lst->len++;
-			} else if (i == FRONT
-			           && grd->cart_coord[2] == grd->num_procs[2] - 1
-			           && (!grd->periodic[2])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-				int ii, jj;
-				for (jj = 0; jj < grd->ny; jj++) {
-					for (ii = 0; ii < grd->nx; ii++) {
-						int ind = (grd->nz-1)*grd->nx*grd->ny + jj*grd->nx + ii;
-						lst->v[lst->len].dirichlet[jj*grd->nx + ii] =
-							pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-					}
-				}
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = grd->ie[2];
-				lst->v[lst->len].ie[2] = grd->ie[2];
-				lst->v[lst->len].norm_dir = -3;
-
-				lst->len++;
-			} else if (i == BACK
-			           && grd->cart_coord[2] == 0
-			           && (!grd->periodic[2])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-				int ii, jj;
-				for (jj = 0; jj < grd->ny; jj++) {
-					for (ii = 0; ii < grd->nx; ii++) {
-						int ind = jj*grd->nx + ii;
-						lst->v[lst->len].dirichlet[jj*grd->nx + ii] =
-							pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-					}
-				}
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = grd->is[2];
-				lst->v[lst->len].ie[2] = grd->is[2];
-				lst->v[lst->len].norm_dir = 3;
-
-				lst->len++;
-			}
+		len = 0;
+		if (i == NORTH
+		    && grd->cart_coord[1] == grd->num_procs[1]-1
+		    && (!grd->periodic[1])) {
+			stride = 1;
+			offset = (grd->ny-1)*grd->nx;
+			len = grd->nx;
+			norm_dir = -2;
+		} else if (i == SOUTH
+		           && grd->cart_coord[1] == 0
+		           && (!grd->periodic[1])) {
+			stride = 1;
+			offset = 0;
+			len = grd->nx;
+			norm_dir = 2;
+		} else if (i == EAST
+		           && grd->cart_coord[0] == grd->num_procs[0]-1
+		           && (!grd->periodic[0])) {
+			stride = grd->nx;
+			offset = grd->nx - 1;
+			len = grd->ny;
+			norm_dir = -1;
+		} else if (i == WEST
+		           && grd->cart_coord[0] == 0
+		           && (!grd->periodic[0])) {
+			stride = grd->nx;
+			offset = 0;
+			len = grd->ny;
+			norm_dir = 1;
 		}
-	} else {
-		for (i = 0; i < 4; i++) {
-			if (i == NORTH
-			    && grd->cart_coord[1] == grd->num_procs[1]-1
-			    && (!grd->periodic[1])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts
-				                                              *sizeof(double));
-				for (j = 0; j < grd->nx; j++) {
-					lst->v[lst->len].dirichlet[j] = pb->sol(
-						grd->x[(grd->ny-1)*grd->nx + j],
-						grd->y[(grd->ny-1)*grd->nx + j], 0);
-				}
 
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[1] = grd->ie[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = 0;
-				lst->v[lst->len].ie[2] = 0;
-				lst->v[lst->len].norm_dir = -2;
-
-				lst->len++;
-			} else if (i == SOUTH
-			           && grd->cart_coord[1] == 0
-			           && (!grd->periodic[1])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-
-				for (j = 0; j < grd->nx; j++)
-					lst->v[lst->len].dirichlet[j] = pb->sol(grd->x[j], grd->y[j], 0);
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->is[1];
-				lst->v[lst->len].is[2] = 0;
-				lst->v[lst->len].ie[2] = 0;
-				lst->v[lst->len].norm_dir = 2;
-
-				lst->len++;
-			} else if (i == EAST
-			           && grd->cart_coord[0] == grd->num_procs[0]-1
-			           && (!grd->periodic[0])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-
-				for (j = 0; j < grd->ny; j++)
-					lst->v[lst->len].dirichlet[j] = pb->sol(grd->x[j*grd->nx + grd->nx - 1], grd->y[j*grd->nx + grd->nx - 1], 0);
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->ie[0];
-				lst->v[lst->len].ie[0] = grd->ie[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = 0;
-				lst->v[lst->len].ie[2] = 0;
-				lst->v[lst->len].norm_dir = -1;
-
-				lst->len++;
-			} else if (i == WEST
-			           && grd->cart_coord[0] == 0
-			           && (!grd->periodic[0])) {
-				lst->v[lst->len].dirichlet = (double*) malloc(grd->num_pts*sizeof(double));
-				for (j = 0; j < grd->ny; j++)
-					lst->v[lst->len].dirichlet[j] = pb->sol(grd->x[j*grd->nx], grd->y[j*grd->nx], 0);
-
-				lst->v[lst->len].type = pb->boundary[i];
-
-				lst->v[lst->len].is[0] = grd->is[0];
-				lst->v[lst->len].ie[0] = grd->is[0];
-				lst->v[lst->len].is[1] = grd->is[1];
-				lst->v[lst->len].ie[1] = grd->ie[1];
-				lst->v[lst->len].is[2] = 0;
-				lst->v[lst->len].ie[2] = 0;
-				lst->v[lst->len].norm_dir = 1;
-
-				lst->len++;
+		int j;
+		for (j = 0; j < len; j++) {
+			int ind = j*stride + offset;
+			// Give Dirichlet bc precedence
+			if (!((classify[ind] == DIRICHLET) && (pb->boundary[i] != DIRICHLET))) {
+				classify[ind] = pb->boundary[i];
+				if (pb->boundary[i] == DIRICHLET)
+					values[ind] = pb->sol(grd->x[ind], grd->y[ind], 0);
+				else
+					values[ind] = 0.0;
+				norm_dirs[ind] = norm_dir;
 			}
 		}
 	}
-
-	if (pb->id == ELECTRODE) {
-		for (i = 0; i < pb->nholes; ++i) {
-			boundary *bnd = lst->v + lst->len;
-			int el_is[3];
-			int el_ie[3];
-
-			bnd->type = DIRICHLET;
-
-			int k;
-			for (k = 0; k < grd->nd; k++) {
-				double esize = pb->holes[i].rel_size[k] * grd->num_global[k];
-				double offset = pb->holes[i].rel_offset[k] * grd->num_global[k];
-				el_is[k] = offset - esize * 0.5;
-				el_ie[k] = offset + esize * 0.5;
-			}
-
-			if (contains(grd->is, grd->ie,
-			             el_is, el_ie, grd->nd)) {
-				int ne[3];
-				ne[2] = 1;
-				for (k = 0; k < grd->nd; k++) {
-					bnd->is[k] = max(el_is[k], grd->is[k]);
-					bnd->ie[k] = min(el_ie[k], grd->ie[k]);
-					ne[k] = bnd->ie[k] - bnd->is[k] + 1;
-				}
-
-				printf("Electrode: (%d %d %d) -> (%d %d %d)\n",
-				       bnd->is[0], bnd->is[1], bnd->is[2],
-				       bnd->ie[0], bnd->ie[1], bnd->ie[2]);
-
-				bnd->dirichlet = (double*) malloc(ne[0]*ne[1]*ne[2]*sizeof(double));
-
-				if (grd->nd == 2) {
-					int ii,jj;
-					for (jj = 0; jj < ne[1]; jj++) {
-						for (ii = 0; ii < ne[0]; ii++) {
-							int ind = (bnd->is[1] - grd->is[1] + jj)*grd->nx + (bnd->is[0] - grd->is[0] + ii);
-							bnd->dirichlet[jj*ne[0] + ii] = pb->sol(grd->x[ind], grd->y[ind], 0);
-							/* if (i-4) */
-							/* 	bnd->dirichlet[jj*nbx + ii] = 1.0; */
-							/* else */
-							/* 	bnd->dirichlet[jj*nbx + ii] = -1.0; */
-						}
-					}
-				} else {
-					int ii,jj,kk;
-					for (kk = 0; kk < ne[2]; kk++) {
-						for (jj = 0; jj < ne[1]; jj++) {
-							for (ii = 0; ii < ne[0]; ii++) {
-								int ind = (((bnd->is[2] - grd->is[2] + kk)*grd->nx*grd->ny) +
-								           ((bnd->is[1] - grd->is[1] + jj)*grd->nx) +
-								           ((bnd->is[0] - grd->is[0] + ii)));
-								bnd->dirichlet[kk*ne[0]*ne[1] + jj*ne[0] + ii] =
-									pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
-							}
-						}
-					}
-				}
-
-				lst->v[lst->len].norm_dir = 1;
-
-				lst->len++;
-			}
-		}
-	}
-
-
-	lst->v = realloc(lst->v, lst->len*sizeof(boundary));
-
-	return lst;
 }
 
 
-void boundary_destroy(blist *lst)
+static void add_3d(boundary *bnd, grid *grd, problem *pb)
 {
-	int i;
+	char *classify = bnd->classify;
+	char *norm_dirs = bnd->norm_dir;
+	double *values = bnd->values;
 
-	for (i = 0; i < lst->len; i++) {
-		free(lst->v[i].dirichlet);
+	int i;
+	for (i = 0; i < 6; i++) {
+		int ii, jj;
+		int stride[2];
+		int len[2];
+		int offset;
+		char norm_dir;
+
+		len[0] = 0;
+		len[1] = 0;
+		if (i == NORTH
+		    && grd->cart_coord[1] == grd->num_procs[1]-1
+		    && (!grd->periodic[1])) {
+			stride[0] = grd->nx*grd->ny;
+			stride[1] = 1;
+			offset = (grd->ny-1)*grd->nx;
+			norm_dir = -2;
+			len[0] = grd->nz;
+			len[1] = grd->nx;
+		} else if (i == SOUTH
+		           && grd->cart_coord[1] == 0
+		           && (!grd->periodic[1])) {
+			stride[0] = grd->nx*grd->ny;
+			stride[1] = 1;
+			offset = 0;
+			norm_dir = 2;
+			len[0] = grd->nz;
+			len[1] = grd->nx;
+		} else if (i == EAST
+		           && grd->cart_coord[0] == grd->num_procs[0]-1
+		           && (!grd->periodic[0])) {
+			stride[0] = grd->nx*grd->ny;
+			stride[1] = grd->nx;
+			offset = grd->nx-1;
+			norm_dir = -1;
+			len[0] = grd->nz;
+			len[1] = grd->ny;
+		} else if (i == WEST
+		           && grd->cart_coord[0] == 0
+		           && (!grd->periodic[0])) {
+			stride[0] = grd->nx*grd->ny;
+			stride[1] = grd->nx;
+			offset = 0;
+			norm_dir = 1;
+			len[0] = grd->nz;
+			len[1] = grd->ny;
+		} else if (i == FRONT
+		           && grd->cart_coord[2] == grd->num_procs[2] - 1
+		           && (!grd->periodic[2])) {
+			stride[0] = grd->nx;
+			stride[1] = 1;
+			offset = (grd->nz-1)*grd->nx*grd->ny;
+			norm_dir = -3;
+			len[0] = grd->ny;
+			len[1] = grd->nx;
+		} else if (i == BACK
+		           && grd->cart_coord[2] == 0
+		           && (!grd->periodic[2])) {
+			stride[0] = grd->nx;
+			stride[1] = 1;
+			offset = 0;
+			norm_dir = 3;
+			len[0] = grd->ny;
+			len[1] = grd->nx;
+		}
+
+		for (ii = 0; ii < len[0]; ii++) {
+			for (jj = 0; jj < len[1]; jj++) {
+				int ind = ii*stride[0] + jj*stride[1] + offset;
+				// Give Dirichlet bc precedence
+				if (!((classify[ind] == DIRICHLET) && (pb->boundary[i] != DIRICHLET))) {
+					classify[ind] = pb->boundary[i];
+					if (pb->boundary[i] == DIRICHLET)
+						values[ind] = pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
+					else
+						values[ind] = 0.0;
+					norm_dirs[ind] = norm_dir;
+				}
+			}
+		}
+	}
+}
+
+
+static void add_electrodes(boundary *bnd, grid* grd, problem *pb)
+{
+	char *classify = bnd->classify;
+	char *norm_dir = bnd->norm_dir;
+	double *values = bnd->values;
+	int i;
+	for (i = 0; i < pb->nholes; i++) {
+		int bnd_is[3], el_is[3];
+		int bnd_ie[3], el_ie[3];
+
+		int k;
+		for (k = 0; k < grd->nd; k++) {
+			double esize = pb->holes[i].rel_size[k] * grd->num_global[k];
+			double offset = pb->holes[i].rel_offset[k] * grd->num_global[k];
+			el_is[k] = offset - esize * 0.5;
+			el_ie[k] = offset + esize * 0.5;
+		}
+
+		if (contains(grd->is, grd->ie,
+		             el_is, el_ie, grd->nd)) {
+			int ne[3];
+			ne[2] = 1;
+			for (k = 0; k < grd->nd; k++) {
+				bnd_is[k] = max(el_is[k], grd->is[k]);
+				bnd_ie[k] = min(el_ie[k], grd->ie[k]);
+				ne[k] = bnd_ie[k] - bnd_is[k] + 1;
+			}
+
+			printf("Electrode: (%d %d %d) -> (%d %d %d)\n",
+			       bnd_is[0], bnd_is[1], bnd_is[2],
+			       bnd_ie[0], bnd_ie[1], bnd_ie[2]);
+
+			if (grd->nd == 2) {
+				int ii, jj;
+				for (jj = 0; jj < ne[1]; jj++) {
+					for (ii = 0; ii < ne[0]; ii++) {
+						int ind = (bnd_is[1] - grd->is[1] + jj)*grd->nx + (bnd_is[0] - grd->is[0] + ii);
+						values[ind] = pb->sol(grd->x[ind], grd->y[ind], 0);
+						classify[ind] = DIRICHLET;
+						norm_dir[ind] = 0.0;
+					}
+				}
+			} else {
+				int ii,jj,kk;
+				for (kk = 0; kk < ne[2]; kk++) {
+					for (jj = 0; jj < ne[1]; jj++) {
+						for (ii = 0; ii < ne[0]; ii++) {
+							int ind = (((bnd_is[2] - grd->is[2] + kk)*grd->nx*grd->ny) +
+							           ((bnd_is[1] - grd->is[1] + jj)*grd->nx) +
+							           ((bnd_is[0] - grd->is[0] + ii)));
+							values[ind] = pb->sol(grd->x[ind], grd->y[ind], grd->z[ind]);
+							classify[ind] = DIRICHLET;
+							norm_dir[ind] = 0.0;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+boundary *boundary_create(grid *grd, problem *pb)
+{
+	int i, j;
+
+	boundary *bnd = (boundary*) malloc(sizeof(boundary));
+
+	bnd->classify = (char*) malloc(grd->num_pts*sizeof(char));
+	bnd->norm_dir = (char*) malloc(grd->num_pts*sizeof(char));
+	bnd->values = (double*) malloc(grd->num_pts*sizeof(double));
+
+	for (i = 0; i < grd->num_pts; i++)
+		bnd->classify[i] = 0;
+
+	if (grd->nd == 3) {
+		add_3d(bnd, grd, pb);
+	} else {
+		add_2d(bnd, grd, pb);
 	}
 
-	free(lst->v);
+	if (pb->id == ELECTRODE) {
+		add_electrodes(bnd, grd, pb);
+	}
+
+	return bnd;
+}
+
+
+void boundary_destroy(boundary *bnd)
+{
+	free(bnd->classify);
+	free(bnd->norm_dir);
+	free(bnd->values);
 }

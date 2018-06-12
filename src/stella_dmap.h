@@ -17,10 +17,6 @@ typedef struct stella_dmap {
 	int xs, ys, zs, xm, ym, zm;
 	int nd;        /**< number of dimensions of structured grid */
 	int stride[3]; /**< strides of array that will be mapped */
-	PetscErrorCode (*get_2d)(struct stella_dmap *mp, double *src, double ***array);
-	PetscErrorCode (*restore_2d)(struct stella_dmap *mp, double ***array);
-	PetscErrorCode (*get_3d)(struct stella_dmap *mp, double *src, double ****array);
-	PetscErrorCode (*restore_3d)(struct stella_dmap *mp, double ****array);
 } stella_dmap;
 
 
@@ -65,6 +61,23 @@ PetscErrorCode stella_dmap_get(stella_dmap *mp, double *src, void *array);
  * Frees memory created when using stella_dmap_get
  */
 PetscErrorCode stella_dmap_restore(stella_dmap *mp, void *array);
+
+
+/**
+ * Gives a multidimensional array of mapped data indexed globally
+ * on the two or three dimensional structured grid.
+ *
+ * @param mp data mapping object
+ * @param src data mapping source array
+ * @param array multidimensional array of mapped data
+ */
+PetscErrorCode stella_dmap_get_char(stella_dmap *mp, char *src, void *array);
+
+
+/**
+ * Frees memory created when using stella_dmap_get
+ */
+PetscErrorCode stella_dmap_restore_char(stella_dmap *mp, void *array);
 
 
 PetscErrorCode stella_dmap_destroy(stella_dmap *mp);

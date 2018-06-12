@@ -93,16 +93,17 @@ PetscErrorCode stella_solve(stella*);
 
 
 /**
- * Sets solver state.
+ * Gives stella the location of external arrays used in the discretization
+ * for input and output.
  *
  * @param slv solver object
- * @param phi array where solver will put the solution
- * @param dcoef permittivity of electric field
- * @param jump  jump condition
+ * @param[out] phi array where solver will put the solution
+ * @param[in] dcoef variable coefficient for elliptic operator (- div dcoef grad phi)
+ * @param[in] bcoef diagonal contribution (- div dcoef grad phi - bcoef)
+ * @param[in] jump interface condition ([n . dcoef grad phi] = jump).  Interface must be grid aligned.
  */
-PetscErrorCode stella_set_state(stella *slv, double phi[], double dcoef[],
-                                double bcoef[], double jump[]);
-
+PetscErrorCode stella_set_external(stella *slv, double phi[], double dcoef[],
+                                   double bcoef[], double jump[]);
 
 /**
  * Sets solver rhs.
@@ -132,6 +133,19 @@ PetscErrorCode stella_set_sol(stella *slv, double sol[]);
  * @param xyz array of Cartesian coordinates for each grid point on this processor
  */
 PetscErrorCode stella_set_grid(stella *slv, int is[], int ie[], int num_cells, double xyz[]);
+
+
+/**
+ * Set boundary conditions.
+ *
+ * @param slv solver object
+ * @param ptypes specifies values for boundary condition flags (so classify array can be interpreted)
+ * @param classify grid array that classifies each grid point as specific boundary condition or interior
+ * @param norm_dir grid array that specifies the normal direction for the boundary condition applied at each point (if applicable)
+ * @param values grid array that specifies the value of a boundary condition for each point (e.g., solution[idx] = value[idx] if classify[idx] == dirichlet)
+ */
+PetscErrorCode stella_set_boundary(stella *slv, stella_ptypes ptypes,
+                                   char classify[], char norms[], double values[]);
 
 
 /**

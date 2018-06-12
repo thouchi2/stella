@@ -1,0 +1,5 @@
+if (${cond}) {
+% for line in body.split('\n'):
+    ${line}
+% endfor
+}

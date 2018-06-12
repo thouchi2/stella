@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 typedef struct {
-	blist *bnd;
+	boundary *bnd;
 	state *state;
 	stella  *ptr;
 	int axisymmetric;

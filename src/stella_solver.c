@@ -6,6 +6,7 @@
 
 #include "stella_mat.h"
 #include "stella_pc.h"
+#include "stella_classify.h"
 
 #ifdef WITH_BOXMG
 #include <boxmg/capi.h>
@@ -35,6 +36,157 @@ static inline PetscErrorCode petsc_options_set_value(const char name[], const ch
 	#else
 	ierr = PetscOptionsSetValue(name, value);CHKERRQ(ierr);
 	#endif
+
+	return 0;
+}
+
+
+/**
+ * Copy external array to PETSc vec
+ */
+static PetscErrorCode store_external_array(stella *slv, double src[], Vec dest)
+{
+	PetscErrorCode ierr;
+
+	if (slv->grid.nd == 2) {
+		PetscScalar **dest_loc;
+		double **src_loc;
+		PetscInt i, j;
+		PetscInt xs, ys, xm, ym;
+
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, src, &src_loc);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
+		for (j = ys; j < ys + ym; j++) {
+			for (i = xs; i < xs + xm; i++) {
+				dest_loc[j][i] = src_loc[j][i];
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &src_loc);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
+	} else { // slv->grid.nd == 3
+		PetscScalar ***dest_loc;
+		double ***src_loc;
+		PetscInt i, j, k;
+		PetscInt xs, ys, zs, xm, ym, zm;
+		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+		ierr = stella_dmap_get(slv->dmap, src, &src_loc);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					dest_loc[k][j][i] = src_loc[k][j][i];
+				}
+			}
+		}
+		ierr = stella_dmap_restore(slv->dmap, &src_loc);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
+	}
+
+	return 0;
+}
+
+
+/**
+ * Fill external array with updated solution
+ */
+static PetscErrorCode update_solution(stella *slv)
+{
+	PetscErrorCode ierr;
+	PetscInt i, j, k, xs, ys, zs, xm, ym, zm;
+	PetscInt ngx,ngy,ngz;
+	DMBoundaryType bx, by, bz;
+
+	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0, &bx, &by, &bz,0);CHKERRQ(ierr);
+	ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
+
+	if (slv->grid.nd == 2) {
+		Vec loc_x;
+		PetscScalar **xvec;
+		double **phi;
+
+		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
+		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+
+		for (j = ys; j < ys + ym; j++) {
+			for (i = xs; i < xs + xm; i++) {
+				phi[j][i] = xvec[j][i];
+			}
+		}
+
+		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
+			for (i = xs; i < xs + xm; i++) {
+				phi[ngy][i] = xvec[ngy][i];
+			}
+		}
+
+		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
+			for (j = ys; j < ys + ym; j++) {
+				phi[j][ngx] = xvec[j][ngx];
+			}
+		}
+
+		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+		if (stella_log(slv, STELLA_LOG_VTK)) {
+			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
+		}
+		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+	} else if (slv->grid.nd == 3) {
+		PetscScalar ***xvec;
+		double ***phi;
+		Vec loc_x;
+
+		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
+		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
+		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+
+		for (k = zs; k < zs + zm; k++) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					phi[k][j][i] = xvec[k][j][i];
+				}
+			}
+		}
+
+		if ((bz == DM_BOUNDARY_PERIODIC) && (zs + zm == ngz) && slv->grid.overlap_periodic) {
+			for (j = ys; j < ys + ym; j++) {
+				for (i = xs; i < xs + xm; i++) {
+					phi[ngz][j][i] = xvec[ngz][j][i];
+				}
+			}
+		}
+		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
+			for (k = zs; k < zs + zm; k++) {
+				for (i = xs; i < xs + xm; i++) {
+					phi[k][ngy][i] = xvec[k][ngy][i];
+				}
+			}
+		}
+		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
+			for (k = zs; k < zs + zm; k++) {
+				for (j = ys; j < ys + ym; j++) {
+					phi[k][j][ngx] = xvec[k][j][ngx];
+				}
+			}
+		}
+
+		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
+		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
+		if (stella_log(slv, STELLA_LOG_VTK)) {
+			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
+			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
+		}
+		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
+	}
 
 	return 0;
 }
@@ -177,9 +329,6 @@ PetscErrorCode stella_init(stella **solver_ctx, MPI_Comm comm,
 PetscErrorCode stella_solve(stella *slv)
 {
 	PetscErrorCode ierr;
-	PetscInt i, j, k, xs, ys, zs, xm, ym, zm;
-	PetscInt ngx,ngy,ngz;
-	DMBoundaryType bx, by, bz;
 	PetscBool boxmg_direct = 0;
 	slv->ts++;
 
@@ -207,98 +356,8 @@ PetscErrorCode stella_solve(stella *slv)
 	  ierr = VecDestroy(&err);CHKERRQ(ierr);
 	}
 
-
-	ierr = DMDAGetInfo(slv->dm, 0, &ngx, &ngy, &ngz,0,0,0,0,0, &bx, &by, &bz,0);CHKERRQ(ierr);
-
-	ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-
-	if (slv->grid.nd == 2) {
-		Vec loc_x;
-		PetscScalar **xvec;
-		double **phi;
-
-		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
-		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				phi[j][i] = xvec[j][i];
-			}
-		}
-
-		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
-			for (i = xs; i < xs + xm; i++) {
-				phi[ngy][i] = xvec[ngy][i];
-			}
-		}
-
-		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
-			for (j = ys; j < ys + ym; j++) {
-				phi[j][ngx] = xvec[j][ngx];
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-		if (stella_log(slv, STELLA_LOG_VTK)) {
-			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
-		}
-		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		PetscScalar ***xvec;
-		double ***phi;
-		Vec loc_x;
-
-		ierr = stella_dmap_get(slv->dmap, slv->state.phi, &phi);CHKERRQ(ierr);
-		ierr = DMGetLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalBegin(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMGlobalToLocalEnd(slv->dm, slv->x, INSERT_VALUES, loc_x);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					phi[k][j][i] = xvec[k][j][i];
-				}
-			}
-		}
-
-		if ((bz == DM_BOUNDARY_PERIODIC) && (zs + zm == ngz) && slv->grid.overlap_periodic) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					phi[ngz][j][i] = xvec[ngz][j][i];
-				}
-			}
-		}
-		if ((by == DM_BOUNDARY_PERIODIC) && (ys + ym == ngy) && slv->grid.overlap_periodic) {
-			for (k = zs; k < zs + zm; k++) {
-				for (i = xs; i < xs + xm; i++) {
-					phi[k][ngy][i] = xvec[k][ngy][i];
-				}
-			}
-		}
-		if ((bx == DM_BOUNDARY_PERIODIC) && (xs + xm == ngx) && slv->grid.overlap_periodic) {
-			for (k = zs; k < zs + zm; k++) {
-				for (j = ys; j < ys + ym; j++) {
-					phi[k][j][ngx] = xvec[k][j][ngx];
-				}
-			}
-		}
-
-		ierr = stella_dmap_restore(slv->dmap, &phi);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, loc_x, &xvec);CHKERRQ(ierr);
-		if (stella_log(slv, STELLA_LOG_VTK)) {
-			ierr = DMLocalToGlobalBegin(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = DMLocalToGlobalEnd(slv->dm, loc_x, INSERT_VALUES, slv->x);CHKERRQ(ierr);
-			ierr = stella_io_vtkwrite(slv->dm, slv->x, "phi", slv->grid.id, slv->ts);CHKERRQ(ierr);
-		}
-		ierr = DMRestoreLocalVector(slv->dm, &loc_x);CHKERRQ(ierr);
-	}
+	// Update external array with solution
+	ierr = update_solution(slv);CHKERRQ(ierr);
 
 	if (stella_log(slv, STELLA_LOG_PROBLEM)) {
 		PetscViewer vout;
@@ -311,8 +370,8 @@ PetscErrorCode stella_solve(stella *slv)
 }
 
 
-PetscErrorCode stella_set_state(stella *slv, double phi[], double dcoef[],
-                                double bcoef[], double jump[])
+PetscErrorCode stella_set_external(stella *slv, double phi[], double dcoef[],
+                                   double bcoef[], double jump[])
 {
 	PetscErrorCode ierr;
 
@@ -322,80 +381,27 @@ PetscErrorCode stella_set_state(stella *slv, double phi[], double dcoef[],
 	slv->state.jump = jump;
 	slv->state.sol = NULL;
 
-	if (slv->grid.nd == 2) {
-		PetscScalar **dcoefvec;
-		double **dcostella_state;
-		PetscInt i, j;
-		PetscInt xs, ys, xm, ym;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.dcoef, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				dcoefvec[j][i] = dcostella_state[j][i];
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		PetscScalar ***dcoefvec;
-		double ***dcostella_state;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.dcoef, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					dcoefvec[k][j][i] = dcostella_state[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &dcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.dcoef, &dcoefvec);CHKERRQ(ierr);
-
-	}
-
+	ierr = store_external_array(slv, slv->state.dcoef, slv->level.dcoef);CHKERRQ(ierr);
+	// populate halo region
 	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
 	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
 
-  if (slv->grid.nd == 2) {
-    PetscScalar **bcoefvec;
-    double **bcostella_state;
-    PetscInt i, j;
-    PetscInt xs, ys, xm, ym;
-    ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-    ierr = stella_dmap_get(slv->dmap, slv->state.bcoef, &bcostella_state);CHKERRQ(ierr);
-    ierr = DMDAVecGetArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-    for (j = ys; j < ys + ym; j++) {
-        for (i = xs; i < xs + xm; i++) {
-            bcoefvec[j][i] = bcostella_state[j][i];
-        }
-    }
-    ierr = stella_dmap_restore(slv->dmap, &bcostella_state);CHKERRQ(ierr);
-    ierr = DMDAVecRestoreArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-  } else if (slv->grid.nd == 3) {
-		PetscScalar ***bcoefvec;
-		double ***bcostella_state;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.bcoef, &bcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					bcoefvec[k][j][i] = bcostella_state[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &bcostella_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->level.bcoef, &bcoefvec);CHKERRQ(ierr);
-  }
+	ierr = store_external_array(slv, slv->state.bcoef, slv->level.bcoef);CHKERRQ(ierr);
+	// populate halo region
+	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
+	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
 
-  ierr = DMGlobalToLocalBegin(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
-  ierr = DMGlobalToLocalEnd(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
+	return 0;
+}
+
+
+
+PetscErrorCode stella_set_rhs(stella *slv, double rhs[])
+{
+	PetscErrorCode ierr;
+
+	slv->state.rhs = rhs;
+	ierr = stella_changed_rhs(slv);CHKERRQ(ierr);
 
 	return 0;
 }
@@ -408,53 +414,9 @@ PetscErrorCode stella_set_sol(stella *slv, double sol[])
 	ierr = DMCreateGlobalVector(slv->dm, &slv->sol);
 	slv->state.sol = sol;
 
-	if (slv->grid.nd == 2) {
-		PetscScalar **svec;
-		double **sol_state;
-		PetscInt i, j;
-		PetscInt xs, ys, xm, ym;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.sol, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				svec[j][i] = sol_state[j][i];
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-	} else if (slv->grid.nd == 3) {
-		PetscScalar ***svec;
-		double ***sol_state;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, slv->state.sol, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					svec[k][j][i] = sol_state[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &sol_state);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, slv->sol, &svec);CHKERRQ(ierr);
-	}
+	ierr = store_external_array(slv, slv->state.sol, slv->sol);CHKERRQ(ierr);
 
 	return 0;
-}
-
-
-PetscErrorCode stella_set_rhs(stella *slv, double rhs[])
-{
-	PetscErrorCode ierr;
-
-	slv->state.rhs = rhs;
-	ierr = stella_changed_rhs(slv);CHKERRQ(ierr);
-
-	return ierr;
 }
 
 
@@ -526,6 +488,18 @@ PetscErrorCode stella_set_grid(stella *slv, int is[], int ie[], int num_cells, d
 		ierr = VecView(gc, vout);CHKERRQ(ierr);
 		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
 	}
+
+	return 0;
+}
+
+
+PetscErrorCode stella_set_boundary(stella *slv, stella_ptypes ptypes,
+                                   char classify[], char norm_dir[], double values[])
+{
+	PetscErrorCode ierr;
+
+	ierr = stella_classify_create(&slv->level.classify, slv->dm, slv->dmap, classify, ptypes);CHKERRQ(ierr);
+	ierr = stella_boundary_set(slv->boundary, norm_dir, values);CHKERRQ(ierr);
 
 	return 0;
 }

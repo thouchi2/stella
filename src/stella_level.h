@@ -4,6 +4,7 @@
 #include <petscvec.h>
 
 #include "stella_metric.h"
+#include "stella_classify.h"
 
 /**
  * Data structure containing data
@@ -20,6 +21,8 @@ typedef struct {
 	Vec bcoef;
 	Vec lbcoef;
 	DM dm;
+
+	stella_classify *classify;
 } stella_level;
 
 
