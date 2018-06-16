@@ -7,11 +7,21 @@ include(cxx11)
 include(cxx_config)
 include(testing)
 
+option(ENABLE_UNIT_TESTS "Enable unit testing" OFF)
+option(AutodetectMPI "Automatically detect MPI" ON)
+
 enable_language(C CXX Fortran)
 
 find_package(PETSc REQUIRED)
+if(AutoDetectMPI)
+  find_package(MPI REQUIRED)
+endif()
 
 include_directories(${MPI_INCLUDE_PATH} ${PETSC_INCLUDES} src)
+
+if(ENABLE_UNIT_TESTS)
+  add_subdirectory(test)
+endif()
 
 add_subdirectory(src)
 add_library(stella ${stella_sources})
