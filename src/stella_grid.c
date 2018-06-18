@@ -232,6 +232,6 @@ PetscErrorCode stella_grid_setup(stella_grid *grid, DM *dm, MPI_Comm *comm, int 
 	} else {
 		SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_SUP, "Unsupported dimmension: %d", nd);
 	}
-
+	ierr = DMSetUp(*dm);CHKERRQ(ierr);
 	return 0;
 }

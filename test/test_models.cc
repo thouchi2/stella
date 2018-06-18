@@ -3,6 +3,7 @@
 #include <cmath>
 #include <mpi.h>
 #include <vector>
+#include <array>
 #include "gtest/gtest.h"
 
 #include "problem.h"
@@ -411,7 +412,7 @@ TEST(Models, CurlSine) {
 		                        0, 1, nx,
 		                        0, 0, 0);
 
-		map *mp = map_create(MAP_CURL, grd->nd);
+		mapping *mp = map_create(MAP_CURL, grd->nd);
 		grid_apply_map(grd, mp);
 
 		problem *pb = problem_create(SIN, 2, mp->id);
@@ -467,7 +468,7 @@ TEST(Models, SecondTutorial) {
 		                        0, 1, nx,
 		                        0, 0, 0);
 
-		map *mp = map_create(MAP_SECOND, grd->nd);
+		mapping *mp = map_create(MAP_SECOND, grd->nd);
 		grid_apply_map(grd, mp);
 
 		problem *pb = problem_create(MTUT, 2, mp->id);
@@ -522,7 +523,7 @@ TEST(Models, Rot) {
 		grid *grd = grid_create(0, 1, nx,
 		                        0, 1, nx,
 		                        0, 0, 0);
-		map *mp = map_create(MAP_ROT, grd->nd);
+		mapping *mp = map_create(MAP_ROT, grd->nd);
 		grid_apply_map(grd, mp);
 
 		problem *pb = problem_create(ROT, 2, mp->id);
@@ -738,7 +739,7 @@ TEST(Models, HalfAnnulus) {
 		                        0, 1, nx,
 		                        0, 0, 0);
 
-		map *mp = map_create(MAP_HANNULUS, grd->nd);
+		mapping *mp = map_create(MAP_HANNULUS, grd->nd);
 		grid_apply_map(grd, mp);
 
 		problem *pb = problem_create(MTUT, 2, mp->id);
@@ -794,7 +795,7 @@ TEST(Models, Warping) {
 		                        0, 1, nx,
 		                        0, 0, 0);
 
-		map *mp = map_create(MAP_DISTORT, grd->nd);
+		mapping *mp = map_create(MAP_DISTORT, grd->nd);
 		grid_apply_map(grd, mp);
 
 		problem *pb = problem_create(MTUT, 2, mp->id);

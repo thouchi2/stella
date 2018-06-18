@@ -3,6 +3,7 @@
 #include <cmath>
 #include <mpi.h>
 #include <vector>
+#include <array>
 #include "gtest/gtest.h"
 
 #include "problem.h"
@@ -219,7 +220,7 @@ TEST(Models3, Periodic)
 		                        0, 1, nx);
 
 		grd->periodic[1] = 1;
-		map *mp = map_create(MAP_POLAR, grd->nd);
+		mapping *mp = map_create(MAP_POLAR, grd->nd);
 		grid_apply_map(grd, mp);
 
 		problem *pb = problem_create(PERIODIC, 3, mp->id);
