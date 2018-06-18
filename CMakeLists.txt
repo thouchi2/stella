@@ -13,11 +13,17 @@ option(AutodetectMPI "Automatically detect MPI" ON)
 enable_language(C CXX Fortran)
 
 find_package(PETSc REQUIRED)
-if(AutoDetectMPI)
+
+set(req-lib ${PETSC_LIBRARIES} m)
+set(req-inc ${PETSC_INCLUDES})
+
+if(AutodetectMPI)
   find_package(MPI REQUIRED)
+  list(APPEND req-lib ${MPI_C_LIBRARIES})
+  list(APPEND req-inc ${MPI_C_INCLUDE_PATH})
 endif()
 
-include_directories(${MPI_INCLUDE_PATH} ${PETSC_INCLUDES} src)
+include_directories(src)
 
 if(ENABLE_UNIT_TESTS)
   add_subdirectory(test)
@@ -26,10 +32,7 @@ endif()
 add_subdirectory(src)
 add_library(stella ${stella_sources})
 target_compile_definitions(stella PUBLIC PETSC_OPTIONS_TAKES_DATABASE)
-target_link_libraries(stella PUBLIC
-  ${MPI_C_LIBRARIES}
-  ${PETSC_LIBRARIES}
-  m
-)
+target_link_libraries(stella PUBLIC ${req-lib})
+target_include_directories(stella PUBLIC ${req-inc})
 
 add_subdirectory(tools)
