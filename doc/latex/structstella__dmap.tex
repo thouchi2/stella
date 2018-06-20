@@ -1,0 +1,46 @@
+\hypertarget{structstella__dmap}{}\section{stella\+\_\+dmap Struct Reference}
+\label{structstella__dmap}\index{stella\+\_\+dmap@{stella\+\_\+dmap}}
+
+
+Data mapping object.  
+
+
+
+
+{\ttfamily \#include $<$stella\+\_\+dmap.\+h$>$}
+
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{structstella__dmap_ae1538110e94bee9026b476a681c44946}\label{structstella__dmap_ae1538110e94bee9026b476a681c44946}} 
+int {\bfseries xs}
+\item 
+\mbox{\Hypertarget{structstella__dmap_a94190e8f2f3c1efee08b51752d95c6ec}\label{structstella__dmap_a94190e8f2f3c1efee08b51752d95c6ec}} 
+int {\bfseries ys}
+\item 
+\mbox{\Hypertarget{structstella__dmap_a06bde1f9d13046c7f907a2ccdd38345e}\label{structstella__dmap_a06bde1f9d13046c7f907a2ccdd38345e}} 
+int {\bfseries zs}
+\item 
+\mbox{\Hypertarget{structstella__dmap_a44f81af4ad90a0daaa293a5b27d23cd8}\label{structstella__dmap_a44f81af4ad90a0daaa293a5b27d23cd8}} 
+int {\bfseries xm}
+\item 
+\mbox{\Hypertarget{structstella__dmap_a1a8ce114a2fbc771a693a14353588ab9}\label{structstella__dmap_a1a8ce114a2fbc771a693a14353588ab9}} 
+int {\bfseries ym}
+\item 
+\mbox{\Hypertarget{structstella__dmap_af16139e8ef8d7724bbeb8af004176c68}\label{structstella__dmap_af16139e8ef8d7724bbeb8af004176c68}} 
+int {\bfseries zm}
+\item 
+\mbox{\Hypertarget{structstella__dmap_a70743458c3c20e0bc910126f429ef45b}\label{structstella__dmap_a70743458c3c20e0bc910126f429ef45b}} 
+int \mbox{\hyperlink{structstella__dmap_a70743458c3c20e0bc910126f429ef45b}{nd}}
+\begin{DoxyCompactList}\small\item\em number of dimensions of structured grid \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{structstella__dmap_afe5870832e891c0254aa65a3f2f72e3e}\label{structstella__dmap_afe5870832e891c0254aa65a3f2f72e3e}} 
+int \mbox{\hyperlink{structstella__dmap_afe5870832e891c0254aa65a3f2f72e3e}{stride}} \mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em strides of array that will be mapped \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+This object manages mapping data from a given source. For example, arrays on 2 or 3 dimensional grids may include ghost points or have different strides. This object provides a general interface from which the efield solver can map contiguous data arrays from different sources to two or three dimensional arrays on a structured grid. 
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/stella\+\_\+dmap.\+h\end{DoxyCompactItemize}

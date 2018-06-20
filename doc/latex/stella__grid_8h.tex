@@ -1,0 +1,56 @@
+\hypertarget{stella__grid_8h}{}\section{src/stella\+\_\+grid.h File Reference}
+\label{stella__grid_8h}\index{src/stella\+\_\+grid.\+h@{src/stella\+\_\+grid.\+h}}
+
+
+Class used to store grid information from Plas\+Com\+CM.  
+
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{structstella__grid}{stella\+\_\+grid}}
+\begin{DoxyCompactList}\small\item\em Holds grid information from Plas\+Com\+CM. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Petsc\+Error\+Code \mbox{\hyperlink{stella__grid_8h_a4d8a983e0d895297191a3b6e210703ef}{stella\+\_\+grid\+\_\+setup}} (\mbox{\hyperlink{structstella__grid}{stella\+\_\+grid}} $\ast$grid, DM $\ast$dm, M\+P\+I\+\_\+\+Comm $\ast$comm, int n\+Global\mbox{[}$\,$\mbox{]}, int n\+Procs\mbox{[}$\,$\mbox{]}, int n\+Local\mbox{[}$\,$\mbox{]}, int cart\+Coord\mbox{[}$\,$\mbox{]}, int periodic\mbox{[}$\,$\mbox{]}, int periodic\+\_\+storage, int nd)
+\begin{DoxyCompactList}\small\item\em Sets up the grid data structure The primary responsibilities are\+: \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\mbox{\Hypertarget{stella__grid_8h_a4d8a983e0d895297191a3b6e210703ef}\label{stella__grid_8h_a4d8a983e0d895297191a3b6e210703ef}} 
+\index{stella\+\_\+grid.\+h@{stella\+\_\+grid.\+h}!stella\+\_\+grid\+\_\+setup@{stella\+\_\+grid\+\_\+setup}}
+\index{stella\+\_\+grid\+\_\+setup@{stella\+\_\+grid\+\_\+setup}!stella\+\_\+grid.\+h@{stella\+\_\+grid.\+h}}
+\subsubsection{\texorpdfstring{stella\+\_\+grid\+\_\+setup()}{stella\_grid\_setup()}}
+{\footnotesize\ttfamily Petsc\+Error\+Code stella\+\_\+grid\+\_\+setup (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structstella__grid}{stella\+\_\+grid}} $\ast$}]{grid,  }\item[{DM $\ast$}]{dm,  }\item[{M\+P\+I\+\_\+\+Comm $\ast$}]{comm,  }\item[{int}]{n\+Global\mbox{[}$\,$\mbox{]},  }\item[{int}]{n\+Procs\mbox{[}$\,$\mbox{]},  }\item[{int}]{n\+Local\mbox{[}$\,$\mbox{]},  }\item[{int}]{cart\+Coord\mbox{[}$\,$\mbox{]},  }\item[{int}]{periodic\mbox{[}$\,$\mbox{]},  }\item[{int}]{periodic\+\_\+storage,  }\item[{int}]{nd }\end{DoxyParamCaption})}
+
+
+\begin{DoxyEnumerate}
+\item Renumber ranks to match Plas\+Com\+CM rank to Cartesian grid ordering
+\item Create P\+E\+T\+Sc D\+M\+DA object with parallel grid topology info from Plas\+Com\+CM
+\item Initialize D\+M\+DA coordinates (overwritten by efs\+\_\+set\+\_\+grid in stella\+\_\+solver.\+c)
+\end{DoxyEnumerate}
+
+
+\begin{DoxyParams}{Parameters}
+{\em grid} & grid object \\
+\hline
+{\em dm} & P\+E\+T\+Sc DM object to setup \\
+\hline
+{\em \mbox{[}in/out\mbox{]}} & comm M\+PI Communicator from Plas\+Com\+CM \\
+\hline
+{\em n\+Global} & number of global grid points by dimension \\
+\hline
+{\em n\+Procs} & number of processors by dimension \\
+\hline
+{\em n\+Local} & number of local grid points by dimension \\
+\hline
+{\em cart\+Coord} & Cartesian coordinates of grid \\
+\hline
+{\em periodic} & flag to set periodicity by dimension \\
+\hline
+{\em periodic\+\_\+storage} & flag for duplicate grid points if periodic \\
+\hline
+{\em nd} & number of dimensions \\
+\hline
+\end{DoxyParams}
