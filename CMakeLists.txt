@@ -36,3 +36,63 @@ target_link_libraries(stella PUBLIC ${req-lib})
 target_include_directories(stella PUBLIC ${req-inc})
 
 add_subdirectory(tools)
+
+# Set the Doxygen list
+set(list_for_doxygen_headers
+    "src/stella_bc.h"
+    "src/stella_boundary.h"
+    "src/stella_classify.h"
+    "src/stella_dirichlet.h"
+    "src/stella_dmap.h"
+    "src/stella_fd.h"
+    "src/stella_gen.h"
+    "src/stella_grid.h"
+    "src/stella_io.h"
+    "src/stella_level.h"
+    "src/stella_mat.h"
+    "src/stella_metric.h"
+    "src/stella_neumann.h"
+    "src/stella_operator.h"
+    "src/stella_pc.h"
+    "src/stella_rhs.h"
+    "src/stella_signals.h"
+    "src/stella_solver.h"
+    "src/stella_state.h"
+    "src/stella_stencil.h"
+    "tools/single-block/base.h"
+    "tools/single-block/block.h"
+    "tools/single-block/boundary.h"
+    "tools/single-block/grid.h"
+    "tools/single-block/map.h"
+    "tools/single-block/option.h"
+    "tools/single-block/problem.h"
+    "tools/single-block/solver.h"
+    "tools/single-block/state.h"
+    )
+foreach(arg ${list_for_doxygen_headers})
+    set(doxygen_headers "${doxygen_headers} ${CMAKE_CURRENT_SOURCE_DIR}/${arg}")
+endforeach(arg ${list_for_doxygen_headers})
+
+# build documentation (if enabled)
+option(DOC "Create and install the HTML based API documentation (requires Doxygen)" ON)
+if(DOC)
+
+    find_package(Doxygen)
+
+    if(NOT DOXYGEN_FOUND)
+        message(FATAL_ERROR "Doxygen is needed to build the documentation.")
+    endif()
+
+    set(doxyfile_in ${CMAKE_CURRENT_SOURCE_DIR}/doxygen/Doxyfile)
+    set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.bin)
+
+    configure_file(${doxyfile_in} ${doxyfile} @ONLY)
+
+    add_custom_target(doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/html DESTINATION share/doc/stella OPTIONAL)
+endif()
