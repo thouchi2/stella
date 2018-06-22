@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(stella)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(cxx11)
 include(cxx_config)
