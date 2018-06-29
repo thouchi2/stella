@@ -57,7 +57,7 @@ PetscErrorCode stella_io_print(MPI_Comm comm, char *msg)
 {
 	PetscErrorCode ierr;
 
-	ierr = PetscPrintf(comm, "PlasComCM: %s\n", msg);CHKERRQ(ierr);
+	ierr = PetscPrintf(comm, "stella: %s\n", msg);CHKERRQ(ierr);
 
 	return 0;
 }
