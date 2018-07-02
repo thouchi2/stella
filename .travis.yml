@@ -5,10 +5,10 @@ before_install:
   - test -n $CXX && unset CXX
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich2 liblapack-dev libboost-filesystem-dev libboost-system-dev python-numpy clang-3.9 ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip install pyamg ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich2 ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip install petsc ; fi
 before_script:
   - mkdir build
   - cd build
-  - cmake -DENABLE_UNIT_TESTS=yes -DCMAKE_CXX_COMPILER=clang++-3.9 ..
+  - cmake -DENABLE_UNIT_TESTS=yes ..
 script: make && make test
