@@ -9,5 +9,5 @@ install:
 before_script:
   - mkdir build
   - cd build
-  - cmake -DENABLE_UNIT_TESTS=yes ..
+  - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DCMAKE_Fortran_COMPILER=`which mpif90` ..
 script: make && make test
