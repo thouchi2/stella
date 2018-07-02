@@ -6,7 +6,7 @@ before_install:
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich2 ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install PETSc; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip install PETSc; fi
 before_script:
   - mkdir build
   - cd build
