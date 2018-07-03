@@ -4,8 +4,8 @@ before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
 install:
-    sudo apt-get update -qq ; fi
-    sudo apt-get install -y cmake3 mpich petsc-dev ; fi
+  - sudo apt-get update -qq ; fi
+  - sudo apt-get install -y cmake3 mpich petsc-dev ; fi
 before_script:
   - mkdir build
   - cd build
