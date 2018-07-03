@@ -5,7 +5,7 @@ before_install:
   - test -n $CXX && unset CXX
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich2 libpetsc3.4.2 petsc-dev doxygen ; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich2 libpetsc3.4.2 libpetsc3.4.2-dbg libpetsc3.4.2-dev petsc-dev petsc3.4.2-doc doxygen ; fi
 before_script:
   - mkdir build
   - cd build
