@@ -4,7 +4,8 @@ before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
 install:
-    ./.install-$TRAVIS_OS_NAME-deps.sh
+    sudo apt-get update -qq
+    sudo apt-get install -y cmake3 mpich petsc-dev
 before_script:
   - mkdir build
   - cd build
