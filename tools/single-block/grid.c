@@ -156,18 +156,14 @@ grid *grid_create(double startx, double endx, int nx,
 	grd->hy = (endy - starty) / (grd->num_global[1] - 1);
 	grd->hz = (endz - startz) / (grd->num_global[2] - 1);
 
-	startx = startx + (grd->is[0]-1)*grd->hx - grd->ibeg[0]*grd->hx;
-	starty = starty + (grd->is[1]-1)*grd->hy - grd->ibeg[1]*grd->hy;
-	startz = startz + (grd->is[2]-1)*grd->hz - grd->ibeg[2]*grd->hz;
-
 	if (grd->nd == 3) {
 		for (k = 0; k < grd->len[2]; k++) {
 			for (j = 0; j < grd->len[1]; j++) {
 				for (i = 0; i < grd->len[0]; i++) {
 					ind = k*grd->len[0]*grd->len[1] + j*grd->len[0] + i;
-					grd->x[ind] = startx + i*grd->hx;
-					grd->y[ind] = starty + j*grd->hy;
-					grd->z[ind] = startz + k*grd->hz;
+					grd->x[ind] = startx + (grd->is[0]-1-grd->ibeg[0]+i)*grd->hx;
+					grd->y[ind] = starty + (grd->is[1]-1-grd->ibeg[1]+j)*grd->hy;
+					grd->z[ind] = startz + (grd->is[2]-1-grd->ibeg[2]+k)*grd->hz;
 				}
 			}
 		}
@@ -175,8 +171,8 @@ grid *grid_create(double startx, double endx, int nx,
 		for (j = 0; j < grd->len[1]; j++) {
 			for (i = 0; i < grd->len[0]; i++) {
 				ind = j*grd->len[0] + i;
-				grd->x[ind] = startx + i*grd->hx;
-				grd->y[ind] = starty + j*grd->hy;
+				grd->x[ind] = startx + (grd->is[0]-1-grd->ibeg[0]+i)*grd->hx;
+				grd->y[ind] = starty + (grd->is[1]-1-grd->ibeg[1]+j)*grd->hy;
 			}
 		}
 	}
