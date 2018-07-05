@@ -15,4 +15,4 @@ cd mpich-3.2
 mkdir build && cd build
 ../configure CC=$PRK_CC CXX=$PRK_CXX --disable-fortran --prefix=$TRAVIS_ROOT/mpich
 make -j4
-make install
+sudo make install
