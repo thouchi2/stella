@@ -7,7 +7,7 @@ before_install:
   - chmod +x install-$TRAVIS_OS_NAME-deps.sh
 install: ./install-$TRAVIS_OS_NAME-deps.sh
 env:
-  - BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
+  #- BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
   - BUILD_TYPE=Release PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_opt
 script:
   - mkdir build && cd build
