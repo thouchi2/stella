@@ -3,6 +3,7 @@ os: linux
 before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
+  - chmod +x install-$TRAVIS_OS_NAME-deps.sh
 install: ./install-$TRAVIS_OS_NAME-deps.sh
 env:
   - BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
