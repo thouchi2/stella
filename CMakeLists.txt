@@ -43,12 +43,12 @@ option(AutodetectMPI "Automatically detect MPI" ON)
 
 enable_language(C CXX)
 
-find_package(PETSc REQUIRED)
-
 set(PETSC_DIR $ENV{PETSC_DIR})
   if(DEFINED ENV{PETSC_ARCH})
     set(PETSC_ARCH $ENV{PETSC_ARCH})
   endif()
+
+find_package(PETSc REQUIRED)
 
 set(req-lib ${PETSC_LIBRARIES} m)
 set(req-inc ${PETSC_INCLUDES})
