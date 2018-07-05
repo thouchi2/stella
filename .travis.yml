@@ -3,6 +3,7 @@ os: linux
 before_install:
   - test -n $CC
   - test -n $CXX
+  - test -n $FC
   - chmod +x install-$TRAVIS_OS_NAME-deps.sh
 install: ./install-$TRAVIS_OS_NAME-deps.sh
 env:
