@@ -1,8 +1,8 @@
 language: cpp
 os: linux
 before_install:
-  - test -n $CC  && unset CC
-  - test -n $CXX && unset CXX
+  - test -n $CC
+  - test -n $CXX
   - chmod +x install-$TRAVIS_OS_NAME-deps.sh
 install: ./install-$TRAVIS_OS_NAME-deps.sh
 env:
