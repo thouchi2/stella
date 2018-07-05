@@ -3,9 +3,10 @@ os: linux
 before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
-install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich petsc-dev doxygen; fi
+install: ./.install-$TRAVIS_OS_NAME-deps.sh
+env:
+  - BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
+  - BUILD_TYPE=Release PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_opt
 before_script:
   - mkdir build
   - cd build
