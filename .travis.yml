@@ -9,8 +9,12 @@ install: ./install-$TRAVIS_OS_NAME-deps.sh
 env:
   - BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
   - BUILD_TYPE=Release PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_opt
-before_script:
-  - mkdir build
-  - cd build
+script:
+  - mkdir build && cd build
+  - ls $PWD
+  - ls $PETSC_DIR
+  - ls $PETSC_DIR/$PETSC_ARCH
+  - ls $PETSC_DIR/$PETSC_ARCH/lib
+  - export TMPDIR=/tmp
   - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DCMAKE_Fortran_COMPILER='which mpif90' ..
 script: make && make test
