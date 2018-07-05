@@ -11,12 +11,6 @@ env:
   - BUILD_TYPE=Release PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_opt
 script:
   - mkdir build && cd build
-  - ln -s $PETSC_DIR/lib/petsc/conf $PETSC_DIR/conf
-  - ln -s $PETSC_DIR/include/petsc/finclude $PETSC_DIR/include/finclude
-  - ls $PWD
-  - ls $PETSC_DIR
-  - ls $PETSC_DIR/$PETSC_ARCH
-  - ls $PETSC_DIR/$PETSC_ARCH/lib
   - export TMPDIR=/tmp
   - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DCMAKE_Fortran_COMPILER='which mpif90' ..
   - make && make test
