@@ -31,7 +31,7 @@ if (NOT CMAKE_Fortran_COMPILER)
   if (NOT $ENV{FC} STREQUAL "")
     set(CMAKE_Fortran_COMPILER $ENV{FC})
   else()
-    set(CMAKE_Fortran_COMPILER gfortran)
+    set(CMAKE_Fortran_COMPILER "which mpif90")
   endif()
 endif()
 if (NOT CMAKE_Fortran_FLAGS)
@@ -41,7 +41,7 @@ endif()
 option(ENABLE_UNIT_TESTS "Enable unit testing" OFF)
 option(AutodetectMPI "Automatically detect MPI" ON)
 
-enable_language(C CXX Fortran)
+enable_language(C CXX)
 
 find_package(PETSc REQUIRED)
 
