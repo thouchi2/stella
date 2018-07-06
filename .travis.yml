@@ -19,5 +19,5 @@ script:
   - export TMPDIR=/tmp
   - ln -s $PETSC_DIR/lib/petsc/conf $PETSC_DIR/conf
   - ln -s $PETSC_DIR/include/petsc/finclude $PETSC_DIR/include/finclude
-  - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DCMAKE_Fortran_COMPILER='which mpif90' -DENABLE_UNIT_TESTS=yes ..
-  - make && make test
+  - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DCMAKE_Fortran_COMPILER='which mpif90' ..
+  - make
