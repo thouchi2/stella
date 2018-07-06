@@ -1,5 +1,6 @@
 language: cpp
 os: linux
+sudo: required
 before_install:
   - test -n $CC
   - test -n $CXX
