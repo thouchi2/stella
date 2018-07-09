@@ -1,14 +1,22 @@
 language: cpp
 os: linux
+sudo: required
 before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
-install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get update ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt-get install cmake3 mpich2 liblapack-dev libboost-filesystem-dev libboost-system-dev python-numpy clang-3.9 ; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo pip install pyamg ; fi
-before_script:
-  - mkdir build
-  - cd build
-  - cmake -DENABLE_UNIT_TESTS=yes -DCMAKE_CXX_COMPILER=clang++-3.9 ..
-script: make && make test
+  - chmod +x install-$TRAVIS_OS_NAME-deps.sh
+install: ./install-$TRAVIS_OS_NAME-deps.sh
+env:
+  - BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
+  - BUILD_TYPE=Release PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_opt
+script:
+  - mkdir build && cd build
+  - ls $PWD
+  - ls $PETSC_DIR
+  - ls $PETSC_DIR/$PETSC_ARCH
+  - ls $PETSC_DIR/$PETSC_ARCH/lib
+  - export TMPDIR=/tmp
+  - ln -s $PETSC_DIR/lib/petsc/conf $PETSC_DIR/conf
+  - ln -s $PETSC_DIR/include/petsc/finclude $PETSC_DIR/include/finclude
+  - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DENABLE_UNIT_TESTS=yes ..
+  - make && make test

@@ -10,7 +10,12 @@ include(testing)
 option(ENABLE_UNIT_TESTS "Enable unit testing" OFF)
 option(AutodetectMPI "Automatically detect MPI" ON)
 
-enable_language(C CXX Fortran)
+enable_language(C CXX)
+
+set(PETSC_DIR $ENV{PETSC_DIR})
+  if(DEFINED ENV{PETSC_ARCH})
+    set(PETSC_ARCH $ENV{PETSC_ARCH})
+  endif()
 
 find_package(PETSc REQUIRED)
 
