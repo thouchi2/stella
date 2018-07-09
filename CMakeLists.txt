@@ -13,9 +13,6 @@ option(AutodetectMPI "Automatically detect MPI" ON)
 enable_language(C CXX Fortran)
 
 find_package(PETSc REQUIRED)
-if(PETSC_VERSION VERSION_LESS 3.7.0)
-  message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
-endif()
 
 set(req-lib ${PETSC_LIBRARIES} m)
 set(req-inc ${PETSC_INCLUDES})
@@ -34,7 +31,9 @@ endif()
 
 add_subdirectory(src)
 add_library(stella ${stella_sources})
-target_compile_definitions(stella PUBLIC PETSC_OPTIONS_TAKES_DATABASE)
+if(NOT (PETSC_VERSION VERSION_LESS 3.7.0))
+  target_compile_definitions(stella PUBLIC PETSC_OPTIONS_TAKES_DATABASE)
+endif()
 target_link_libraries(stella PUBLIC ${req-lib})
 target_include_directories(stella PUBLIC ${req-inc})
 
