@@ -18,9 +18,9 @@ set(PETSC_DIR $ENV{PETSC_DIR})
   endif()
 
 find_package(PETSc REQUIRED)
-if(PETSC_VERSION VERSION_LESS 3.7.0)
-  message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
-endif()
+# if(PETSC_VERSION VERSION_LESS 3.7.0)
+#   message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
+# endif()
 
 set(req-lib ${PETSC_LIBRARIES} m)
 set(req-inc ${PETSC_INCLUDES})
