@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 project(stella)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 
 include(cxx11)
 include(cxx_config)
@@ -49,6 +49,9 @@ set(PETSC_DIR $ENV{PETSC_DIR})
   endif()
 
 find_package(PETSc REQUIRED)
+if(PETSC_VERSION VERSION_LESS 3.7.0)
+  message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
+endif()
 
 set(req-lib ${PETSC_LIBRARIES} m)
 set(req-inc ${PETSC_INCLUDES})
