@@ -19,4 +19,4 @@ script:
   - ln -s $PETSC_DIR/lib/petsc/conf $PETSC_DIR/conf
   - ln -s $PETSC_DIR/include/petsc/finclude $PETSC_DIR/include/finclude
   - cmake -DCMAKE_C_COMPILER=`which mpicc` -DCMAKE_CXX_COMPILER=`which mpicxx` -DENABLE_UNIT_TESTS=yes ..
-  - make && travis_wait make test
+  - make && travis_wait 40 make test
