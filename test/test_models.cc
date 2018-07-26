@@ -20,25 +20,41 @@ static double estimate_order(std::vector<double> & hs, std::vector<double> & nor
 	return std::log(norms[1] / norms[0]) / std::log(hs[1] / hs[0]);
 }
 
-static double norm(double v[], int len)
+static double norm(grid *grd, double *e_sol, double *c_sol)
 {
+	double *diff = new double[grd->num_pts];
+
 	int i;
+	for (i = 0; i < grd->num_pts; i++)
+		diff[i] = 0;
+
+	{
+		int i, j;
+		for (j = grd->ibeg[1]; j <= grd->iend[1]; j++) {
+			for (i = grd->ibeg[0]; i <= grd->iend[0]; i++) {
+				int ind = j*grd->len[0] + i;
+				diff[ind] = e_sol[ind] - c_sol[ind];
+			}
+		}
+	}
 
 	double curr = 0;
-	for (i = 0; i < len; i++) {
-		if (fabs(v[i]) > curr) curr = fabs(v[i]);
+	for (i = 0; i < grd->num_pts; i++) {
+		if (fabs(diff[i]) > curr) curr = fabs(diff[i]);
 	}
+
+	delete[] diff;
 
 	return curr;
 }
 
 
-static double mpi_norm(double v[], int len)
+static double mpi_norm(grid *grd, double *e_sol, double *c_sol)
 {
 	int rank;
 	double n;
 
-	double mynorm = norm(v, len);
+	double mynorm = norm(grd, e_sol, c_sol);
 	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
 	MPI_Reduce(&mynorm, &n, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
@@ -71,13 +87,9 @@ TEST(Models, UniformSine)
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -85,7 +97,6 @@ TEST(Models, UniformSine)
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -123,13 +134,9 @@ TEST(Models, UniformTSine)
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -137,7 +144,6 @@ TEST(Models, UniformTSine)
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -174,13 +180,9 @@ TEST(Models, UniformMixed) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -188,7 +190,6 @@ TEST(Models, UniformMixed) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -225,13 +226,9 @@ TEST(Models, UniformMixed1) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -239,7 +236,6 @@ TEST(Models, UniformMixed1) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -273,13 +269,9 @@ TEST(Models, UniformMixed2) {
 	ASSERT_EQ(ierr, 0);
 
 	double *u = new double[grd->num_pts];
-	double *diff = new double[grd->num_pts];
 	grid_eval(grd, pb->sol, u);
 
-	for (i = 0; i < grd->num_pts; i++)
-		diff[i] = sol->state->phi[i] - u[i];
-
-	double nrm = mpi_norm(diff, grd->num_pts);
+	double nrm = mpi_norm(grd, sol->state->phi, u);
 
 	ASSERT_LT(nrm, tol);
 
@@ -288,7 +280,6 @@ TEST(Models, UniformMixed2) {
 	ASSERT_EQ(ierr, 0);
 	grid_destroy(grd); free(grd);
 	delete[] u;
-	delete[] diff;
 }
 
 
@@ -316,13 +307,9 @@ TEST(Models, StretchSine) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -330,7 +317,6 @@ TEST(Models, StretchSine) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 		ny = (ny-1)*2 + 1;
@@ -369,13 +355,9 @@ TEST(Models, StretchMixed) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -383,7 +365,6 @@ TEST(Models, StretchMixed) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 		ny = (ny-1)*2 + 1;
@@ -424,13 +405,9 @@ TEST(Models, CurlSine) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		map_destroy(mp); free(mp);
@@ -439,7 +416,6 @@ TEST(Models, CurlSine) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -480,13 +456,9 @@ TEST(Models, SecondTutorial) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		map_destroy(mp); free(mp);
@@ -495,7 +467,6 @@ TEST(Models, SecondTutorial) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -535,13 +506,9 @@ TEST(Models, Rot) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		map_destroy(mp); free(mp);
@@ -550,7 +517,6 @@ TEST(Models, Rot) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -588,13 +554,9 @@ TEST(Models, Axisymmetric) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -602,7 +564,6 @@ TEST(Models, Axisymmetric) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -640,13 +601,9 @@ TEST(Models, Electrode)
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		problem_destroy(pb); free(pb);
@@ -654,7 +611,6 @@ TEST(Models, Electrode)
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -697,13 +653,9 @@ TEST(Models, Jump)
 			ASSERT_EQ(ierr, 0);
 
 			double *u = new double[grd->num_pts];
-			double *diff = new double[grd->num_pts];
 			grid_eval(grd, pb->sol, u);
 
-			for (i = 0; i < grd->num_pts; i++)
-				diff[i] = sol->state->phi[i] - u[i];
-
-			double nrm = mpi_norm(diff, grd->num_pts);
+			double nrm = mpi_norm(grd, sol->state->phi, u);
 			norms.push_back(nrm);
 
 			problem_destroy(pb); free(pb);
@@ -711,7 +663,6 @@ TEST(Models, Jump)
 			ASSERT_EQ(ierr, 0);
 			grid_destroy(grd); free(grd);
 			delete[] u;
-			delete[] diff;
 		}
 
 		int rank;
@@ -751,13 +702,9 @@ TEST(Models, HalfAnnulus) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		map_destroy(mp); free(mp);
@@ -766,7 +713,6 @@ TEST(Models, HalfAnnulus) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
 	}
@@ -807,13 +753,9 @@ TEST(Models, Warping) {
 		ASSERT_EQ(ierr, 0);
 
 		double *u = new double[grd->num_pts];
-		double *diff = new double[grd->num_pts];
 		grid_eval(grd, pb->sol, u);
 
-		for (i = 0; i < grd->num_pts; i++)
-			diff[i] = sol->state->phi[i] - u[i];
-
-		double nrm = mpi_norm(diff, grd->num_pts);
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		norms.push_back(nrm);
 
 		map_destroy(mp); free(mp);
@@ -822,9 +764,53 @@ TEST(Models, Warping) {
 		ASSERT_EQ(ierr, 0);
 		grid_destroy(grd); free(grd);
 		delete[] u;
-		delete[] diff;
 
 		nx = (nx-1)*2 + 1;
+	}
+
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	if (rank == 0) {
+		double order = estimate_order(hs, norms);
+		ASSERT_GT(order, 2 - tol);
+	}
+}
+TEST(Models, Disco)
+{
+	std::vector<double> norms;
+	std::vector<double> hs;
+	std::array<int, 2> nvals = {200, 400};
+	double tol = 1e-1;
+
+	for (int k = 0; k < 2; k++) {
+		int i, ierr;
+
+		auto nx = nvals[k];
+
+		hs.push_back(2.0/(nx-1));
+
+		grid *grd = grid_create(-1, 1, nx,
+		                        -1, 1, nx,
+		                        -1, 1, 0);
+		problem *pb = problem_create(DISCO, 2, 0);
+		solver *sol = solver_create(grd, pb);
+
+		ierr = solver_init(sol, grd);
+		ASSERT_EQ(ierr, 0);
+		ierr = solver_run(sol);
+		ASSERT_EQ(ierr, 0);
+
+		double *u = new double[grd->num_pts];
+		grid_eval(grd, pb->sol, u);
+
+		double nrm = mpi_norm(grd, sol->state->phi, u);
+		norms.push_back(nrm);
+
+		problem_destroy(pb); free(pb);
+		ierr = solver_destroy(sol); free(sol);
+		ASSERT_EQ(ierr, 0);
+		grid_destroy(grd); free(grd);
+		delete[] u;
 	}
 
 	int rank;
