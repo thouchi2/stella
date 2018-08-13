@@ -775,11 +775,11 @@ TEST(Models, Warping) {
 		ASSERT_GT(order, 2 - tol);
 	}
 }
-TEST(Models, Disco)
+TEST(Models, Cboard)
 {
 	std::vector<double> norms;
 	std::vector<double> hs;
-	std::array<int, 2> nvals = {200, 400};
+	std::array<int, 2> nvals = {201, 401};
 	double tol = 1e-1;
 
 	for (int k = 0; k < 2; k++) {
@@ -792,7 +792,7 @@ TEST(Models, Disco)
 		grid *grd = grid_create(-1, 1, nx,
 		                        -1, 1, nx,
 		                        -1, 1, 0);
-		problem *pb = problem_create(DISCO, 2, 0);
+		problem *pb = problem_create(CBOARD, 2, 0);
 		solver *sol = solver_create(grd, pb);
 
 		ierr = solver_init(sol, grd);

@@ -10,10 +10,10 @@ const char *problem_name[NUM_PROBLEMS] = {"Multigrid Tutorial", "Mixed Boundarie
                                           "Mixed Boundaries 1", "Mixed Boundaries 2",
                                           "Sine", "Translated Sine",
                                           "Rotation", "Electrode", "Jump",
-                                          "Axisymmetric", "Periodic", "Discontinous Coefficent"};
+                                          "Axisymmetric", "Periodic", "Checkerboard"};
 const char *problem_key[NUM_PROBLEMS] = {"tutorial", "mixed", "mixed1", "mixed2", "sin",
                                          "tsine", "rotation",
-                                         "electrode", "jump","axisymmetric", "periodic", "disco"};
+                                         "electrode", "jump","axisymmetric", "periodic", "cboard"};
 
 double electrode_rhs(double x, double y, double z)
 {
@@ -64,12 +64,12 @@ double mtut_sol(double x, double y, double z)
 
 double mtut_rhs_3d(double x, double y, double z)
 {
-    return 1;
+    return 12*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
 }
 
 double mtut_sol_3d(double x, double y, double z)
 {
-    return 1;
+    return sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
 }
 
 double sin_rhs(double x, double y, double z)
@@ -247,22 +247,24 @@ double jump_rhs(double x, double y, double z)
 		return 16;
 }
 
-double disco_sol(double x, double y, double z){
+double cboard_sol(double x, double y, double z){
     if (x <= 0 && y < 0)
 		return (2*(x*x) + (13./4)*x + 4*y - 4*(y*y));
     else if (x > 0 && y >= 0)
-        return (-4*(x*x) + 4*x + 2*(y*y) + 13./4*y);
+        return (-4*(x*x) + 4*x + 2*(y*y) + 13./11.*y);
     else if (x <= 0 && y >= 0)
         return (2*(x*x) + 13./4*x + 2*(y*y) + 13./11.*y);
     else
         return (-4*(x*x) + 4*x - 4*(y*y) + 4*y);
 }
 
-double disco_rhs(double x, double y, double z){
+double cboard_rhs(double x, double y, double z){
     if ((x <= 0 && y < 0) || (x > 0 && y >= 0))
+        return 16;
+    else if (x <= 0 && y >=0)
         return -16;
     else
-        return 16;
+        return 32;
 }
 
 problem *problem_create(problem_id id, int nd, int map_id)
@@ -326,12 +328,17 @@ problem *problem_create(problem_id id, int nd, int map_id)
 		pb->boundary[WEST] =  NEUMANN;
 		break;
 	case (MTUT):
-		pb->rhs = &mtut_rhs;
-		pb->sol = &mtut_sol;
-		pb->boundary[NORTH] = DIRICHLET;
-		pb->boundary[SOUTH] = DIRICHLET;
-		pb->boundary[EAST] =  DIRICHLET;
-		pb->boundary[WEST] =  DIRICHLET;
+        pb->boundary[NORTH] = DIRICHLET;
+        pb->boundary[SOUTH] = DIRICHLET;
+        pb->boundary[EAST] =  DIRICHLET;
+        pb->boundary[WEST] =  DIRICHLET;
+        if (nd == 3) {
+            pb->rhs = &mtut_rhs_3d;
+    		pb->sol = &mtut_sol_3d;
+        } else {
+            pb->rhs = &mtut_rhs;
+    		pb->sol = &mtut_sol;
+        }
 		break;
 	case (SIN):
 		pb->boundary[NORTH] = DIRICHLET;
@@ -454,9 +461,9 @@ problem *problem_create(problem_id id, int nd, int map_id)
 		pb->rhs = &mtut_rhs;
 		pb->sol = &mtut_sol;
 		break;
-    case (DISCO):
-    	pb->rhs = &disco_rhs;
-    	pb->sol = &disco_sol;
+    case (CBOARD):
+    	pb->rhs = &cboard_rhs;
+    	pb->sol = &cboard_sol;
     	pb->boundary[NORTH] = DIRICHLET;
     	pb->boundary[SOUTH] = DIRICHLET;
     	pb->boundary[EAST] =  DIRICHLET;

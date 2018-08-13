@@ -45,7 +45,7 @@ state *state_create(grid *grd, problem *pb)
 		for (i = 0; i < grd->num_pts; i++) {
 			st->jc[i] = -5;
 		}
-	} else if (pb->id == DISCO) {
+	} else if (pb->id == CBOARD) {
 		if (grd->nd == 2) {
 			for (j = 0; j < grd->len[1]; j++) {
 				for (i = 0; i < grd->len[0]; i++) {
@@ -69,8 +69,32 @@ state *state_create(grid *grd, problem *pb)
 				}
 			}
 		}
-		for (i = 0; i < grd->num_pts; i++) {
-			st->jc[i] = 5;
+		if (grd->nd == 2) {
+			for (j = 0; j < grd->len[1]; j++) {
+				for (i = 0; i < grd->len[0]; i++) {
+					ind = j*grd->len[0] + i;
+					if ((grd->x[ind] <= 0 && grd->y[ind] < 0) || (grd->x[ind] > 0 && grd->y[ind] >= 0))
+						st->jc[ind] = -5;
+					if (grd->x[ind] <= 0 && grd->y[ind] >= 0)
+						st->jc[ind] = 5;
+					else
+						st->jc[ind] = -10;
+				}
+			}
+		} else {
+			for (k = 0; k < grd->len[2]; k++) {
+				for (j = 0; j < grd->len[1]; j++) {
+					for (i = 0; i < grd->len[0]; i++) {
+						ind = k*grd->len[0]*grd->len[1] + j*grd->len[0] + i;
+						if ((grd->x[ind] <= 0 && grd->y[ind] < 0) || (grd->x[ind] > 0 && grd->y[ind] >= 0))
+							st->jc[ind] = -5;
+						if (grd->x[ind] <= 0 && grd->y[ind] >= 0)
+							st->jc[ind] = 5;
+						else
+							st->jc[ind] = -10;
+					}
+				}
+			}
 		}
 	} else {
 		for (i = 0; i < grd->num_pts; i++) {

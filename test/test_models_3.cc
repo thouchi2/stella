@@ -304,7 +304,7 @@ TEST(Models3, Jump)
 	}
 }
 
-TEST(Models3, Disco)
+TEST(Models3, Cboard)
 {
 	std::vector<double> norms;
 	std::vector<double> hs;
@@ -321,7 +321,7 @@ TEST(Models3, Disco)
 		grid *grd = grid_create(-1, 1, nx,
 		                        -1, 1, nx,
 		                        -1, 1, nx);
-		problem *pb = problem_create(DISCO, 3, 0);
+		problem *pb = problem_create(CBOARD, 3, 0);
 		solver *sol = solver_create(grd, pb);
 
 		ierr = solver_init(sol, grd);
@@ -353,8 +353,8 @@ TEST(Models3, Disco)
 TEST(Models, Warping) {
 	std::vector<double> norms;
 	std::vector<double> hs;
-	int nx = 201;
-	double tol = 1e-3;
+	int nx = 21;
+	double tol = 5e-1;
 
 	for (int k = 0; k < 2; k++) {
 		int i, ierr;
