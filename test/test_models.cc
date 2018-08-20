@@ -782,7 +782,7 @@ TEST(Models, Cboard)
 	if (size == 1) {
 		std::vector<double> norms;
 		std::vector<double> hs;
-		std::array<int, 2> nvals = {200, 400};
+		std::array<int, 2> nvals = {201, 401};
 		double tol = 1e-1;
 
 		for (int k = 0; k < 2; k++) {
