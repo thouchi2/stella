@@ -22,12 +22,22 @@ static double norm(grid *grd, double *e_sol, double *c_sol)
 	for (i = 0; i < grd->num_pts; i++)
 		diff[i] = 0;
 
-	{
+	if (grd->nd == 2) {
 		int i, j;
 		for (j = grd->ibeg[1]; j <= grd->iend[1]; j++) {
 			for (i = grd->ibeg[0]; i <= grd->iend[0]; i++) {
 				int ind = j*grd->len[0] + i;
 				diff[ind] = e_sol[ind] - c_sol[ind];
+			}
+		}
+	} else {
+		int i, j, k;
+		for (k = grd->ibeg[2]; k <= grd->iend[2]; k++) {
+			for (j = grd->ibeg[1]; j <= grd->iend[1]; j++) {
+				for (i = grd->ibeg[0]; i <= grd->iend[0]; i++) {
+					int ind = k*grd->len[1]*grd->len[0] + j*grd->len[0] + i;
+					diff[ind] = e_sol[ind] - c_sol[ind];
+				}
 			}
 		}
 	}
@@ -99,14 +109,51 @@ TEST(Signals, dcoef2D) {
 
 	double nrm = mpi_norm(grd, sol->state->phi, u);
 	ASSERT_LT(nrm, nrm_exp);
+}
 
+
+TEST(Signals, dcoef3D) {
+	// expected norm for correct dcoef
+	float nrm_exp = 1e-4;
+	PetscErrorCode ierr;
+	int nx = 53;
+	grid *grd = grid_create(0, 1, nx,
+	                        0, 1, nx,
+	                        0, 1, nx);
+	problem *pb = problem_create(SIN, 3, 0);
+	solver *sol = solver_create(grd, pb);
+
+	// inject bad dcoef
+	double *dcoef = sol->state->eps;
+	for (int i = 0; i < grd->num_pts; i++)
+		dcoef[i] = 0;
+
+	ierr = solver_init(sol, grd);
+	ASSERT_EQ(ierr, 0);
+	ierr = solver_run(sol);
+	ASSERT_EQ(ierr, 0);
+
+	double *u = new double[grd->num_pts];
+	grid_eval(grd, pb->sol, u);
 	{
+		double nrm = mpi_norm(grd, sol->state->phi, u);
 		int rank;
 		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		if (rank == 0)
-			printf("Norm: %g\n", nrm);
-			// std::cout << "Norm: " << nrm << std::endl;
+		if (rank > 0)
+			nrm = 1;
+		ASSERT_GT(nrm, nrm_exp);
 	}
+
+	// inject correct dcoef
+	for (int i = 0; i < grd->num_pts; i++)
+		dcoef[i] = 1.0;
+	ierr = stella_changed_dcoef(sol->ptr);
+	ASSERT_EQ(ierr, 0);
+	ierr = stella_solve(sol->ptr);
+	ASSERT_EQ(ierr, 0);
+
+	double nrm = mpi_norm(grd, sol->state->phi, u);
+	ASSERT_LT(nrm, nrm_exp);
 }
 
 }
