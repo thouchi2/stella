@@ -5,7 +5,9 @@ before_install:
   - test -n $CC  && unset CC
   - test -n $CXX && unset CXX
   - chmod +x install-$TRAVIS_OS_NAME-deps.sh
-install: ./install-$TRAVIS_OS_NAME-deps.sh
+install:
+  - ./install-$TRAVIS_OS_NAME-deps.sh
+  - travis_wait 30 mvn install
 env:
   - BUILD_TYPE=Debug PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_debug
   - BUILD_TYPE=Release PETSC_DIR=$PWD/petsc PETSC_ARCH=petsc_opt
