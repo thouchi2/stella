@@ -145,7 +145,7 @@ static void add_3d(boundary *bnd, grid *grd, problem *pb)
 			offset = (grd->ibeg[2] + (grd->nz-1))*grd->len[0]*grd->len[1];
 			norm_dir = -3;
 			len[0] = grd->len[1];
-			len[1] = grd->len[2];
+			len[1] = grd->len[0];
 		} else if (i == BACK
 		           && grd->cart_coord[2] == 0
 		           && (!grd->periodic[2])) {
@@ -157,9 +157,13 @@ static void add_3d(boundary *bnd, grid *grd, problem *pb)
 			len[1] = grd->len[0];
 		}
 
+		int rank;
+		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 		for (ii = 0; ii < len[0]; ii++) {
 			for (jj = 0; jj < len[1]; jj++) {
 				int ind = ii*stride[0] + jj*stride[1] + offset;
+				if (ind >= grd->num_pts)
+					printf("[%d] %d %d  %d\n", rank, stride[0], stride[1], offset);
 				// Give Dirichlet bc precedence
 				if (!((classify[ind] == DIRICHLET) && (pb->boundary[i] != DIRICHLET))) {
 					classify[ind] = pb->boundary[i];

@@ -6,6 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(cxx11)
 include(cxx_config)
 include(testing)
+include(CTest)
 
 option(ENABLE_UNIT_TESTS "Enable unit testing" OFF)
 option(AutodetectMPI "Automatically detect MPI" ON)
