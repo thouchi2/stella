@@ -1,4 +1,4 @@
-pip update -qq
+pip install --upgrade pip
 pip install --user cmake gcc mpich doxygen git
 export TMPDIR=/tmp
 
