@@ -1,5 +1,5 @@
-sudo apt-get update -qq
-sudo apt-get install -y cmake gcc mpich doxygen git
+apt-get update -qq
+apt-get install -y cmake gcc mpich doxygen git
 export TMPDIR=/tmp
 
 # Go get PETSc and build it.
