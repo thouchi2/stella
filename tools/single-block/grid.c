@@ -118,10 +118,6 @@ grid *grid_create(double startx, double endx, int nx,
 	grd->num_local[0] = grd->nx;
 	grd->num_local[1] = grd->ny;
 
-	for (i = 0; i < grd->nd; i++) {
-		grd->iend[i] = grd->ibeg[i] + grd->num_local[i] - 1;
-	}
-
 	grd->is[0] = BLOCK_LOW(grd->cart_coord[0], grd->num_procs[0], nx) + 1;
 	grd->ie[0] = BLOCK_HIGH(grd->cart_coord[0], grd->num_procs[0], nx) + 1;
 	grd->is[1] = BLOCK_LOW(grd->cart_coord[1], grd->num_procs[1], ny) + 1;
@@ -132,6 +128,10 @@ grid *grid_create(double startx, double endx, int nx,
 		grd->num_local[2] = grd->nz;
 		grd->is[2] = BLOCK_LOW(grd->cart_coord[2], grd->num_procs[2], nz) + 1;
 		grd->ie[2] = BLOCK_HIGH(grd->cart_coord[2], grd->num_procs[2], nz) + 1;
+	}
+
+	for (i = 0; i < grd->nd; i++) {
+		grd->iend[i] = grd->ibeg[i] + grd->num_local[i] - 1;
 	}
 
 	int nghosts;
