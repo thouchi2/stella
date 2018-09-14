@@ -22,7 +22,7 @@ static PetscErrorCode apply_neumann(stella_bc *bc, Mat A, DM da)
 	Vec lc;
 
 	MatType mtype;
-	PetscBool is_boxmg;
+	PetscBool is_cedar;
 	double acc;
 	stella_metric *met;
 
@@ -167,8 +167,8 @@ static PetscErrorCode apply_neumann(stella_bc *bc, Mat A, DM da)
 					bscale = .25;
 				v[0] += PetscSign(v[0]) * bscale*PetscAbsScalar(diag_cont);
 
-				ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
-				if (is_boxmg) {
+				ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
+				if (is_cedar) {
 					ierr = stella_bmg_SetValuesStencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
 				} else {
 					ierr = MatSetValuesStencil(A, 1, &row, ind, col, v, INSERT_VALUES);CHKERRQ(ierr);
@@ -206,7 +206,7 @@ static PetscErrorCode apply_neumann_3d(stella_bc *bc, Mat A, DM da)
 	PetscInt cnt;
 	MatStencil row, col[19];
 	MatType mtype;
-	PetscBool is_boxmg;
+	PetscBool is_cedar;
 	double dcoefh[19];
 	PetscScalar ***acont;
 	stella_metric *met;
@@ -231,8 +231,8 @@ static PetscErrorCode apply_neumann_3d(stella_bc *bc, Mat A, DM da)
 	PetscErrorCode (*set_stencil)(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
 	                              const MatStencil idxn[], const PetscScalar v[],
 	                              InsertMode addv);
-	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
-	if (is_boxmg) {
+	ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
+	if (is_cedar) {
 		set_stencil = &stella_bmg_SetValuesStencil;
 	} else {
 		set_stencil = &MatSetValuesStencil;

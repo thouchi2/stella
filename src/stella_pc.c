@@ -1,5 +1,6 @@
 #include "stella_mat.h"
 #include "stella_pc.h"
+#include "stella_cedar.h"
 
 
 #undef __FUNCT__
@@ -19,7 +20,7 @@ PetscErrorCode stella_pc_create(stella_pc **pc)
 #define __FUNCT__ "stella_pc_setup"
 PetscErrorCode stella_pc_setup(PC pc)
 {
-	#ifdef WITH_BOXMG
+	#ifdef WITH_CEDAR
 	PetscErrorCode ierr;
 	Mat pmat;
 	stella_pc *pc_ctx;
@@ -30,10 +31,14 @@ PetscErrorCode stella_pc_setup(PC pc)
 	ierr = MatShellGetContext(pmat, (void**)&mat_ctx);CHKERRQ(ierr);
 
 	pc_ctx->nd = mat_ctx->nd;
-	if (pc_ctx->nd == 2)
-		pc_ctx->solver2 = bmg2_solver_create(&mat_ctx->op2);
-	else
-		pc_ctx->solver3 = bmg3_solver_create(&mat_ctx->op3);
+	pc_ctx->solvec = mat_ctx->solvec;
+	pc_ctx->rhsvec = mat_ctx->rhsvec;
+	int cedar_err;
+	cedar_err = cedar_solver_create(mat_ctx->so, &pc_ctx->solver);chkerr(cedar_err);
+
+	if (cedar_err) {
+		SETERRQ1(PETSC_COMM_WORLD, PETSC_ERR_LIB, "Cedar error code: %d", cedar_err);
+	}
 	#endif
 
 	return 0;
@@ -44,7 +49,8 @@ PetscErrorCode stella_pc_setup(PC pc)
 #define __FUNCT__ "stella_pc_apply"
 PetscErrorCode stella_pc_apply(PC pc, Vec x, Vec y)
 {
-	#ifdef WITH_BOXMG
+	#ifdef WITH_CEDAR
+	int cedar_err;
 	PetscErrorCode ierr;
 	stella_pc *pc_ctx;
 	double *yarr;
@@ -54,10 +60,9 @@ PetscErrorCode stella_pc_apply(PC pc, Vec x, Vec y)
 	ierr = VecGetArrayRead(x, &xarr);CHKERRQ(ierr);
 	ierr = VecGetArray(y, &yarr);CHKERRQ(ierr);
 
-	if (pc_ctx->nd == 2)
-		bmg2_solver_run(pc_ctx->solver2, yarr, xarr);
-	else
-		bmg3_solver_run(pc_ctx->solver3, yarr, xarr);
+	cedar_copyto(xarr, pc_ctx->rhsvec);
+	cedar_err = cedar_solver_run(pc_ctx->solver, pc_ctx->solvec, pc_ctx->rhsvec);chkerr(cedar_err);
+	cedar_copyfrom(pc_ctx->solvec, yarr);
 
 	ierr = VecRestoreArrayRead(x, &xarr);CHKERRQ(ierr);
 	ierr = VecRestoreArray(y, &yarr);CHKERRQ(ierr);

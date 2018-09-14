@@ -265,7 +265,7 @@ static PetscErrorCode apply_dirichlet(stella_bc *bc, Mat A, DM da)
 	PetscScalar v[9];
 	MatStencil row, col[9];
 	MatType mtype;
-	PetscBool is_boxmg;
+	PetscBool is_cedar;
 	PetscScalar **acont;
 	stella_metric *met;
 	PetscScalar **dcoef;
@@ -383,8 +383,8 @@ static PetscErrorCode apply_dirichlet(stella_bc *bc, Mat A, DM da)
 					}
 				}
 
-				ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
-				if (is_boxmg) {
+				ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
+				if (is_cedar) {
 					ierr = stella_bmg_SetValuesStencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
 				} else {
 					ierr = MatSetValuesStencil(A, 1, &row, cnt, col, v, INSERT_VALUES);CHKERRQ(ierr);
@@ -417,7 +417,7 @@ static PetscErrorCode apply_dirichlet_3d(stella_bc *bc, Mat A, DM da)
 	PetscScalar v[19];
 	MatStencil row, col[19];
 	MatType mtype;
-	PetscBool is_boxmg;
+	PetscBool is_cedar;
 	double dcoefh[19];
 	PetscScalar ***acont;
 	stella_metric *met;
@@ -428,8 +428,8 @@ static PetscErrorCode apply_dirichlet_3d(stella_bc *bc, Mat A, DM da)
 	PetscErrorCode (*set_stencil)(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
 	                              const MatStencil idxn[], const PetscScalar v[],
 	                              InsertMode addv);
-	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
-	if (is_boxmg) {
+	ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
+	if (is_cedar) {
 		set_stencil = &stella_bmg_SetValuesStencil;
 	} else {
 		set_stencil = &MatSetValuesStencil;

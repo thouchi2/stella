@@ -3,8 +3,8 @@
 
 #include "petscksp.h"
 
-#ifdef WITH_BOXMG
-#include <boxmg/capi.h>
+#ifdef WITH_CEDAR
+#include <cedar/capi.h>
 #endif
 
 /**
@@ -15,9 +15,10 @@
 
 typedef struct {
 	int nd;
-	#ifdef WITH_BOXMG
-	bmg2_solver solver2;
-	bmg2_solver solver3;
+	#ifdef WITH_CEDAR
+	cedar_solver solver;
+	cedar_vec solvec;
+	cedar_vec rhsvec;
 	#endif
 } stella_pc;
 

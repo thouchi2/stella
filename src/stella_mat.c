@@ -1,11 +1,12 @@
 #include "stella_mat.h"
+#include "stella_cedar.h"
 
 
 PetscErrorCode stella_bmg_SetValuesStencil(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
                                            const MatStencil idxn[], const PetscScalar v[],
                                            InsertMode addv)
 {
-	#ifdef WITH_BOXMG
+	#ifdef WITH_CEDAR
 	PetscInt ierr;
 	stella_bmg_mat *ctx;
 	ierr = MatShellGetContext(mat, (void**) &ctx);
@@ -13,7 +14,7 @@ PetscErrorCode stella_bmg_SetValuesStencil(Mat mat, PetscInt m, const MatStencil
 	if (ctx->nd == 2) {
 		unsigned int i, j;
 
-		grid_coord_2d *coords = (grid_coord_2d*) malloc(n*m*sizeof(grid_coord_2d));
+		cedar_coord_2d *coords = (cedar_coord_2d*) malloc(n*m*sizeof(cedar_coord_2d));
 
 		for (i = 0; i < m; i++) {
 			for (j = 0; j < n; j++) {
@@ -41,13 +42,13 @@ PetscErrorCode stella_bmg_SetValuesStencil(Mat mat, PetscInt m, const MatStencil
 			}
 		}
 
-		bmg2_operator_set(ctx->op2, n*m, coords, (double*)v);
+		cedar_mat_set2d(ctx->so, n*m, coords, (cedar_real*)v);
 
 		free(coords);
 	} else {
 		unsigned int i, j;
 
-		grid_coord_3d *coords = (grid_coord_3d*) malloc(n*m*sizeof(grid_coord_3d));
+		cedar_coord_3d *coords = (cedar_coord_3d*) malloc(n*m*sizeof(cedar_coord_3d));
 
 		for (i = 0; i < m; i++) {
 			for (j = 0; j < n; j++) {
@@ -205,7 +206,7 @@ PetscErrorCode stella_bmg_SetValuesStencil(Mat mat, PetscInt m, const MatStencil
 				}
 			}
 		}
-		bmg3_operator_set(ctx->op3, n*m, coords, (double*)v);
+		cedar_mat_set3d(ctx->so, n*m, coords, (cedar_real*)v);
 
 		free(coords);
 	}
@@ -215,7 +216,8 @@ PetscErrorCode stella_bmg_SetValuesStencil(Mat mat, PetscInt m, const MatStencil
 
 PetscErrorCode stella_bmg_mult(Mat A, Vec x, Vec b)
 {
-	#ifdef WITH_BOXMG
+	#ifdef WITH_CEDAR
+	int cedar_err;
 	PetscErrorCode ierr;
 	stella_bmg_mat *ctx;
 	double *barr;
@@ -225,10 +227,9 @@ PetscErrorCode stella_bmg_mult(Mat A, Vec x, Vec b)
 	ierr = VecGetArray(b, &barr);CHKERRQ(ierr);
 	ierr = VecGetArrayRead(x, &xarr);CHKERRQ(ierr);
 
-	if (ctx->nd == 2)
-		bmg2_operator_apply(ctx->op2, xarr, barr);
-	else
-		bmg3_operator_apply(ctx->op3, xarr, barr);
+	cedar_copyto(xarr, ctx->rhsvec);
+	cedar_err = cedar_matvec(ctx->so, ctx->rhsvec, ctx->solvec);chkerr(cedar_err);
+	cedar_copyfrom(ctx->solvec, barr);
 
 	ierr = VecRestoreArrayRead(x, &xarr);CHKERRQ(ierr);
 	ierr = VecRestoreArray(b, &barr);CHKERRQ(ierr);

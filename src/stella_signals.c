@@ -1,6 +1,7 @@
 #include "stella_io.h"
 #include "stella_util.h"
 #include "stella_signals.h"
+#include "stella_mat.h"
 
 // private signal helpers
 
@@ -213,14 +214,11 @@ PetscErrorCode stella_changed_bc(stella * slv)
 			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
 		}
 	} else {
-		#ifdef WITH_BOXMG
+		#ifdef WITH_CEDAR
 		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
 			stella_bmg_mat *ctx;
 			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			if (ctx->nd == 2)
-				bmg2_operator_dump(ctx->op2);
-			else
-				bmg3_operator_dump(ctx->op3);
+			cedar_mat_dump(ctx->so);
 		}
 		#endif
 	}

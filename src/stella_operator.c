@@ -24,7 +24,7 @@ static PetscErrorCode centered_2d(stella_operator *op, Mat A, DM da)
     PetscScalar **rootg;
 	double acc;
 	MatType mtype;
-	PetscBool is_boxmg;
+	PetscBool is_cedar;
 
 	stella_metric *met;
 
@@ -40,8 +40,8 @@ static PetscErrorCode centered_2d(stella_operator *op, Mat A, DM da)
 	PetscErrorCode (*set_stencil)(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
 	                              const MatStencil idxn[], const PetscScalar v[],
 	                              InsertMode addv);
-	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
-	if (is_boxmg) {
+	ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
+	if (is_cedar) {
 		set_stencil = &stella_bmg_SetValuesStencil;
 	} else {
 		set_stencil = &MatSetValuesStencil;
@@ -133,7 +133,7 @@ static PetscErrorCode centered_2d(stella_operator *op, Mat A, DM da)
 			}
 			v[O] += PetscSign(v[O]) * PetscAbsScalar(diag_cont);
 
-			ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
+			ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
 			ierr = set_stencil(A, 1, &row, ncol, col, v, INSERT_VALUES);CHKERRQ(ierr);
 		}
 	}
@@ -170,7 +170,7 @@ static PetscErrorCode centered_3d(stella_operator *op, Mat A, DM da)
 	PetscScalar ***coef[19];
 	PetscScalar ***jac[9];
 	MatType mtype;
-	PetscBool is_boxmg;
+	PetscBool is_cedar;
 
 	stella_metric *met;
 
@@ -182,8 +182,8 @@ static PetscErrorCode centered_3d(stella_operator *op, Mat A, DM da)
 	PetscErrorCode (*set_stencil)(Mat mat, PetscInt m, const MatStencil idxm[], PetscInt n,
 	                              const MatStencil idxn[], const PetscScalar v[],
 	                              InsertMode addv);
-	ierr = PetscStrcmp(mtype, MATSHELL, &is_boxmg);CHKERRQ(ierr);
-	if (is_boxmg) {
+	ierr = PetscStrcmp(mtype, MATSHELL, &is_cedar);CHKERRQ(ierr);
+	if (is_cedar) {
 		set_stencil = &stella_bmg_SetValuesStencil;
 	} else {
 		set_stencil = &MatSetValuesStencil;

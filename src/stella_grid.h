@@ -4,7 +4,7 @@
 #include <petscdmda.h>
 #include "mpi.h"
 
-#ifdef WITH_BOXMG
+#ifdef WITH_CEDAR
 #include <cedar/capi.h>
 #endif
 
@@ -26,9 +26,8 @@ typedef struct {
 	int num_cells; /**< cells number of d.o.f. in grid */
 	int overlap_periodic;  /**< are there duplicate grid points if periodic */
 	double *xyz;   /**< grid coordinates */
-	#ifdef WITH_BOXMG
-	bmg2_topo topo2;/**< holds boxmg topology object */
-	bmg3_topo topo3;/**< holds boxmg topology object */
+	#ifdef WITH_CEDAR
+	cedar_topo topo;/**< holds cedar topology handle */
 	#endif
 } stella_grid;
 

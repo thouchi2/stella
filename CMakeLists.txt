@@ -19,11 +19,18 @@ endif()
 
 set(req-lib ${PETSC_LIBRARIES} m)
 set(req-inc ${PETSC_INCLUDES})
+set(req-def PETSC_OPTIONS_TAKES_DATABASE)
 
 if(AutodetectMPI)
   find_package(MPI REQUIRED)
   list(APPEND req-lib ${MPI_C_LIBRARIES})
   list(APPEND req-inc ${MPI_C_INCLUDE_PATH})
+endif()
+find_package(cedar QUIET)
+if (cedar_FOUND)
+  list(APPEND req-inc ${CEDAR_INCLUDE_DIR})
+  list(APPEND req-lib cedar)
+  list(APPEND req-def WITH_CEDAR)
 endif()
 
 include_directories(src)
@@ -34,7 +41,7 @@ endif()
 
 add_subdirectory(src)
 add_library(stella ${stella_sources})
-target_compile_definitions(stella PUBLIC PETSC_OPTIONS_TAKES_DATABASE)
+target_compile_definitions(stella PUBLIC ${req-def})
 target_link_libraries(stella PUBLIC ${req-lib})
 target_include_directories(stella PUBLIC ${req-inc})
 

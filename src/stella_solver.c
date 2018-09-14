@@ -9,8 +9,9 @@
 #include "stella_pc.h"
 #include "stella_classify.h"
 
-#ifdef WITH_BOXMG
-#include <boxmg/capi.h>
+#ifdef WITH_CEDAR
+#include <cedar/capi.h>
+#include "stella_cedar.h"
 #endif
 
 #include "petscmat.h"
@@ -194,7 +195,7 @@ static PetscErrorCode stella_setup(stella *slv, int offset[], int stride[])
 		ierr = PCShellSetApply(slv->pc, stella_pc_apply);CHKERRQ(ierr);
 		ierr = PCShellSetDestroy(slv->pc, stella_pc_destroy);CHKERRQ(ierr);
 		ierr = PCShellSetContext(slv->pc, shell);CHKERRQ(ierr);
-		ierr = PCShellSetName(slv->pc, "boxmg");CHKERRQ(ierr);
+		ierr = PCShellSetName(slv->pc, "cedar");CHKERRQ(ierr);
 		ierr = PCShellSetSetUp(slv->pc, stella_pc_setup);CHKERRQ(ierr);
 	}
 
@@ -220,20 +221,23 @@ static PetscErrorCode stella_setup(stella *slv, int offset[], int stride[])
 	ierr = DMCreateGlobalVector(slv->dm, &slv->x);CHKERRQ(ierr);
 
 	if (!slv->options.algebraic) {
-		#ifdef WITH_BOXMG
-		ef_bmg_mat *mat_ctx = (ef_bmg_mat*) malloc(sizeof(ef_bmg_mat));
+		#ifdef WITH_CEDAR
+		stella_bmg_mat *mat_ctx = (stella_bmg_mat*) malloc(sizeof(stella_bmg_mat));
+		int cedar_err;
 		if (slv->grid.nd == 2) {
-			mat_ctx->op2 = bmg2_operator_create(slv->grid.topo2);
+			cedar_err = cedar_mat_create2d(slv->grid.topo, CEDAR_STENCIL_NINE_PT, &mat_ctx->so);chkerr(cedar_err);
+			cedar_err = cedar_vec_create2d(slv->grid.topo, &mat_ctx->solvec);chkerr(cedar_err);
+			cedar_err = cedar_vec_create2d(slv->grid.topo, &mat_ctx->rhsvec);chkerr(cedar_err);
 			mat_ctx->nd = 2;
 			ierr = MatCreateShell(slv->comm, xm*ym, xm*ym, ngx*ngy, ngx*ngy, mat_ctx, &slv->A);CHKERRQ(ierr);
-
 		} else {
-			ef_bmg_mat *mat_ctx = (ef_bmg_mat*) malloc(sizeof(ef_bmg_mat));
-			mat_ctx->op3 = bmg3_operator_create(slv->grid.topo3);
+			cedar_err = cedar_mat_create3d(slv->grid.topo, CEDAR_STENCIL_XXVII_PT, &mat_ctx->so);chkerr(cedar_err);
+			cedar_err = cedar_vec_create3d(slv->grid.topo, &mat_ctx->solvec);chkerr(cedar_err);
+			cedar_err = cedar_vec_create3d(slv->grid.topo, &mat_ctx->rhsvec);chkerr(cedar_err);
 			mat_ctx->nd = 3;
 			ierr = MatCreateShell(slv->comm, xm*ym*zm, xm*ym*zm, ngx*ngy*ngz, ngx*ngy*ngz, mat_ctx, &slv->A);CHKERRQ(ierr);
 		}
-		ierr = MatShellSetOperation(slv->A, MATOP_MULT, (void(*)(void)) ef_bmg_mult);CHKERRQ(ierr);
+		ierr = MatShellSetOperation(slv->A, MATOP_MULT, (void(*)(void)) stella_bmg_mult);CHKERRQ(ierr);
 		#endif
 	} else {
 		ierr = DMCreateMatrix(slv->dm, &slv->A);CHKERRQ(ierr);
@@ -259,9 +263,9 @@ PetscErrorCode stella_init(stella **solver_ctx, MPI_Comm comm,
 	slv->options.axisymmetric = axisymmetric;
 	{
 		PetscBool flg;
-		ierr = petsc_options_has_name("-boxmg", &flg);CHKERRQ(ierr);
+		ierr = petsc_options_has_name("-cedar", &flg);CHKERRQ(ierr);
 		if (flg) {
-		#ifdef WITH_BOXMG
+		#ifdef WITH_CEDAR
 			slv->options.algebraic = 0;
 		#endif
 		} else {
@@ -284,15 +288,15 @@ PetscErrorCode stella_init(stella **solver_ctx, MPI_Comm comm,
 PetscErrorCode stella_solve(stella *slv)
 {
 	PetscErrorCode ierr;
-	PetscBool boxmg_direct = 0;
+	PetscBool cedar_direct = 0;
 	slv->ts++;
 
-	ierr = petsc_options_has_name("-boxmg_direct", &boxmg_direct);CHKERRQ(ierr);
+	ierr = petsc_options_has_name("-cedar_direct", &cedar_direct);CHKERRQ(ierr);
 
 	// Temporarily signal bcs have changed to be safe
 	ierr = stella_changed_bc(slv);CHKERRQ(ierr);
 	ierr = VecSet(slv->x, 0);CHKERRQ(ierr);
-	if (!slv->options.algebraic && boxmg_direct) {
+	if (!slv->options.algebraic && cedar_direct) {
 		PC bmg_pc;
 		ierr = KSPGetPC(slv->ksp, &bmg_pc);CHKERRQ(ierr);
 		ierr = PCApply(bmg_pc, slv->rhs, slv->x);CHKERRQ(ierr);
@@ -484,14 +488,12 @@ PetscErrorCode stella_setup_op(stella *slv)
 			ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
 		}
 	} else {
-		#ifdef WITH_BOXMG
+		#ifdef WITH_CEDAR
 		if (stella_log(slv, STELLA_LOG_PROBLEM)) {
 			stella_bmg_mat *ctx;
 			ierr = MatShellGetContext(slv->A, (void**) &ctx);CHKERRQ(ierr);
-			if (ctx->nd == 2)
-				bmg2_operator_dump(ctx->op2);
-			else
-				bmg3_operator_dump(ctx->op3);
+			int cedar_err;
+			cedar_err = cedar_mat_dump(ctx->so);chkerr(cedar_err);
 		}
 		#endif
 	}

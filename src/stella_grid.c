@@ -1,6 +1,7 @@
 #include "stdio.h"
 
 #include "stella_grid.h"
+#include "stella_cedar.h"
 
 
 static PetscErrorCode setup_2d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGlobal[], int nProcs[], int nLocal[], int cartCoord[], int periodic[])
@@ -66,9 +67,11 @@ static PetscErrorCode setup_2d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 
 	ierr = DMDASetUniformCoordinates(*dm, 0, 1, 0, 1, 0.0, 0.0);CHKERRQ(ierr);
 
-	#ifdef WITH_BOXMG
-	grid->topo = bmg_topo_create(comm, nGlobal[0], nGlobal[1],
-	                             nPerProcx_uint, nPerProcy_uint, nProcs[0], nProcs[1]);
+	#ifdef WITH_CEDAR
+	int cedar_err;
+	cedar_err = cedar_topo_create2d(comm, nGlobal[0], nGlobal[1],
+	                                nPerProcx_uint, nPerProcy_uint, nProcs[0], nProcs[1],
+	                                &grid->topo);chkerr(cedar_err);
 	#endif
 
 	// BEGIN DEBUG
@@ -181,10 +184,12 @@ static PetscErrorCode setup_3d(stella_grid *grid, DM *dm, MPI_Comm comm, int nGl
 	/* SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_SUP,"HERE"); */
 	// END DEBUG
 
-	#ifdef WITH_BOXMG
-	grid->topo3 = bmg3_topo_create(comm, nGlobal[0], nGlobal[1], nGlobal[2],
-	                               nPerProcx_uint, nPerProcy_uint, nPerProcz_uint,
-	                               nProcs[0], nProcs[1], nProcs[2]);
+	#ifdef WITH_CEDAR
+	int cedar_err;
+	cedar_err = cedar_topo_create3d(comm, nGlobal[0], nGlobal[1], nGlobal[2],
+	                                nPerProcx_uint, nPerProcy_uint, nPerProcz_uint,
+	                                nProcs[0], nProcs[1], nProcs[2],
+	                                &grid->topo);chkerr(cedar_err);
 	#endif
 
 	free(lnPerProcx);
