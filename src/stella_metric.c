@@ -55,6 +55,11 @@ static PetscErrorCode compute_3d_interior(stella_metric *met, DM da, stella_fd *
 		ierr = DMDAVecGetArray(da, met->jac_v[i], &jac_v[i]);CHKERRQ(ierr);
 	}
 
+	for (i = 0; i < 9; i++) {
+		ierr = DMGlobalToLocalBegin(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+		ierr = DMGlobalToLocalEnd(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+	}
+
 	si = fd->first[0]->v;
 	sp = fd->first[1]->v;
 	sm = fd->first[-1]->v;
@@ -108,6 +113,11 @@ static PetscErrorCode compute_2d_interior(stella_metric *met, DM da, stella_fd *
 
 	for (i = 0; i < 4; i++) {
 		ierr = DMDAVecGetArray(da, met->jac_v[i], &jac_v[i]);CHKERRQ(ierr);
+	}
+
+	for (i = 0; i < 4; i++) {
+		ierr = DMGlobalToLocalBegin(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+		ierr = DMGlobalToLocalEnd(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
 	}
 
 	vec__x_s = jac_v[met->t2map[0][0]];
@@ -261,6 +271,11 @@ static PetscErrorCode compute_3d_boundary(stella_metric *met, DM da, stella_fd *
 		ierr = DMDAVecGetArray(da, met->jac_v[i], &jac_v[i]);CHKERRQ(ierr);
 	}
 
+	for (i = 0; i < 9; i++) {
+		ierr = DMGlobalToLocalBegin(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+		ierr = DMGlobalToLocalEnd(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+	}
+
 	si = fd->first[0]->v;
 	sp = fd->first[1]->v;
 	sm = fd->first[-1]->v;
@@ -320,6 +335,11 @@ static PetscErrorCode compute_2d_boundary(stella_metric *met, DM da, stella_fd *
 
 	for (i = 0; i < 4; i++) {
 		ierr = DMDAVecGetArray(da, met->jac_v[i], &jac_v[i]);CHKERRQ(ierr);
+	}
+
+	for (i = 0; i < 4; i++) {
+		ierr = DMGlobalToLocalBegin(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+		ierr = DMGlobalToLocalEnd(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
 	}
 
 	vec__x_s = jac_v[met->t2map[0][0]];
@@ -703,6 +723,7 @@ PetscErrorCode stella_metric_create(stella_metric **metptr, DM da, stella_fd *fd
 	if (dim == 2) {
 		for (i=0; i < 4; i++) {
 			ierr = VecDuplicate(met->coef[0], &met->jac_v[i]);CHKERRQ(ierr);
+			ierr = VecDuplicate(met->lcoef[0], &met->ljac_v[i]);CHKERRQ(ierr);
 		}
 
 		for (i = 1; i < 5; i++) {
@@ -714,6 +735,7 @@ PetscErrorCode stella_metric_create(stella_metric **metptr, DM da, stella_fd *fd
 	} else if (dim == 3) {
 		for (i=0; i < 9; i++) {
 			ierr = VecDuplicate(met->coef[0], &met->jac_v[i]);CHKERRQ(ierr);
+			ierr = VecDuplicate(met->lcoef[0], &met->ljac_v[i]);CHKERRQ(ierr);
 		}
 
 		for (i = 1; i < 10; i++) {

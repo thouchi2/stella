@@ -73,10 +73,14 @@ state *state_create(grid *grd, problem *pb)
 			for (j = 0; j < grd->len[1]; j++) {
 				for (i = 0; i < grd->len[0]; i++) {
 					ind = j*grd->len[0] + i;
-					if (grd->x[ind] < 0)
+					if (grd->x[ind] <= 0 && grd->y[ind] >= 0)
+						st->jc[ind] = 5;
+					else if (grd->x[ind] > 0 && grd->y[ind] >= 0)
+						st->jc[ind] = 5;
+					else if (grd->x[ind] < 0 && grd->y[ind] < 0)
 						st->jc[ind] = -5;
 					else
-						st->jc[ind] = 5;
+						st->jc[ind] = -5;
 				}
 			}
 		} else {
@@ -86,7 +90,7 @@ state *state_create(grid *grd, problem *pb)
 						ind = k*grd->len[0]*grd->len[1] + j*grd->len[0] + i;
 						if ((grd->x[ind] <= 0 && grd->y[ind] < 0) || (grd->x[ind] > 0 && grd->y[ind] >= 0))
 							st->jc[ind] = -5;
-						if (grd->x[ind] <= 0 && grd->y[ind] >= 0)
+						else if (grd->x[ind] <= 0 && grd->y[ind] >= 0)
 							st->jc[ind] = 5;
 						else
 							st->jc[ind] = -10;

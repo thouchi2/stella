@@ -262,7 +262,6 @@ TEST(Models3, Jump)
 {
 	int size;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	if (size == 1) { // only works in serial for now
 		std::vector<double> norms;
 		std::vector<double> hs;
 		std::array<int, 2> nvals = {40, 80};
@@ -305,7 +304,6 @@ TEST(Models3, Jump)
 			double order = estimate_order(hs, norms);
 			ASSERT_GT(order, 2 - tol);
 		}
-	}
 }
 
 // TEST(Models3, Cboard)
