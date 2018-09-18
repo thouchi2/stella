@@ -93,14 +93,6 @@ static PetscErrorCode contribute_interface(stella *slv)
 		int rank, size;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
         MPI_Comm_size(MPI_COMM_WORLD, &size);
-        FILE *ofile;
-        if (size == 1)
-                ofile = fopen("ser", "w");
-        else {
-                char fname[32];
-                sprintf(fname, "par-%d", rank);
-                ofile = fopen(fname, "w");
-        }
 
 		for (j = ys; j < ys + ym; j++) {
 			for (i = xs; i < xs + xm; i++) {
@@ -123,10 +115,8 @@ static PetscErrorCode contribute_interface(stella *slv)
 					fym = 2.0*dcoef[j][i]*jump[jm][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				else fym = 0;
 				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
-				fprintf(ofile, "%d => %g %g %g\n", j * ngx + i, fxp, fxm, x_s[j][i]+x_s[j][i+1]);
 			}
 		}
-		fclose(ofile);
 
 		for (i = 0; i < 4; i++) {
 			ierr = DMDAVecRestoreArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
