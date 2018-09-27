@@ -1,3 +1,5 @@
+#include "stella_io.h"
+#include "stella_util.h"
 #include "stella_signals.h"
 
 // private signal helpers
@@ -257,6 +259,27 @@ PetscErrorCode stella_changed_rhs(stella *slv)
 		PetscViewerASCIIOpen(slv->comm, "b.txt", &bout);
 		ierr = VecView(b, bout);CHKERRQ(ierr);
 	}
+
+	return 0;
+}
+
+
+PetscErrorCode stella_changed_dcoef(stella *slv)
+{
+	PetscErrorCode ierr;
+
+	ierr = stella_store_external_array(slv, slv->state.dcoef, slv->level.dcoef);CHKERRQ(ierr);
+	// populate halo region
+	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
+	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
+
+	ierr = stella_operator_assemble(slv->op, slv->A, slv->dm);CHKERRQ(ierr);
+
+	if (stella_log(slv, STELLA_LOG_STATUS)) {
+		ierr = stella_io_print(slv->comm, "Matrix assembled");CHKERRQ(ierr);
+	}
+
+	ierr = stella_changed_bc(slv);CHKERRQ(ierr);
 
 	return 0;
 }

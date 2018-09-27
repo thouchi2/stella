@@ -145,7 +145,7 @@ static void add_3d(boundary *bnd, grid *grd, problem *pb)
 			offset = (grd->ibeg[2] + (grd->nz-1))*grd->len[0]*grd->len[1];
 			norm_dir = -3;
 			len[0] = grd->len[1];
-			len[1] = grd->len[2];
+			len[1] = grd->len[0];
 		} else if (i == BACK
 		           && grd->cart_coord[2] == 0
 		           && (!grd->periodic[2])) {

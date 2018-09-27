@@ -3,6 +3,7 @@
 #include "stella_solver.h"
 #include "stella_io.h"
 #include "stella_signals.h"
+#include "stella_util.h"
 
 #include "stella_mat.h"
 #include "stella_pc.h"
@@ -36,52 +37,6 @@ static inline PetscErrorCode petsc_options_set_value(const char name[], const ch
 	#else
 	ierr = PetscOptionsSetValue(name, value);CHKERRQ(ierr);
 	#endif
-
-	return 0;
-}
-
-
-/**
- * Copy external array to PETSc vec
- */
-static PetscErrorCode store_external_array(stella *slv, double src[], Vec dest)
-{
-	PetscErrorCode ierr;
-
-	if (slv->grid.nd == 2) {
-		PetscScalar **dest_loc;
-		double **src_loc;
-		PetscInt i, j;
-		PetscInt xs, ys, xm, ym;
-
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, 0, &xm, &ym, 0);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, src, &src_loc);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
-		for (j = ys; j < ys + ym; j++) {
-			for (i = xs; i < xs + xm; i++) {
-				dest_loc[j][i] = src_loc[j][i];
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &src_loc);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
-	} else { // slv->grid.nd == 3
-		PetscScalar ***dest_loc;
-		double ***src_loc;
-		PetscInt i, j, k;
-		PetscInt xs, ys, zs, xm, ym, zm;
-		ierr = DMDAGetCorners(slv->dm, &xs, &ys, &zs, &xm, &ym, &zm);CHKERRQ(ierr);
-		ierr = stella_dmap_get(slv->dmap, src, &src_loc);CHKERRQ(ierr);
-		ierr = DMDAVecGetArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
-		for (k = zs; k < zs + zm; k++) {
-			for (j = ys; j < ys + ym; j++) {
-				for (i = xs; i < xs + xm; i++) {
-					dest_loc[k][j][i] = src_loc[k][j][i];
-				}
-			}
-		}
-		ierr = stella_dmap_restore(slv->dmap, &src_loc);CHKERRQ(ierr);
-		ierr = DMDAVecRestoreArray(slv->dm, dest, &dest_loc);CHKERRQ(ierr);
-	}
 
 	return 0;
 }
@@ -381,12 +336,12 @@ PetscErrorCode stella_set_external(stella *slv, double phi[], double dcoef[],
 	slv->state.jump = jump;
 	slv->state.sol = NULL;
 
-	ierr = store_external_array(slv, slv->state.dcoef, slv->level.dcoef);CHKERRQ(ierr);
+	ierr = stella_store_external_array(slv, slv->state.dcoef, slv->level.dcoef);CHKERRQ(ierr);
 	// populate halo region
 	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
 	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.dcoef, INSERT_VALUES, slv->level.ldcoef);CHKERRQ(ierr);
 
-	ierr = store_external_array(slv, slv->state.bcoef, slv->level.bcoef);CHKERRQ(ierr);
+	ierr = stella_store_external_array(slv, slv->state.bcoef, slv->level.bcoef);CHKERRQ(ierr);
 	// populate halo region
 	ierr = DMGlobalToLocalBegin(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
 	ierr = DMGlobalToLocalEnd(slv->dm, slv->level.bcoef, INSERT_VALUES, slv->level.lbcoef);CHKERRQ(ierr);
@@ -414,7 +369,7 @@ PetscErrorCode stella_set_sol(stella *slv, double sol[])
 	ierr = DMCreateGlobalVector(slv->dm, &slv->sol);
 	slv->state.sol = sol;
 
-	ierr = store_external_array(slv, slv->state.sol, slv->sol);CHKERRQ(ierr);
+	ierr = stella_store_external_array(slv, slv->state.sol, slv->sol);CHKERRQ(ierr);
 
 	return 0;
 }
