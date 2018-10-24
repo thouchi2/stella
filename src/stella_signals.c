@@ -60,6 +60,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 	PetscErrorCode ierr;
 	PetscInt i, j, k, xs, ys, zs, xm, ym, zm, ngx, ngy, ngz;
 	Vec b;
+	Vec jump_vec;
 
 	b = slv->rhs;
 
@@ -74,6 +75,11 @@ static PetscErrorCode contribute_interface(stella *slv)
 		ierr = stella_dmap_get(slv->dmap, slv->state.jump, &jump);CHKERRQ(ierr);
 		ierr = DMDAVecGetArray(slv->dm, slv->level.ldcoef, &dcoef);CHKERRQ(ierr);
 		ierr = DMDAVecGetArray(slv->dm, b, &bvec);CHKERRQ(ierr);
+
+		ierr = VecDuplicate(b, &jump_vec);CHKERRQ(ierr);
+		ierr = stella_store_external_array(slv, slv->state.jump, jump_vec);
+		ierr = stella_io_vtkwrite(slv->dm, jump_vec, "jump", 0, 0);CHKERRQ(ierr);
+		ierr = VecDestroy(&jump_vec);CHKERRQ(ierr);
 
 		double fxp, fxm, fyp, fym;
 		PetscScalar **jac[4];
@@ -97,23 +103,44 @@ static PetscErrorCode contribute_interface(stella *slv)
 		for (j = ys; j < ys + ym; j++) {
 			for (i = xs; i < xs + xm; i++) {
 
-				int ip = smallerValue(i, i+1, dcoef[j][i], dcoef[j][i+1]);
-				int im = smallerValue(i, i-1, dcoef[j][i], dcoef[j][i-1]);
-				int jp = smallerValue(j, j+1, dcoef[j][i], dcoef[j+1][i]);
-				int jm = smallerValue(j, j-1, dcoef[j][i], dcoef[j-1][i]);
+				//int ip = smallerValue(i, i+1, dcoef[j][i], dcoef[j][i+1]);
+				//int im = smallerValue(i, i-1, dcoef[j][i], dcoef[j][i-1]);
+				//int jp = smallerValue(j, j+1, dcoef[j][i], dcoef[j+1][i]);
+				//int jm = smallerValue(j, j-1, dcoef[j][i], dcoef[j-1][i]);
 
 				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]))
-					fxp = 2.0*dcoef[j][i]*jump[j][ip] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+					fxp = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
 				else fxp = 0;
 				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]))
-					fxm = 2.0*dcoef[j][i]*jump[j][im] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+					fxm = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
 				else fxm = 0;
 				if ((j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i]))
-					fyp = 2.0*dcoef[j][i]*jump[jp][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+					fyp = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
 				else fyp = 0;
 				if ((j != 0) && (dcoef[j][i] != dcoef[j-1][i]))
-					fym = 2.0*dcoef[j][i]*jump[jm][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+					fym = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				else fym = 0;
+
+				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
+					fxp = 2.0*dcoef[j][i]*jump[j-1][i] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+					fyp = 2.0*dcoef[j][i]*jump[j][i-1] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+				}
+
+				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
+					fxp = 2.0*dcoef[j][i]*jump[j-1][i] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+					fym = 2.0*dcoef[j][i]*jump[j][i+1] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+				}
+
+				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
+					fxm = 2.0*dcoef[j][i]*jump[j+1][i] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+					fyp = 2.0*dcoef[j][i]*jump[j][i-1] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+				}
+
+				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
+					fxm = 2.0*dcoef[j][i]*jump[j+1][i] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+					fym = 2.0*dcoef[j][i]*jump[j][i+1] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+				}
+
 				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
 			}
 		}
