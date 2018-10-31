@@ -141,7 +141,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 					fym = 2.0*dcoef[j][i]*jump[j][i+1] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				}
 
-				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
+				bvec[j][i] = rhs[j][i] - fxp - fxm;// - fyp - fym;
 			}
 		}
 

@@ -249,17 +249,19 @@ double jump_rhs(double x, double y, double z)
 
 double cboard_sol(double x, double y, double z){
     if (x <= 0 && y < 0)
-		return (2*(x*x) + 13/4*x + 4*y - 4*(y*y));
+		return 2*(x*x) + 13/4*x;// - 4*(y*y) + 4*y;
     else if (x > 0 && y >= 0)
-        return (-4*(x*x) + 4*x + 2*(y*y) + 13/4*y);
+        return -4*(x*x) + 4*x;// + 2*(y*y) + 13/4*y;
     else if (x <= 0 && y >= 0)
-        return (2*(x*x) + 13/4*x + 2*(y*y) + 13/11*y);
+        return 2*(x*x) + 13/4*x;// + 2*(y*y) + 13/4*y;
     else
-        return (-4*(x*x) + 4*x - 4*(y*y) + 4*y);
+        return -4*(x*x) + 4*x;// - 4*(y*y) + 4*y;
 }
 
 double cboard_rhs(double x, double y, double z){
-    if ((x <= 0 && y < 0) || (x > 0 && y >= 0))
+    if (x <= 0 && y < 0)
+        return -8;
+    else if (x > 0 && y >= 0)
         return 16;
     else if (x <= 0 && y >=0)
         return -16;

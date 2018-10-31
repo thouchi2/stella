@@ -51,9 +51,9 @@ state *state_create(grid *grd, problem *pb)
 				for (i = 0; i < grd->len[0]; i++) {
 					ind = j*grd->len[0] + i;
 					if ((grd->x[ind] <= 0 && grd->y[ind] < 0) || (grd->x[ind] > 0 && grd->y[ind] >= 0))
-						st->eps[ind] = 4;
-					else
 						st->eps[ind] = 2;
+					else
+						st->eps[ind] = 4;
 				}
 			}
 		} else {
@@ -78,19 +78,23 @@ state *state_create(grid *grd, problem *pb)
 					indmy = (j-1)*grd->len[0] + i;
 					indmx = j*grd->len[0] + (i-1);
 					if (grd->x[ind] <= 0 && grd->y[ind] >= 0)
-						st->jc[ind] = -9.5;
+						st->jc[ind] = -5;
 					else if (grd->x[ind] > 0 && grd->y[ind] >= 0)
-						st->jc[ind] = -9.5;
+						st->jc[ind] = -5;
 					else if (grd->x[ind] < 0 && grd->y[ind] < 0)
-						st->jc[ind] = 5;
+						st->jc[ind] = 9.5;
 					else if (grd->x[ind] >= 0 && grd->y[ind] < 0)
-						st->jc[ind] = 5;
+						st->jc[ind] = 9.5;
 
 					//borders
-					if ((grd->x[ind] < 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
-						st->jc[ind] = 9.5;
-					if ((grd->x[ind] >= 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
-						st->jc[ind] = -5;
+					// if ((grd->x[ind] < 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
+					// 	st->jc[ind] = 5;
+					// if ((grd->x[ind] < 0) && (j != 0) && (st->eps[ind] != st->eps[indmy]))
+					// 	st->jc[ind] = 5;
+					// if ((grd->x[ind] >= 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
+					// 	st->jc[ind] = -9.5;
+					// if ((grd->x[ind] >= 0) && (j != 0) && (st->eps[ind] != st->eps[indmy]))
+					// 	st->jc[ind] = -9.5;
 				}
 			}
 
