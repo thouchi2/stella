@@ -87,14 +87,14 @@ state *state_create(grid *grd, problem *pb)
 						st->jc[ind] = 9.5;
 
 					//borders
-					// if ((grd->x[ind] < 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
-					// 	st->jc[ind] = 5;
-					// if ((grd->x[ind] < 0) && (j != 0) && (st->eps[ind] != st->eps[indmy]))
-					// 	st->jc[ind] = 5;
-					// if ((grd->x[ind] >= 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
-					// 	st->jc[ind] = -9.5;
-					// if ((grd->x[ind] >= 0) && (j != 0) && (st->eps[ind] != st->eps[indmy]))
-					// 	st->jc[ind] = -9.5;
+					if ((grd->x[ind] < 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
+						st->jc[ind] = 5;
+					if ((grd->x[ind] < 0) && (j != 0) && (st->eps[ind] != st->eps[indmy]))
+						st->jc[ind] = 5;
+					if ((grd->x[ind] >= 0) && (j != grd->len[0]-1) && (st->eps[ind] != st->eps[indpy]))
+						st->jc[ind] = -9.5;
+					if ((grd->x[ind] >= 0) && (j != 0) && (st->eps[ind] != st->eps[indmy]))
+						st->jc[ind] = -9.5;
 				}
 			}
 
