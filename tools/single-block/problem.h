@@ -7,12 +7,12 @@
 extern "C" {
 #endif
 
-#define NUM_PROBLEMS 11
+#define NUM_PROBLEMS 12
 
 typedef enum {
 	MTUT=0, MIXED=1, MIXED_1=2, MIXED_2=3,
 	SIN=4, TSINE=5, ROT=6, ELECTRODE=7,
-	JUMP=8, AXISYMMETRIC=9, PERIODIC=10
+	JUMP=8, AXISYMMETRIC=9, PERIODIC=10, CBOARD=11
 } problem_id;
 
 extern const char *problem_name[NUM_PROBLEMS];

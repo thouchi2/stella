@@ -85,7 +85,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 		met = slv->level.metric;
 
 		for (i = 0; i < 4; i++) {
-			ierr = DMDAVecGetArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
+			ierr = DMDAVecGetArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
 		}
 
 		x_s = jac[met->t2map[0][0]];
@@ -96,29 +96,45 @@ static PetscErrorCode contribute_interface(stella *slv)
 		for (j = ys; j < ys + ym; j++) {
 			for (i = xs; i < xs + xm; i++) {
 
-				int ip = smallerValue(i, i+1, dcoef[j][i], dcoef[j][i+1]);
-				int im = smallerValue(i, i-1, dcoef[j][i], dcoef[j][i-1]);
-				int jp = smallerValue(j, j+1, dcoef[j][i], dcoef[j+1][i]);
-				int jm = smallerValue(j, j-1, dcoef[j][i], dcoef[j-1][i]);
-
 				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]))
-					fxp = 2.0*dcoef[j][i]*jump[j][ip] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+					fxp = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
 				else fxp = 0;
 				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]))
-					fxm = 2.0*dcoef[j][i]*jump[j][im] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+					fxm = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
 				else fxm = 0;
 				if ((j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i]))
-					fyp = 2.0*dcoef[j][i]*jump[jp][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+					fyp = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
 				else fyp = 0;
 				if ((j != 0) && (dcoef[j][i] != dcoef[j-1][i]))
-					fym = 2.0*dcoef[j][i]*jump[jm][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+					fym = 2.0*dcoef[j][i]*jump[j][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				else fym = 0;
+
+				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
+					fxp = 2.0*dcoef[j][i]*jump[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+					fyp = 2.0*dcoef[j][i]*jump[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+				}
+
+				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
+					fxp = 2.0*dcoef[j][i]*jump[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+					fym = 2.0*dcoef[j][i]*jump[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+				}
+
+				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
+					fxm = 2.0*dcoef[j][i]*jump[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+					fyp = 2.0*dcoef[j][i]*jump[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+				}
+
+				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
+					fxm = 2.0*dcoef[j][i]*jump[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+					fym = 2.0*dcoef[j][i]*jump[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+				}
+
 				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
 			}
 		}
 
 		for (i = 0; i < 4; i++) {
-			ierr = DMDAVecRestoreArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
+			ierr = DMDAVecRestoreArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
 		}
 
 		ierr = stella_dmap_restore(slv->dmap, &jump);CHKERRQ(ierr);
@@ -136,7 +152,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 		met = slv->level.metric;
 
 		for (i = 0; i < 6; i++) {
-			ierr = DMDAVecGetArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
+			ierr = DMDAVecGetArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
 		}
 
 		x_r = jac[met->t3map[0][0]];
@@ -183,7 +199,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 		}
 
 		for (i = 0; i < 6; i++) {
-			ierr = DMDAVecRestoreArray(slv->dm, met->jac_v[i], &jac[i]);CHKERRQ(ierr);
+			ierr = DMDAVecRestoreArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
 		}
 		ierr = stella_dmap_restore(slv->dmap, &rhs);CHKERRQ(ierr);
 		ierr = stella_dmap_restore(slv->dmap, &jump);CHKERRQ(ierr);
