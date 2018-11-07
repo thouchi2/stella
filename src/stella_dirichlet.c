@@ -243,7 +243,7 @@ static PetscErrorCode update_dirichlet_sym_3d(stella_bc *bc, Mat A, DM da)
 		}
 	}
 
-	ierr = stella_classify_get(cls, &classify);CHKERRQ(ierr);
+	ierr = stella_classify_restore(cls, &classify);CHKERRQ(ierr);
 
 	return 0;
 }
