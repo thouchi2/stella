@@ -11,6 +11,7 @@ typedef struct {
 	int t2map[2][2];
 	int t3map[3][3];
 	Vec jac_v[9];
+	Vec ljac_v[9];
 	Vec jac;
 	int nd;
 } stella_metric;

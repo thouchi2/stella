@@ -703,6 +703,7 @@ PetscErrorCode stella_metric_create(stella_metric **metptr, DM da, stella_fd *fd
 	if (dim == 2) {
 		for (i=0; i < 4; i++) {
 			ierr = VecDuplicate(met->coef[0], &met->jac_v[i]);CHKERRQ(ierr);
+			ierr = VecDuplicate(met->lcoef[0], &met->ljac_v[i]);CHKERRQ(ierr);
 		}
 
 		for (i = 1; i < 5; i++) {
@@ -711,9 +712,16 @@ PetscErrorCode stella_metric_create(stella_metric **metptr, DM da, stella_fd *fd
 		}
 
 		ierr = compute_2d(met, da, fd);CHKERRQ(ierr);
+
+		// Fill halo region
+		for (i = 0; i < 4; i++) {
+			ierr = DMGlobalToLocalBegin(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+			ierr = DMGlobalToLocalEnd(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+		}
 	} else if (dim == 3) {
 		for (i=0; i < 9; i++) {
 			ierr = VecDuplicate(met->coef[0], &met->jac_v[i]);CHKERRQ(ierr);
+			ierr = VecDuplicate(met->lcoef[0], &met->ljac_v[i]);CHKERRQ(ierr);
 		}
 
 		for (i = 1; i < 10; i++) {
@@ -722,6 +730,12 @@ PetscErrorCode stella_metric_create(stella_metric **metptr, DM da, stella_fd *fd
 		}
 
 		ierr = compute_3d(met, da, fd);CHKERRQ(ierr);
+
+		// Fill halo region
+		for (i = 0; i < 9; i++) {
+			ierr = DMGlobalToLocalBegin(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+			ierr = DMGlobalToLocalEnd(da, met->jac_v[i], ADD_VALUES, met->ljac_v[i]);
+		}
 	}
 
 	*metptr = met;
