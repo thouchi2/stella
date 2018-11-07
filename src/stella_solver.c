@@ -318,13 +318,6 @@ PetscErrorCode stella_solve(stella *slv)
 	// Update external array with solution
 	ierr = update_solution(slv);CHKERRQ(ierr);
 
-	if (stella_log(slv, STELLA_LOG_PROBLEM)) {
-		PetscViewer vout;
-		ierr = PetscViewerBinaryOpen(slv->comm, "sol.dat", FILE_MODE_WRITE, &vout);CHKERRQ(ierr);
-		ierr = VecView(slv->x, vout);CHKERRQ(ierr);
-		ierr = PetscViewerDestroy(&vout);CHKERRQ(ierr);
-	}
-
 	return 0;
 }
 
