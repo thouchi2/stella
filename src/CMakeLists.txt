@@ -1,4 +1,4 @@
-set(stella_sources
+set(sources
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_bc.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_boundary.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_dirichlet.c
@@ -15,6 +15,10 @@ set(stella_sources
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_stencil.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_signals.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_classify.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/stella_util.c
-  ${CMAKE_CURRENT_SOURCE_DIR}/stella_cedar.c
-  PARENT_SCOPE)
+  ${CMAKE_CURRENT_SOURCE_DIR}/stella_util.c)
+
+if (cedar_FOUND)
+  list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/stella_cedar.c)
+endif()
+
+set(stella_sources ${sources} PARENT_SCOPE)

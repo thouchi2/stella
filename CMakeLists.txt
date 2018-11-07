@@ -13,8 +13,10 @@ option(AutodetectMPI "Automatically detect MPI" ON)
 enable_language(C CXX Fortran)
 
 find_package(PETSc REQUIRED)
-if(PETSC_VERSION VERSION_LESS 3.7.0)
-  message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
+if(PETSC_VERSION)
+  if(${PETSC_VERSION} VERSION_LESS 3.7.0)
+	message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
+  endif()
 endif()
 
 set(req-lib ${PETSC_LIBRARIES} m)
