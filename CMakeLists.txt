@@ -9,6 +9,7 @@ include(testing)
 
 option(ENABLE_UNIT_TESTS "Enable unit testing" OFF)
 option(AutodetectMPI "Automatically detect MPI" ON)
+option(ENABLE_CEDAR "Enable Cedar solver" OFF)
 
 enable_language(C CXX Fortran)
 
@@ -28,8 +29,9 @@ if(AutodetectMPI)
   list(APPEND req-lib ${MPI_C_LIBRARIES})
   list(APPEND req-inc ${MPI_C_INCLUDE_PATH})
 endif()
-find_package(cedar QUIET)
-if (cedar_FOUND)
+
+if(ENABLE_CEDAR)
+  find_package(cedar REQUIRED)
   list(APPEND req-inc ${CEDAR_INCLUDE_DIR})
   list(APPEND req-lib cedar)
   list(APPEND req-def WITH_CEDAR)

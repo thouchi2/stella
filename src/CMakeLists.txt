@@ -17,7 +17,7 @@ set(sources
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_classify.c
   ${CMAKE_CURRENT_SOURCE_DIR}/stella_util.c)
 
-if (cedar_FOUND)
+if (ENABLE_CEDAR)
   list(APPEND sources ${CMAKE_CURRENT_SOURCE_DIR}/stella_cedar.c)
 endif()
 
