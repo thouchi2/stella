@@ -1,4 +1,7 @@
+#include "stella_io.h"
+#include "stella_util.h"
 #include "stella_signals.h"
+#include "stella_mat.h"
 
 // private signal helpers
 
@@ -134,7 +137,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 					fxm = 2.0*dcoef[j][i]*jump[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
 					fym = 2.0*dcoef[j][i]*jump[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				}
-				
+
 				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
 			}
 		}
