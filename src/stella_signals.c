@@ -93,6 +93,10 @@ static PetscErrorCode contribute_interface(stella *slv)
 		y_s = jac[met->t2map[1][0]];
 		y_t = jac[met->t2map[1][1]];
 
+		int rank, size;
+        MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+        MPI_Comm_size(MPI_COMM_WORLD, &size);
+
 		for (j = ys; j < ys + ym; j++) {
 			for (i = xs; i < xs + xm; i++) {
 

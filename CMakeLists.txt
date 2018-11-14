@@ -6,16 +6,22 @@ list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 include(cxx11)
 include(cxx_config)
 include(testing)
+include(CTest)
 
 option(ENABLE_UNIT_TESTS "Enable unit testing" OFF)
 option(AutodetectMPI "Automatically detect MPI" ON)
 
-enable_language(C CXX Fortran)
+enable_language(C CXX)
+
+set(PETSC_DIR $ENV{PETSC_DIR})
+  if(DEFINED ENV{PETSC_ARCH})
+    set(PETSC_ARCH $ENV{PETSC_ARCH})
+  endif()
 
 find_package(PETSc REQUIRED)
-#if(PETSC_VERSION VERSION_LESS 3.7.0)
-#  message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
-#endif()
+# if(PETSC_VERSION VERSION_LESS 3.7.0)
+#   message(FATAL_ERROR "ERROR: stella requires PETSc 3.7.0 or newer.")
+# endif()
 
 set(req-lib ${PETSC_LIBRARIES} m)
 set(req-inc ${PETSC_INCLUDES})
