@@ -777,7 +777,6 @@ TEST(Models, Cboard)
 {
 	int size;
 	MPI_Comm_size(MPI_COMM_WORLD, &size);
-	if (size == 1) {
 		std::vector<double> norms;
 		std::vector<double> hs;
 		std::array<int, 2> nvals = {200, 400};
@@ -820,7 +819,6 @@ TEST(Models, Cboard)
 			double order = estimate_order(hs, norms);
 			ASSERT_GT(order, 2 - tol);
 		}
-	}
 }
 
 TEST(Models, JumpSine)
