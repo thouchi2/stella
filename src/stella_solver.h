@@ -106,7 +106,7 @@ PetscErrorCode stella_solve(stella*);
  * @param[in] jump interface condition ([n . dcoef grad phi] = jump).  Interface must be grid aligned.
  */
 PetscErrorCode stella_set_external(stella *slv, double phi[], double dcoef[],
-                                   double bcoef[], double jump[]);
+                                   double bcoef[], double jump_x[], double jump_y[], double jump_z[]);
 
 /**
  * Sets solver rhs.
