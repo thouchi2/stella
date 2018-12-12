@@ -289,21 +289,21 @@ double jump_sin_sol(double x, double y, double z)
 double jump_sin_rhs_3d(double x, double y, double z)
 {
     if (x > 0 && y >= 0 && z >= 0)
-	   return -27*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+	   return 27*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
     else if (x <= 0 && y >= 0 && z >= 0)
-        return -6*(M_PI*M_PI)*sin(M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+        return 6*(M_PI*M_PI)*sin(M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
     else if (x <= 0 && y < 0 && z >= 0)
-        return -9*(M_PI*M_PI)*sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
+        return 9*(M_PI*M_PI)*sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
     else if (x > 0 && y < 0 && z >= 0)
-        return -6*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+        return 6*(M_PI*M_PI)*sin(2*M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
     else if (x > 0 && y >= 0 && z < 0)
-        return -84*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
+        return 84*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
     else if (x <= 0 && y >= 0 && z < 0)
-        return -40*(M_PI*M_PI)*sin(M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
+        return 45*(M_PI*M_PI)*sin(M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
     else if (x <= 0 && y < 0 && z < 0)
-        return -42*(M_PI*M_PI)*sin(M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
+        return 42*(M_PI*M_PI)*sin(M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
     else
-        return -40*(M_PI*M_PI)*sin(2*M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
+        return 45*(M_PI*M_PI)*sin(2*M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
 }
 
 
@@ -316,7 +316,7 @@ double jump_sin_sol_3d(double x, double y, double z)
     else if (x <= 0 && y < 0 && z >= 0)
         return sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
     else if (x > 0 && y < 0 && z >= 0)
-        return sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+        return sin(2*M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
     else if (x > 0 && y >= 0 && z < 0)
         return sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
     else if (x <= 0 && y >= 0 && z < 0)
@@ -360,25 +360,17 @@ double cboard_eps(double x, double y, double z)
 
 double cboard_jc_x(double x, double y, double z)
 {
-    if (x <= 0 && y >= 0)
+    if (y >= 0)
         return -5;
-    else if (x > 0 && y >= 0)
-        return -5;
-    else if (x < 0 && y < 0)
-        return 9.5;
-    else if (x >= 0 && y < 0)
+    else
         return 9.5;
 }
 
 double cboard_jc_y(double x, double y, double z)
 {
-    if ((x < 0) && (y != 1))
+    if (x < 0)
         return 5;
-    else if ((x < 0) && (y != -1))
-        return 5;
-    else if ((x >= 0) && (y != 1))
-        return -9.5;
-    else if ((x >= 0) && (y != -1))
+    else
         return -9.5;
 }
 
@@ -432,11 +424,11 @@ double jsine_jc_y_3d(double x, double y, double z)
     if (x > 0 && z >= 0)
         return 5*M_PI*sin(2*M_PI*x)*sin(M_PI*z);
     else if (x <= 0 && z >= 0)
-        return M_PI*sin(M_PI*x)*sin(M_PI*z);
+        return -M_PI*sin(M_PI*x)*sin(M_PI*z);
     else if (x > 0 && z < 0)
         return 9*M_PI*sin(2*M_PI*x)*sin(2*M_PI*z);
     else
-        return -3*M_PI*sin(M_PI*x)*sin(2*M_PI*z);
+        return 3*M_PI*sin(M_PI*x)*sin(2*M_PI*z);
 }
 
 double jsine_jc_z_3d(double x, double y, double z)

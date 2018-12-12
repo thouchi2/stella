@@ -110,26 +110,6 @@ static PetscErrorCode contribute_interface(stella *slv)
 					fym = 2.0*dcoef[j][i]*jump_y[j][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				else fym = 0;
 
-				// if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
-				// 	fxp = 2.0*dcoef[j][i]*jump_x[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
-				// 	fyp = 2.0*dcoef[j][i]*jump_y[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
-				// }
-				//
-				// if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
-				// 	fxp = 2.0*dcoef[j][i]*jump_x[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
-				// 	fym = 2.0*dcoef[j][i]*jump_y[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
-				// }
-				//
-				// if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
-				// 	fxm = 2.0*dcoef[j][i]*jump_x[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
-				// 	fyp = 2.0*dcoef[j][i]*jump_y[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
-				// }
-				//
-				// if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
-				// 	fxm = 2.0*dcoef[j][i]*jump_x[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
-				// 	fym = 2.0*dcoef[j][i]*jump_y[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
-				// }
-
 				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
 			}
 		}
@@ -148,12 +128,12 @@ static PetscErrorCode contribute_interface(stella *slv)
 		PetscScalar ***bvec, ***dcoef;
 
 		double fxp, fxm, fyp, fym, fzp, fzm;
-		PetscScalar ***jac[6];
+		PetscScalar ***jac[9];
 		PetscScalar ***x_r, ***y_s, ***z_t;
 		stella_metric *met;
 		met = slv->level.metric;
 
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < 9; i++) {
 			ierr = DMDAVecGetArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
 		}
 
@@ -196,7 +176,7 @@ static PetscErrorCode contribute_interface(stella *slv)
 			}
 		}
 
-		for (i = 0; i < 6; i++) {
+		for (i = 0; i < 9; i++) {
 			ierr = DMDAVecRestoreArray(slv->dm, met->ljac_v[i], &jac[i]);CHKERRQ(ierr);
 		}
 		ierr = stella_dmap_restore(slv->dmap, &rhs);CHKERRQ(ierr);
