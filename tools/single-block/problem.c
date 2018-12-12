@@ -384,19 +384,11 @@ double jsine_eps(double x, double y, double z)
 
 double jsine_eps_3d(double x, double y, double z)
 {
-    if (x > 0 && y >= 0 && z >= 0)
+    if ((x > 0 && y >= 0 && z >= 0) || (x <= 0 && y < 0 && z >= 0))
         return 3;
-    else if (x <= 0 && y >= 0 && z >= 0)
+    else if ((x <= 0 && y >= 0 && z >= 0) || (x > 0 && y < 0 && z >= 0))
         return 1;
-    else if (x <= 0 && y < 0 && z >= 0)
-        return 3;
-    else if (x > 0 && y < 0 && z >= 0)
-        return 1;
-    else if (x > 0 && y >= 0 && z < 0)
-        return 7;
-    else if (x <= 0 && y >= 0 && z < 0)
-        return 5;
-    else if (x <= 0 && y < 0 && z < 0)
+    else if ((x > 0 && y >= 0 && z < 0) || (x <= 0 && y < 0 && z < 0))
         return 7;
     else
         return 5;

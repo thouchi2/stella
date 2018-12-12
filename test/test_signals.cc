@@ -195,10 +195,14 @@ TEST(Signals, dcoef3D) {
 		for (j = 0; j < grd->len[1]; j++) {
 			for (i = 0; i < grd->len[0]; i++) {
 				ind = k*grd->len[0]*grd->len[1] + j*grd->len[0] + i;
-				if (grd->x[ind] <= 0)
-					dcoef[ind] = 5;
-				else
-					dcoef[ind] = 2;
+				if ((grd->x[ind] > 0 && grd->y[ind] >= 0 && grd->z[ind] >= 0) || (grd->x[ind] <= 0 && grd->y[ind] < 0 && grd->z[ind] >= 0))
+			        dcoef[ind] = 3;
+			    else if ((grd->x[ind] <= 0 && grd->y[ind] >= 0 && grd->z[ind] >= 0) || (grd->x[ind] > 0 && grd->y[ind] < 0 && grd->z[ind] >= 0))
+			        dcoef[ind] = 1;
+			    else if ((grd->x[ind] > 0 && grd->y[ind] >= 0 && grd->z[ind] < 0) || (grd->x[ind] <= 0 && grd->y[ind] < 0 && grd->z[ind] < 0))
+			        dcoef[ind] = 7;
+			    else
+			        dcoef[ind] = 5;
 			}
 		}
 	}
