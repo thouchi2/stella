@@ -110,25 +110,25 @@ static PetscErrorCode contribute_interface(stella *slv)
 					fym = 2.0*dcoef[j][i]*jump_y[j][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
 				else fym = 0;
 
-				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
-					fxp = 2.0*dcoef[j][i]*jump_x[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
-					fyp = 2.0*dcoef[j][i]*jump_y[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
-				}
-
-				if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
-					fxp = 2.0*dcoef[j][i]*jump_x[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
-					fym = 2.0*dcoef[j][i]*jump_y[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
-				}
-
-				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
-					fxm = 2.0*dcoef[j][i]*jump_x[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
-					fyp = 2.0*dcoef[j][i]*jump_y[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
-				}
-
-				if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
-					fxm = 2.0*dcoef[j][i]*jump_x[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
-					fym = 2.0*dcoef[j][i]*jump_y[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
-				}
+				// if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
+				// 	fxp = 2.0*dcoef[j][i]*jump_x[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+				// 	fyp = 2.0*dcoef[j][i]*jump_y[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+				// }
+				//
+				// if ((i != ngx-1) && (dcoef[j][i] != dcoef[j][i+1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
+				// 	fxp = 2.0*dcoef[j][i]*jump_x[j][i-1] / (dcoef[j][i] + dcoef[j][i+1]) / (x_s[j][i]+x_s[j][i+1]);
+				// 	fym = 2.0*dcoef[j][i]*jump_y[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+				// }
+				//
+				// if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != ngy-1) && (dcoef[j][i] != dcoef[j+1][i])){
+				// 	fxm = 2.0*dcoef[j][i]*jump_x[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+				// 	fyp = 2.0*dcoef[j][i]*jump_y[j-1][i] / (dcoef[j][i] + dcoef[j+1][i]) / (y_t[j][i]+y_t[j+1][i]);
+				// }
+				//
+				// if ((i != 0) && (dcoef[j][i] != dcoef[j][i-1]) && (j != 0) && (dcoef[j][i] != dcoef[j-1][i])){
+				// 	fxm = 2.0*dcoef[j][i]*jump_x[j][i+1] / (dcoef[j][i] + dcoef[j][i-1]) / (x_s[j][i]+x_s[j][i-1]);
+				// 	fym = 2.0*dcoef[j][i]*jump_y[j+1][i] / (dcoef[j][i] + dcoef[j-1][i]) / (y_t[j][i]+y_t[j-1][i]);
+				// }
 
 				bvec[j][i] = rhs[j][i] - fxp - fxm - fyp - fym;
 			}
@@ -170,30 +170,24 @@ static PetscErrorCode contribute_interface(stella *slv)
 		for (k = zs; k < zs + zm; k++) {
 			for (j = ys; j < ys + ym; j++) {
 				for (i = xs; i < xs + xm; i++) {
-					int ip = smallerValue(i, i+1, dcoef[k][j][i], dcoef[k][j][i+1]);
-					int im = smallerValue(i, i-1, dcoef[k][j][i], dcoef[k][j][i-1]);
-					int jp = smallerValue(j, j+1, dcoef[k][j][i], dcoef[k][j+1][i]);
-					int jm = smallerValue(j, j-1, dcoef[k][j][i], dcoef[k][j-1][i]);
-					int kp = smallerValue(k, k+1, dcoef[k][j][i], dcoef[k+1][j][i]);
-					int km = smallerValue(k, k-1, dcoef[k][j][i], dcoef[k-1][j][i]);
 
 					if ((i != ngx-1) && (dcoef[k][j][i] != dcoef[k][j][i+1]))
-						fxp = 2.0*dcoef[k][j][i]*jump_x[k][j][ip] / (dcoef[k][j][i] + dcoef[k][j][i+1]) / (x_r[k][j][i]+x_r[k][j][i+1]);
+						fxp = 2.0*dcoef[k][j][i]*jump_x[k][j][i] / (dcoef[k][j][i] + dcoef[k][j][i+1]) / (x_r[k][j][i]+x_r[k][j][i+1]);
 					else fxp = 0;
 					if ((i != 0) && (dcoef[k][j][i] != dcoef[k][j][i-1]))
-						fxm = 2.0*dcoef[k][j][i]*jump_x[k][j][im] / (dcoef[k][j][i] + dcoef[k][j][i-1]) / (x_r[k][j][i]+x_r[k][j][i-1]);
+						fxm = 2.0*dcoef[k][j][i]*jump_x[k][j][i] / (dcoef[k][j][i] + dcoef[k][j][i-1]) / (x_r[k][j][i]+x_r[k][j][i-1]);
 					else fxm = 0;
 					if ((j != ngy-1) && (dcoef[k][j][i] != dcoef[k][j+1][i]))
-						fyp = 2.0*dcoef[k][j][i]*jump_y[k][jp][i] / (dcoef[k][j][i] + dcoef[k][j+1][i]) / (y_s[k][j][i]+y_s[k][j+1][i]);
+						fyp = 2.0*dcoef[k][j][i]*jump_y[k][j][i] / (dcoef[k][j][i] + dcoef[k][j+1][i]) / (y_s[k][j][i]+y_s[k][j+1][i]);
 					else fyp = 0;
 					if ((j != 0) && (dcoef[k][j][i] != dcoef[k][j-1][i]))
-						fym = 2.0*dcoef[k][j][i]*jump_y[k][jm][i] / (dcoef[k][j][i] + dcoef[k][j-1][i]) / (y_s[k][j][i]+y_s[k][j-1][i]);
+						fym = 2.0*dcoef[k][j][i]*jump_y[k][j][i] / (dcoef[k][j][i] + dcoef[k][j-1][i]) / (y_s[k][j][i]+y_s[k][j-1][i]);
 					else fym = 0;
 					if ((k != ngz-1) && (dcoef[k][j][i] != dcoef[k+1][j][i]))
-						fzp = 2.0*dcoef[k][j][i]*jump_z[kp][j][i] / (dcoef[k][j][i] + dcoef[k+1][j][i]) / (z_t[k][j][i]+z_t[k+1][j][i]);
+						fzp = 2.0*dcoef[k][j][i]*jump_z[k][j][i] / (dcoef[k][j][i] + dcoef[k+1][j][i]) / (z_t[k][j][i]+z_t[k+1][j][i]);
 					else fzp = 0;
 					if ((k != 0) && (dcoef[k][j][i] != dcoef[k-1][j][i]))
-						fzm = 2.0*dcoef[k][j][i]*jump_z[km][j][i] / (dcoef[k][j][i] + dcoef[k-1][j][i]) / (z_t[k][j][i]+z_t[k-1][j][i]);
+						fzm = 2.0*dcoef[k][j][i]*jump_z[k][j][i] / (dcoef[k][j][i] + dcoef[k-1][j][i]) / (z_t[k][j][i]+z_t[k-1][j][i]);
 					else fzm = 0;
 
 

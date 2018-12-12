@@ -281,9 +281,50 @@ double jump_sin_rhs(double x, double y, double z)
 double jump_sin_sol(double x, double y, double z)
 {
     if (x <= 0)
-	   return sin(M_PI*x)*sin(2*M_PI*y);
+        return sin(M_PI*x)*sin(2*M_PI*y);
     else
         return sin(2*M_PI*x)*sin(2*M_PI*y);
+}
+
+double jump_sin_rhs_3d(double x, double y, double z)
+{
+    if (x > 0 && y >= 0 && z >= 0)
+	   return -27*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (x <= 0 && y >= 0 && z >= 0)
+        return -6*(M_PI*M_PI)*sin(M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (x <= 0 && y < 0 && z >= 0)
+        return -9*(M_PI*M_PI)*sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
+    else if (x > 0 && y < 0 && z >= 0)
+        return -6*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (x > 0 && y >= 0 && z < 0)
+        return -84*(M_PI*M_PI)*sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
+    else if (x <= 0 && y >= 0 && z < 0)
+        return -40*(M_PI*M_PI)*sin(M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
+    else if (x <= 0 && y < 0 && z < 0)
+        return -42*(M_PI*M_PI)*sin(M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
+    else
+        return -40*(M_PI*M_PI)*sin(2*M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
+}
+
+
+double jump_sin_sol_3d(double x, double y, double z)
+{
+    if (x > 0 && y >= 0 && z >= 0)
+	   return sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (x <= 0 && y >= 0 && z >= 0)
+        return sin(M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (x <= 0 && y < 0 && z >= 0)
+        return sin(M_PI*x)*sin(M_PI*y)*sin(M_PI*z);
+    else if (x > 0 && y < 0 && z >= 0)
+        return sin(2*M_PI*x)*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (x > 0 && y >= 0 && z < 0)
+        return sin(2*M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
+    else if (x <= 0 && y >= 0 && z < 0)
+        return sin(M_PI*x)*sin(2*M_PI*y)*sin(2*M_PI*z);
+    else if (x <= 0 && y < 0 && z < 0)
+        return sin(M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
+    else
+        return sin(2*M_PI*x)*sin(M_PI*y)*sin(2*M_PI*z);
 }
 
 double eps(double x, double y, double z)
@@ -349,9 +390,65 @@ double jsine_eps(double x, double y, double z)
         return 2;
 }
 
+double jsine_eps_3d(double x, double y, double z)
+{
+    if (x > 0 && y >= 0 && z >= 0)
+        return 3;
+    else if (x <= 0 && y >= 0 && z >= 0)
+        return 1;
+    else if (x <= 0 && y < 0 && z >= 0)
+        return 3;
+    else if (x > 0 && y < 0 && z >= 0)
+        return 1;
+    else if (x > 0 && y >= 0 && z < 0)
+        return 7;
+    else if (x <= 0 && y >= 0 && z < 0)
+        return 5;
+    else if (x <= 0 && y < 0 && z < 0)
+        return 7;
+    else
+        return 5;
+}
+
 double jsine_jc(double x, double y, double z)
 {
     return -sin(2*M_PI*y)*M_PI;
+}
+
+double jsine_jc_x_3d(double x, double y, double z)
+{
+    if (y >= 0 && z >= 0)
+        return 5*M_PI*sin(2*M_PI*y)*sin(M_PI*z);
+    else if (y < 0 && z >= 0)
+        return -M_PI*sin(M_PI*y)*sin(M_PI*z);
+    else if (y >= 0 && z < 0)
+        return 9*M_PI*sin(2*M_PI*y)*sin(2*M_PI*z);
+    else
+        return 3*M_PI*sin(M_PI*y)*sin(2*M_PI*z);
+}
+
+double jsine_jc_y_3d(double x, double y, double z)
+{
+    if (x > 0 && z >= 0)
+        return 5*M_PI*sin(2*M_PI*x)*sin(M_PI*z);
+    else if (x <= 0 && z >= 0)
+        return M_PI*sin(M_PI*x)*sin(M_PI*z);
+    else if (x > 0 && z < 0)
+        return 9*M_PI*sin(2*M_PI*x)*sin(2*M_PI*z);
+    else
+        return -3*M_PI*sin(M_PI*x)*sin(2*M_PI*z);
+}
+
+double jsine_jc_z_3d(double x, double y, double z)
+{
+    if (x > 0 && y >= 0)
+        return -11*M_PI*sin(2*M_PI*x)*sin(2*M_PI*y);
+    else if (x > 0 && y < 0)
+        return -9*M_PI*sin(2*M_PI*x)*sin(M_PI*y);
+    else if (x <= 0 && y >= 0)
+        return -9*M_PI*sin(M_PI*x)*sin(2*M_PI*y);
+    else
+        return -11*M_PI*sin(M_PI*x)*sin(M_PI*y);
 }
 
 
@@ -628,6 +725,12 @@ problem *problem_create(problem_id id, int nd, int map_id)
     	pb->boundary[EAST] =  DIRICHLET;
     	pb->boundary[WEST] =  DIRICHLET;
     	if (nd == 3) {
+            pb->rhs = &jump_sin_rhs_3d;
+        	pb->sol = &jump_sin_sol_3d;
+            pb->eps = &jsine_eps_3d;
+            pb->jc[0] = &jsine_jc_x_3d;
+            pb->jc[1] = &jsine_jc_y_3d;
+            pb->jc[2] = &jsine_jc_z_3d;
     		pb->boundary[FRONT] =  DIRICHLET;
     		pb->boundary[BACK] =  DIRICHLET;
     	}
